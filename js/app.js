@@ -58,6 +58,7 @@
   let horizon = 'A';
   let quiz = null; // { n, qs, i, score, picked, order }
   let glossQuery = '';
+  let searchQuery = '';
   let rec = store.get('rec', null) || { plots: [], entries: [] };
   const saveRec = () => store.set('rec', rec);
   /* change the records, and undo the change if the browser cannot store it */
@@ -180,11 +181,11 @@
   const TOOL_KEYS = { tekstur: 'tTexture', ph: 'tPh', cerun: 'tSlope', tanda: 'tDef', baja: 'tFert' };
 
   /* ---------- lesson blocks ---------- */
-  function block(b) {
+  function block(b, i) {
     const [kind, v] = b;
     switch (kind) {
       case 'p': return `<p>${rich(v)}</p>`;
-      case 'h': return `<h2>${rich(v)}</h2>`;
+      case 'h': return `<h2 id="s${i}" tabindex="-1">${rich(v)}</h2>`;
       case 'ul': return `<ul>${v.map(x => `<li>${rich(x)}</li>`).join('')}</ul>`;
       case 'steps': return `<ol class="steps">${v.map(x => `<li>${rich(x)}</li>`).join('')}</ol>`;
       case 'note': return `<p class="note">${rich(v)}</p>`;
@@ -206,6 +207,8 @@
     return `<section class="hero">
       <h1>${esc(t('appName'))}</h1>
       <p class="lede">${esc(t('tagline'))}</p>
+      <label class="searchbox">${esc(t('searchGuide'))}<input type="search" id="sq" value="${esc(searchQuery)}" autocomplete="off" placeholder="${esc(t('searchHint'))}"></label>
+      <div id="sresults" aria-live="polite">${searchResults()}</div>
     </section>
     <section>
       <h2 class="sec">${esc(t('tasksTitle'))}</h2>
@@ -244,7 +247,7 @@
     return `<article class="lesson">
       ${unitHead(u, tr(L.title))}
       ${L.book ? `<p class="hint bookref">${esc(t('bookRef'))} ${L.book}</p>` : ''}
-      ${L.body.map(block).join('')}
+      ${L.body.map((b, i) => block(b, i)).join('')}
       <div class="lesson-end">
         <button type="button" class="btn ${isDone ? 'is-done' : ''}" data-done="${id}" aria-pressed="${isDone}">${isDone ? '✓ ' + esc(t('markedDone')) : esc(t('markDone'))}</button>
         <a class="btn ghost" href="#/kuiz/${u.n}">${esc(t('takeQuiz'))}</a>
@@ -908,6 +911,113 @@
     </section>`;
   }
 
+
+  /* ----- search across the guide ----- */
+  /* plain text of a lesson block in one language */
+  function blockText(b, i) {
+    const pick = x => (typeof x === 'string' ? x : Array.isArray(x) ? (x[i] === undefined ? x[EN] : x[i]) : '');
+    const [kind, v] = b;
+    if (kind === 'p' || kind === 'note' || kind === 'case' || kind === 'formula') return pick(v);
+    if (kind === 'ul' || kind === 'steps') return v.map(pick).join(' ');
+    if (kind === 'ex') return pick(v.title) + ' ' + v.steps.map(pick).join(' ');
+    if (kind === 'table') return v.head.map(pick).join(' ') + ' ' + v.rows.map(r => r.map(pick).join(' ')).join(' ');
+    return '';
+  }
+  const plain = x => String(x).replace(/\*\*/g, '');
+  /* Each entry keeps its text in every language, so a word typed in one language finds
+     the section even while the app is showing another. Built once, on first search. */
+  let searchIndex = null;
+  function buildIndex() {
+    const all = fn => LANGS.map((l, i) => plain(fn(i)));
+    const idx = [];
+    for (const u of UNITS) {
+      for (const id of u.lessons) {
+        const L = LESSONS[id];
+        let head = null, start = 0;
+        const flush = end => {
+          const body = L.body.slice(start, end);
+          if (!body.length) return;
+          idx.push({ kind: 'sLesson', href: `nota/${id}` + (head === null ? '' : `/s${head}`),
+            title: all(i => (L.title[i] === undefined ? L.title[EN] : L.title[i])),
+            sub: head === null ? null : all(i => blockText(['p', L.body[head][1]], i)),
+            text: all(i => body.map(b => blockText(b, i)).join(' ')) });
+        };
+        L.body.forEach((b, i) => { if (b[0] === 'h') { flush(i); head = i; start = i + 1; } });
+        flush(L.body.length);
+      }
+      const a = ACTIVITIES[u.n];
+      idx.push({ kind: 'activity', href: `amali/${u.n}`, title: all(i => blockText(['p', a.title], i)), sub: null,
+        text: all(i => blockText(['p', a.need], i) + ' ' + a.steps.map(x => blockText(['p', x], i)).join(' ')) });
+    }
+    for (const k of TOOLS) {
+      idx.push({ kind: 'sTool', href: `alat/${k}`, title: all(i => blockText(['p', UI[TOOL_KEYS[k]]], i)), sub: null,
+        text: all(i => blockText(['p', UI[TOOL_KEYS[k] + 'Desc']], i)) });
+    }
+    idx.push({ kind: 'navRecords', href: 'rekod', title: all(i => blockText(['p', UI.navRecords], i)), sub: null, text: all(i => blockText(['p', UI.recIntro], i)) });
+    for (const g of GLOSSARY) {
+      idx.push({ kind: 'sGloss', href: 'istilah/' + encodeURIComponent(g[0][li()] || g[0][EN]), termOf: g,
+        title: all(i => g[0][i] || g[0][EN]), sub: null, text: all(i => g[1][i] || g[1][EN]) });
+    }
+    for (const e of idx) e.hay = { title: e.title.join(' \n ').toLowerCase(), sub: e.sub ? e.sub.join(' \n ').toLowerCase() : '', text: e.text.join(' \n ').toLowerCase() };
+    return idx;
+  }
+  /* the query word plus every other spelling or language it is known by */
+  function variants(word) {
+    const out = new Set([word]);
+    for (const group of SEARCH_ALIASES) {
+      const g = group.map(x => x.toLowerCase());
+      if (g.some(x => x === word || (word.length >= 3 && x.startsWith(word)))) g.forEach(x => out.add(x));
+    }
+    return [...out];
+  }
+  function runSearch(query) {
+    const words = query.toLowerCase().split(/[\s,;，、]+/).filter(Boolean).slice(0, 6);
+    if (!words.length) return null;
+    if (!searchIndex) searchIndex = buildIndex();
+    const sets = words.map(variants);
+    const hits = [];
+    for (const e of searchIndex) {
+      let score = 0, ok = true;
+      for (const vs of sets) {
+        const inTitle = vs.some(v => e.hay.title.includes(v)), inSub = vs.some(v => e.hay.sub.includes(v)), inText = vs.some(v => e.hay.text.includes(v));
+        if (!inTitle && !inSub && !inText) { ok = false; break; }
+        score += (inTitle ? 6 : 0) + (inSub ? 4 : 0) + (inText ? 1 : 0);
+      }
+      if (ok) hits.push({ e, score: score + (e.kind === 'sTool' ? 2 : 0) });
+    }
+    hits.sort((a, b) => b.score - a.score);
+    return { hits: hits.slice(0, 15), total: hits.length, terms: [...new Set(sets.flat())] };
+  }
+  /* a short explanation: the sentence around the first match, in the language on screen */
+  function snippet(text, terms) {
+    const low = text.toLowerCase();
+    let at = -1;
+    for (const term of terms) { const i = low.indexOf(term); if (i !== -1 && (at === -1 || i < at)) at = i; }
+    let start = 0;
+    if (at > 60) { const cut = Math.max(text.lastIndexOf('. ', at), text.lastIndexOf('。', at)); start = cut !== -1 && at - cut < 160 ? cut + 1 : at - 60; }
+    let out = text.slice(start, start + 170).trim();
+    if (start > 0) out = '… ' + out;
+    if (start + 170 < text.length) out += ' …';
+    return out;
+  }
+  function highlight(text, terms) {
+    let html = esc(text);
+    const safe = terms.filter(x => x.length >= 2).sort((a, b) => b.length - a.length).map(x => esc(x).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    if (safe.length) html = html.replace(new RegExp('(' + safe.join('|') + ')', 'gi'), '<mark>$1</mark>');
+    return html;
+  }
+  function searchResults() {
+    const res = runSearch(searchQuery);
+    if (!res) return '';
+    if (!res.hits.length) return `<p class="empty">${esc(t('noResults'))}</p>`;
+    const i = li();
+    return `<p class="hint">${res.total} ${esc(t('resultsCount'))}</p><ul class="results">${res.hits.map(({ e }) => {
+      const href = e.termOf ? 'istilah/' + encodeURIComponent(e.termOf[0][i] || e.termOf[0][EN]) : e.href;
+      const title = e.title[i] + (e.sub ? ' › ' + e.sub[i] : '');
+      return `<li><a href="#/${esc(href)}"><small>${esc(t(e.kind))}</small><b>${highlight(title, res.terms)}</b><span>${highlight(snippet(e.text[i], res.terms), res.terms)}</span></a></li>`;
+    }).join('')}</ul>`;
+  }
+
   /* ---------- router ---------- */
   const parse = () => location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
   function render(keepScroll) {
@@ -920,10 +1030,14 @@
       r[0] === 'kuiz' ? pageQuiz(r[1]) :
       r[0] === 'alat' ? pageTools(r[1]) :
       r[0] === 'rekod' ? (r[1] ? pagePlot(r[1]) : pageRecords()) :
-      r[0] === 'istilah' ? pageGlossary() :
+      r[0] === 'istilah' ? (r[1] !== undefined && (glossQuery = r[1].slice(0, 80)), pageGlossary()) :
       r[0] === 'buku' ? pageBook() :
       r[0] === 'sumber' ? pageSources() : pageHome();
     if (!keepScroll) window.scrollTo(0, 0);
+    if (!keepScroll && r[0] === 'nota' && /^s\d+$/.test(r[2] || '')) {
+      const target = document.getElementById(r[2]);
+      if (target) { target.scrollIntoView(); target.focus({ preventScroll: true }); }
+    }
   }
   window.addEventListener('hashchange', () => render(false));
 
@@ -993,6 +1107,7 @@
     if (el.id === 'r-ph') { ph = Number(el.value); document.getElementById('phout').innerHTML = phResult(); return; }
     if (el.dataset.slope) { slope[el.dataset.slope] = el.value; document.getElementById('slopeout').innerHTML = slopeResult(); return; }
     if (el.dataset.phx) { phx[el.dataset.phx] = el.value; document.getElementById('phout').innerHTML = phResult(); return; }
+    if (el.id === 'sq') { searchQuery = el.value; document.getElementById('sresults').innerHTML = searchResults(); return; }
     if (el.id === 'gq') { glossQuery = el.value; document.getElementById('glist').innerHTML = glossaryRows(); return; }
     if (el.dataset.f || el.dataset.g) {
       if (el.dataset.f) fert[el.dataset.f] = el.value;
