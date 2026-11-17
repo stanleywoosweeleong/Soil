@@ -13,7 +13,7 @@ const calc = require('../js/calc.js');
 const store = require('../js/store.js');
 
 /* the content files are plain scripts that declare constants; load them together and hand the constants back */
-const names = ['LANGS', 'UI', 'HORIZONS', 'UNITS', 'TASKS', 'LESSONS', 'ACTIVITIES', 'QUIZ', 'QUIZ_LESSON', 'DEFICIENCY', 'GLOSSARY', 'BOOK',
+const names = ['LANGS', 'LANG_ORDER', 'UI', 'HORIZONS', 'UNITS', 'TASKS', 'LESSONS', 'ACTIVITIES', 'QUIZ', 'QUIZ_LESSON', 'DEFICIENCY', 'GLOSSARY', 'BOOK',
   'PRODUCTS', 'COMPOUND_PRESETS', 'ORGANIC_PRESETS', 'TEXTURE', 'TEXTURE_NOTE', 'TEXTURE_POLY', 'TEXTURE_GROUP', 'PH_BANDS', 'CROP_PH', 'SLOPE_PALM', 'SLOPE_DO', 'SOURCES', 'SEARCH_ALIASES'];
 const ctx = vm.createContext({});
 vm.runInContext(['content', 'units', 'crops', 'records'].map(f => read(`js/${f}.js`)).join('\n') + `\n;globalThis.__c = { ${names.join(', ')} };`, ctx);
@@ -305,7 +305,9 @@ test('the service worker clears only this app\'s old caches and reads only its o
 
 test('the page offers the new version and asks for a language on first launch', () => {
   for (const id of ['toast', 'toastgo', 'toastx', 'langpick']) assert.ok(html.includes(`id="${id}"`), id);
-  assert.deepStrictEqual([...html.matchAll(/data-langpick="(\w+)"/g)].map(m => m[1]), ['ms', 'en', 'zh']);
+  assert.deepStrictEqual([...html.matchAll(/data-langpick="(\w+)"/g)].map(m => m[1]), ['en', 'zh', 'ms'], 'picker order');
+  assert.strictEqual(C.LANG_ORDER.join(','), 'en,zh,ms', 'header order');
+  assert.strictEqual([...C.LANG_ORDER].sort().join(','), C.LANGS.map(l => l.code).sort().join(','), 'every language is offered');
   assert.ok(/postMessage\('check'\)/.test(app) && /e\.data === 'updated'/.test(app));
   const css = read('css/styles.css');
   assert.ok(css.includes('.toast[hidden] { display: none; }') && css.includes('#langpick[hidden] { display: none; }'), 'hidden wins over display:flex');

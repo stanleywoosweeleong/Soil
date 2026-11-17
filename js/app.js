@@ -24,10 +24,10 @@
 
   /* ---------- language ---------- */
   /* The language is whatever the user last chose. With nothing valid saved this is a first launch:
-     the picker is shown and Malay renders behind it. */
+     the picker is shown and the first language in the display order renders behind it. */
   const isLang = code => LANGS.some(l => l.code === code);
   const FIRST_LAUNCH = !isLang(store.get('lang', null));
-  let lang = FIRST_LAUNCH ? 'ms' : store.get('lang', null);
+  let lang = FIRST_LAUNCH ? LANG_ORDER[0] : store.get('lang', null);
   /* the one place a language is set; it is saved even when it equals the current one */
   function setLang(code) {
     if (!isLang(code)) return false;
@@ -125,7 +125,7 @@
       `<a href="#/${r}" ${top === r ? 'aria-current="page"' : ''}>${icon(ic)}<span>${esc(t(key))}</span></a>`).join('');
     const lg = document.getElementById('lang');
     lg.setAttribute('aria-label', t('language'));
-    lg.innerHTML = LANGS.map(l =>
+    lg.innerHTML = LANG_ORDER.map(code => LANGS.find(l => l.code === code)).map(l =>
       `<button type="button" data-lang="${l.code}" lang="${l.html}" aria-pressed="${l.code === lang}" title="${esc(l.name)}">${esc(l.label)}</button>`).join('');
     document.getElementById('foot').textContent = t('disclaimer');
     document.getElementById('toastmsg').textContent = t('toastMsg');

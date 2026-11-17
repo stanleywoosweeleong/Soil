@@ -9,6 +9,10 @@ const LANGS = [
   { code: 'zh', label: '中文', name: '中文', html: 'zh-Hans' },
 ];
 
+/* The order languages are offered in, in the header and on the first-launch picker.
+   Kept apart from LANGS, whose order fixes the position of each translation in a tuple. */
+const LANG_ORDER = ['en', 'zh', 'ms'];
+
 /* ---------- Interface strings ---------- */
 const UI = {
   appName: ['Sains Tanah', 'Soil Science', '土壤科学'],
