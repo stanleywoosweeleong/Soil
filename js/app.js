@@ -84,7 +84,7 @@
     mode: 'straight', area: 1, unit: 'ha',
     n: 100, p: 40, k: 60, pn: 'urea', pp: 'tsp', pk: 'mop',
     g: [15, 15, 15], basis: 'n', crate: 60,
-    need: 20, pct: 60, plants: 300, pnut: 'k',
+    need: 20, pct: 60, plants: 300, pnut: 'k', tprice: '',
     bag: 50, bg: [15, 15, 15], price: '',
     trate: 4.5, tapps: 4, ttrees: 100,
   }, store.get('fert', null) || {});
@@ -552,7 +552,8 @@
         ${numIn(esc(t('plants')), 'plants', '', true)}</div>`;
     }
     if (fert.mode === 'tree') {
-      return `<div class="row2">${numIn(esc(t('treeRate')), 'trate')}${numIn(esc(t('apps')), 'tapps', '', true)}</div>${numIn(esc(t('trees')), 'ttrees', '', true)}`;
+      return `<div class="row2">${numIn(esc(t('treeRate')), 'trate')}${numIn(esc(t('apps')), 'tapps', '', true)}</div>
+        <div class="row2">${numIn(esc(t('trees')), 'ttrees', '', true)}${numIn(esc(t('bagPrice')), 'tprice')}</div>`;
     }
     return `<div class="row2">${numIn(esc(t('bagWeight')), 'bag')}${numIn(esc(t('price')), 'price')}</div>` + gradeFields('bg') +
       `<p class="label">${esc(t('organicPresets'))}</p><div class="presets">${ORGANIC_PRESETS.map(o => `<button type="button" data-preset="bg:${o.g.join('-')}">${esc(tr(o.name))}</button>`).join('')}</div>`;
@@ -614,17 +615,21 @@
       if (rate <= 0 || !isCount(fert.tapps) || !isCount(fert.ttrees)) return empty;
       const apps = Number(fert.tapps), n = Number(fert.ttrees);
       const each = rate / apps, round = each * n, year = rate * n;
+      const price = Number(fert.tprice);
+      const cost = String(fert.tprice).trim() !== '' && Number.isFinite(price) && price >= 0 ? year / 50 * price : null;
       return `<h2>${esc(t('result'))}</h2>
         <ul class="res">
           <li><span>${esc(t('perApp'))}</span><b>${kg(each)}</b></li>
           <li><span>${esc(t('perRound'))}</span><b>${kg(round)}</b><small>${bags(round)}</small></li>
           <li><span>${esc(t('perYear'))}</span><b>${kg(year)}</b><small>${bags(year)}</small></li>
+          ${cost === null ? '' : `<li><span>${esc(t('costRound'))}</span><b>RM ${fmt(cost / apps)}</b></li>
+          <li><span>${esc(t('costYear'))}</span><b>RM ${fmt(cost)}</b><small>RM ${fmt(cost / n)} ${esc(t('perPlant'))}</small></li>`}
         </ul>
         ${work([
           `${fmt(rate)} kg ÷ ${fmt(apps)} ${massExact(each) && isExact(rate) ? '=' : '≈'} ${kg(each)}`,
           `${kg(each)} × ${fmt(n)} ${massExact(round) && massExact(each) ? '=' : '≈'} ${kg(round)}`,
           `${fmt(rate)} kg × ${fmt(n)} ${massExact(year) && isExact(rate) ? '=' : '≈'} ${kg(year)}`,
-        ])}`;
+        ].concat(cost === null ? [] : [`${fmt(year)} kg ÷ 50 × RM ${fmt(price)} ${eq(cost, year, price)} RM ${fmt(cost)}`]))}`;
     }
     const w = Number(fert.bag) || 0;
     const g = fert.bg.map(v => Number(v) || 0);

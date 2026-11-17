@@ -44,6 +44,9 @@ Object.assign(UI, {
   countBad: ['Bilangan pemberian dan bilangan pokok mestilah nombor bulat, 1 atau lebih.', 'Applications and plant counts must be whole numbers of 1 or more.', '施肥次数和株数必须是 1 或以上的整数。'],
   themeLight: ['Tukar ke mod cerah', 'Switch to light mode', '切换到浅色模式'],
   themeDark: ['Tukar ke mod gelap', 'Switch to dark mode', '切换到深色模式'],
+  bagPrice: ['Harga sebeg 50 kg (RM), pilihan', 'Price per 50 kg bag (RM), optional', '每包 50 公斤的价格（RM），可不填'],
+  costYear: ['Kos setahun', 'Cost per year', '每年成本'],
+  costRound: ['Kos setiap pemberian', 'Cost per application', '每次成本'],
   toastMsg: ['Versi baharu sudah sedia', 'A new version is ready', '新版本已就绪'],
   toastGo: ['Muat semula', 'Refresh', '刷新'],
   toastClose: ['Tutup', 'Dismiss', '关闭'],
@@ -111,6 +114,22 @@ const SEARCH_ALIASES = [
   ['rekod', 'records', 'record', 'log', '记录'],
   ['kira', 'pengiraan', 'kalkulator', 'calculate', 'calculation', 'calculator', '计算'],
   ['bris', 'bekas lombong', 'tin tailings', '锡矿尾砂'],
+  ['lom', 'loam', '壤土'],
+  ['zarah', 'kumin', 'particle', 'particles', '颗粒'],
+  ['berbutir', 'butir rapuh', 'granular', 'crumb', '粒状'],
+  ['gumpal', 'berblok', 'blocky', '块状'],
+  ['berkeping', 'berlapis', 'platy', '片状'],
+  ['luluhawa', 'luluh hawa', 'weathering', '风化'],
+  ['makronutrien', 'nutrien makro', 'macronutrient', '大量元素'],
+  ['mikronutrien', 'nutrien mikro', 'micronutrient', '微量元素'],
+  ['pembajakan', 'pemugaran', 'tillage', 'ploughing', 'plowing', '耕作', '翻耕'],
+  ['pengairan', 'irrigation', 'watering', '灌溉'],
+  ['penyaliran', 'saliran'],
+  ['fpj', 'fermented plant juice', 'jus tumbuhan tertapai', '发酵植物汁'],
+  ['ffj', 'fermented fruit juice', 'jus buah tertapai', '发酵果汁'],
+  ['faa', 'fish amino acid', 'asid amino ikan', '鱼氨基酸'],
+  ['cap', 'calcium phosphate', 'kalsium fosfat', '磷酸钙'],
+  ['kos', 'cost', 'price', 'harga', '成本', '价格'],
 ];
 
 /* ---------- Nutrient and cost summary, field readiness, quiz review ---------- */
@@ -153,10 +172,10 @@ Object.assign(UI, {
 /* the lesson each quiz question draws on, in question order */
 const QUIZ_LESSON = {
   1: ['1-1', '1-2', '1-1', '1-2', '1-1'],
-  2: ['2-1', '2-1', '2-2', '2-3', '2-4', '2-4'],
+  2: ['2-1', '2-1', '2-2', '2-3', '2-4', '2-4', '2-1'],
   3: ['3-2', '3-2', '3-1', '3-2', '3-4', '3-4'],
   4: ['4-1', '4-1', '4-2', '4-2', '4-2'],
-  5: ['5-1', '5-1', '5-2', '5-2', '5-3', '5-4'],
-  6: ['6-1', '6-1', '6-4', '6-2', '6-3'],
+  5: ['5-1', '5-1', '5-2', '5-2', '5-3', '5-4', '5-5'],
+  6: ['6-1', '6-1', '6-4', '6-2', '6-3', '6-5', '6-2'],
   7: ['7-1', '7-1', '7-2', '7-3', '7-4', '7-2'],
 };

@@ -90,6 +90,9 @@ const LESSONS = {
       ] }],
     ['src', { s: 'USDA NRCS, Soil Texture Calculator', u: 'https://www.nrcs.usda.gov/resources/data-and-reports/soil-texture-calculator',
       a: ['Had saiz dan kelas tekstur USDA, digunakan di seluruh dunia.', 'USDA size limits and texture classes, used worldwide.', 'USDA 的粒径界限和质地分类，全球通用。'] }],
+    ['p', ['USDA membahagikan pasir kepada lima saiz: sangat kasar (1.0 – 2.0 mm), kasar (0.5 – 1.0 mm), sederhana (0.25 – 0.5 mm), halus (0.10 – 0.25 mm) dan sangat halus (0.05 – 0.10 mm). Dalam bahasa Melayu, lom juga ditulis “loam”, dan zarah tanah juga dipanggil “kumin”.',
+           'The USDA divides sand into five sizes: very coarse (1.0 – 2.0 mm), coarse (0.5 – 1.0 mm), medium (0.25 – 0.5 mm), fine (0.10 – 0.25 mm) and very fine (0.05 – 0.10 mm). In Malay, loam is written “lom” or “loam”, and soil particles are also called “kumin”.',
+           'USDA 把砂粒分为五级：极粗（1.0 – 2.0 毫米）、粗（0.5 – 1.0 毫米）、中（0.25 – 0.5 毫米）、细（0.10 – 0.25 毫米）和极细（0.05 – 0.10 毫米）。马来文中壤土写作“lom”或“loam”，土壤颗粒也称“kumin”。']],
     ['h', ['Kecenderungan umum', 'General tendencies', '一般倾向']],
     ['table', { head: [['Sifat', 'Property', '性质'], ['Berpasir', 'Sandy', '砂质'], ['Lom', 'Loam', '壤土'], ['Liat', 'Clayey', '黏质']],
       rows: [
@@ -111,6 +114,23 @@ const LESSONS = {
            '**Loam** is a balanced mix, so it combines good drainage with enough water and nutrient holding. The USDA divides texture into 12 classes.',
            '**壤土**是比例均衡的混合土，兼具良好的排水性和足够的保水保肥力。USDA 把质地分为 12 个类别。']],
     ['tool', 'tekstur'],
+    ['h', ['Membaca segi tiga dengan tangan', 'Reading the triangle by hand', '手工查读三角图']],
+    ['p', ['Setiap sisi segi tiga ialah satu skala dari 0 hingga 100%. Tiga garisan, satu bagi setiap pecahan, bertemu di dalam satu kelas.',
+           'Each side of the triangle is a scale from 0 to 100%. Three lines, one for each fraction, meet inside one class.',
+           '三角形的每条边都是 0 至 100% 的刻度。三条线（每种粒级一条）在某一类别内相交。']],
+    ['steps', [
+      ['**Liat**: cari peratus liat pada sisi kiri dan ikut garisan mendatar ke kanan.', '**Clay**: find the clay percentage on the left side and follow the horizontal line to the right.', '**黏粒**：在左边找到黏粒百分比，沿水平线向右。'],
+      ['**Kelodak**: cari peratus kelodak pada sisi kanan dan ikut garisan yang menurun ke kiri.', '**Silt**: find the silt percentage on the right side and follow the line that runs down to the left.', '**粉粒**：在右边找到粉粒百分比，沿向左下方的斜线走。'],
+      ['**Pasir**: cari peratus pasir pada tapak dan ikut garisan yang menaik ke kiri.', '**Sand**: find the sand percentage on the base and follow the line that runs up to the left.', '**砂粒**：在底边找到砂粒百分比，沿向左上方的斜线走。'],
+      ['Baca nama kelas di tempat tiga garisan itu bertemu. Dua garisan sudah memadai; yang ketiga mengesahkan.', 'Read the class name where the three lines meet. Two lines are enough; the third confirms.', '读出三线交点所在的类别名称。两条线已足够，第三条用于验证。'],
+    ]],
+    ['ex', { title: ['Contoh', 'Example', '例题'], steps: [
+      ['Pasir 66%, kelodak 20%, liat 14%.', 'Sand 66%, silt 20%, clay 14%.', '砂粒 66%、粉粒 20%、黏粒 14%。'],
+      ['Ketiga-tiga garisan bertemu dalam kelas **lom berpasir**.', 'The three lines meet in the **sandy loam** class.', '三条线相交于**砂质壤土**类别。'],
+      ['Ia bukan lom liat berpasir, kerana kelas itu memerlukan sekurang-kurangnya 20% liat.', 'It is not sandy clay loam, because that class needs at least 20% clay.', '它不是砂质黏壤土，因为该类别要求黏粒至少 20%。'],
+    ] }],
+    ['src', { s: 'USDA NRCS, Soil Texture Calculator; University of Nebraska–Lincoln, Soil Texture', u: 'https://passel2.unl.edu/view/lesson/0cff7943f577/2',
+      a: ['Segi tiga tekstur USDA.', 'The USDA texture triangle.', 'USDA 质地三角图。'] }],
   ] },
 
   '2-2': { book: '1.2.1', title: ['Struktur', 'Structure', '结构'], body: [
@@ -118,6 +138,9 @@ const LESSONS = {
            'Soil structure is the way particles bind into clumps called aggregates. Unlike texture, structure can be improved or ruined in a single season.',
            '土壤结构是指颗粒结合成团块（团聚体）的方式。与质地不同，结构在一个季节内就可能被改善或破坏。']],
     ['fig', 'structure'],
+    ['p', ['Nama lain dalam bahasa Melayu: berbutir juga dipanggil “butir rapuh”, gumpal juga “berblok”, dan berkeping juga “berlapis”.',
+           'Other Malay names you may meet: granular is also called “butir rapuh”, blocky “berblok”, and platy “berlapis”.',
+           '马来文中的其他叫法：粒状又称“butir rapuh”，块状又称“berblok”，片状又称“berlapis”。']],
     ['table', { head: [['Jenis', 'Type', '类型'], ['Bentuk', 'Shape', '形状'], ['Biasa ditemui', 'Usually found', '常见位置']],
       rows: [
         [['Berbutir', 'Granular', '粒状'], ['Agregat kecil dan bulat', 'Small, rounded aggregates', '细小的圆形团聚体'], ['Tanah atas', 'Topsoil', '表土']],
@@ -158,6 +181,21 @@ const LESSONS = {
       ['**Tanah bertekstur sederhana** seperti lom berkelodak lazimnya mempunyai air tersedia paling tinggi.', '**Medium-textured soil** such as silt loam generally has the most available water.', '**中等质地的土壤**（如粉质壤土）通常有效水最多。'],
       ['**Tanah liat** memegang banyak air, tetapi sebahagian besarnya terikat kuat dan tidak tersedia.', '**Clay soil** holds a lot of water, but much of it is tightly held and unavailable.', '**黏质土**保水多，但其中很大一部分被紧紧吸附，无法利用。'],
     ]],
+    ['h', ['Cuba sendiri: pegangan air dan saliran', 'Try it: water holding and drainage', '动手试一试：保水与排水']],
+    ['p', ['Dua ujian ringkas ini membandingkan sampel tanah secara bersebelahan. Gunakan tanah kering, dan kuantiti tanah serta air yang sama bagi setiap sampel.',
+           'These two simple tests compare soil samples side by side. Use dry soil, and the same amount of soil and water for every sample.',
+           '这两个简单试验可把土样并排比较。使用干土，每个样本的土量和水量必须相同。']],
+    ['steps', [
+      ['Sediakan satu corong bagi setiap sampel, dilapik dengan kertas turas atau kain, di atas bekas penyukat. Botol plastik yang dipotong dan diterbalikkan boleh dijadikan corong.',
+       'Set up one funnel per sample, lined with filter paper or cloth, over a measuring container. A cut plastic bottle turned upside down works as a funnel.',
+       '每个样本准备一个漏斗，垫上滤纸或布，放在量杯上。把塑料瓶剪开倒置即可当漏斗。'],
+      ['Masukkan kuantiti tanah kering yang sama ke dalam setiap corong, contohnya secawan.', 'Put the same amount of dry soil in each funnel, for example one cup.', '在每个漏斗中放入等量的干土，例如一杯。'],
+      ['Tuang isi padu air yang sama ke atas setiap sampel pada masa yang sama, contohnya 200 ml, dan mulakan jam randik.', 'Pour the same volume of water on each sample at the same moment, for example 200 ml, and start a stopwatch.', '同时向每个样本倒入等量的水，例如 200 毫升，并开始计时。'],
+      ['**Saliran**: catat masa titisan pertama keluar dan masa titisan berhenti. Semakin singkat, semakin cepat saliran.', '**Drainage**: note when the first drip appears and when dripping stops. The shorter the time, the faster the drainage.', '**排水**：记录第一滴水出现和停止滴水的时间。时间越短，排水越快。'],
+      ['**Pegangan air**: sukat air yang terkumpul. Air yang dipegang oleh tanah ialah air yang dituang tolak air yang terkumpul.', '**Water holding**: measure the water collected. The water held by the soil is the water poured minus the water collected.', '**保水**：量出收集到的水。土壤保持的水量等于倒入的水量减去收集到的水量。'],
+    ]],
+    ['src', { s: 'Utah Agriculture in the Classroom, Perkin’ Through the Pores; USDA Agriculture in the Classroom', u: 'https://www.soils4teachers.org/files/s4t/lessons/perkin-through.pdf',
+      a: ['Perbandingan di dalam kelas, bukan ukuran makmal.', 'A classroom comparison, not a laboratory measurement.', '课堂上的比较试验，并非实验室测量。'] }],
     ['note', ['Petua pengairan: tanaman boleh menggunakan kira-kira separuh daripada air tersedia sebelum mula tertekan. Siram sebelum tanah kering sepenuhnya.',
               'Irrigation rule of thumb: crops can use about half of the available water before they start to suffer. Water before the soil dries right out.',
               '灌溉经验法则：作物大约用掉一半有效水之后就会开始受旱。应在土壤完全干透之前浇水。']],
@@ -610,6 +648,16 @@ const LESSONS = {
     ['p', ['Beg yang lebih murah tidak semestinya lebih jimat. Bandingkan kos bagi setiap kilogram nutrien: harga beg dibahagi dengan kilogram nutrien di dalamnya. Ini perbandingan kasar: pilih dahulu baja yang membekalkan nutrien yang diperlukan, kemudian bandingkan harga antara baja yang setara.',
            'A cheaper bag is not always the better buy. Compare the cost per kilogram of nutrient: the bag price divided by the kilograms of nutrient inside. This is a rough comparison: first choose fertilisers that supply the nutrient you need, then compare price between equivalent products.',
            '较便宜的一包未必更划算。应比较每公斤养分的成本：每包价格除以其中所含养分的公斤数。这只是粗略比较：先选出能提供所需养分的肥料，再在同类产品之间比较价格。']],
+    ['h', ['Kos satu program pembajaan', 'The cost of a fertilising programme', '施肥计划的成本']],
+    ['formula', ['Kos = jumlah baja (kg) ÷ berat sebeg (kg) × harga sebeg', 'Cost = total fertiliser (kg) ÷ bag weight (kg) × price per bag', '成本 = 肥料总量（公斤）÷ 每包重量（公斤）× 每包价格']],
+    ['ex', { title: ['Contoh 4: kos setahun', 'Example 4: cost for a year', '例四：全年成本'], steps: [
+      ['100 pokok, setiap satu menerima 4.5 kg baja setahun: 100 × 4.5 = 450 kg.', '100 trees, each receiving 4.5 kg of fertiliser a year: 100 × 4.5 = 450 kg.', '100 株树，每株每年施 4.5 公斤肥料：100 × 4.5 = 450 公斤。'],
+      ['450 ÷ 50 = 9 beg 50 kg.', '450 ÷ 50 = 9 bags of 50 kg.', '450 ÷ 50 = 9 包（每包 50 公斤）。'],
+      ['Jika harganya RM 150 sebeg (harga contoh sahaja): 9 × 150 = RM 1,350 setahun, iaitu RM 13.50 sepokok.', 'If a bag costs RM 150 (an example price only): 9 × 150 = RM 1,350 a year, which is RM 13.50 per tree.', '若每包 RM 150（仅为示例价格）：9 × 150 = 每年 RM 1,350，即每株 RM 13.50。'],
+    ] }],
+    ['p', ['Tambah kos buruh, pengangkutan dan kapur untuk mendapat kos sebenar program. Mod “Program pokok” dalam kalkulator mengira kos ini apabila harga sebeg dimasukkan.',
+           'Add labour, transport and lime to get the real cost of the programme. The “Tree programme” mode in the calculator works out this cost when a bag price is entered.',
+           '再加上人工、运输和石灰的费用，才是施肥计划的实际成本。在计算器的“果树施肥计划”模式中输入每包价格，即可算出这项成本。']],
     ['tool', 'baja'],
   ] },
 };
@@ -911,9 +959,9 @@ LESSONS['3-3'] = { book: '1.1.1', title: ['Mengenal tanah di Malaysia', 'Identif
   ['src', { s: 'FFTC Agricultural Policy Platform, Malaysian problem soils; JIRCAS Tropical Agriculture Research Series 24', u: 'https://ap.fftc.org.tw/node/3178',
     a: ['Gambaran umum Malaysia; sebahagiannya daripada kertas lama.', 'A general picture of Malaysia; partly from older papers.', '马来西亚的概况；部分来自较早的文献。'] }],
   ['h', ['Mencari siri tanah anda', 'Finding your soil series', '查找所在地的土系']],
-  ['p', ['Di Semenanjung Malaysia, portal GeoTanih Jabatan Pertanian menerangkan siri tanah yang berdaftar, lengkap dengan huraian profil. Siri tanah dinamakan mengikut tempat ia mula-mula ditemui. Portal ini meliputi Semenanjung sahaja; untuk Sabah dan Sarawak, rujuk jabatan pertanian negeri masing-masing.',
-         'In Peninsular Malaysia, the Jabatan Pertanian portal GeoTanih describes the registered soil series, with profile descriptions. A soil series is named after the place where it was first found. The portal covers the Peninsula only; for Sabah and Sarawak, refer to the state agriculture departments.',
-         '在马来西亚半岛，农业局的 GeoTanih 网站介绍了已登记的土系，并附有剖面描述。土系以最初发现的地点命名。该网站只涵盖半岛；沙巴和砂拉越请查询各自的州农业局。']],
+  ['p', ['Di Semenanjung Malaysia, portal GeoTanih Jabatan Pertanian menerangkan siri tanah yang berdaftar, lengkap dengan huraian profil. Portal itu menyenaraikan 323 siri tanah berdaftar. Siri tanah dinamakan mengikut tempat ia mula-mula ditemui. Portal ini meliputi Semenanjung sahaja; untuk Sabah dan Sarawak, rujuk jabatan pertanian negeri masing-masing.',
+         'In Peninsular Malaysia, the Jabatan Pertanian portal GeoTanih describes the registered soil series, with profile descriptions. The portal lists 323 registered soil series. A soil series is named after the place where it was first found. The portal covers the Peninsula only; for Sabah and Sarawak, refer to the state agriculture departments.',
+         '在马来西亚半岛，农业局的 GeoTanih 网站介绍了已登记的土系，并附有剖面描述。该网站列出 323 个已登记的土系。土系以最初发现的地点命名。该网站只涵盖半岛；沙巴和砂拉越请查询各自的州农业局。']],
   ['src', { s: 'Jabatan Pertanian Malaysia, GeoTanih', u: 'https://geotanih.doa.gov.my/', a: ['Semenanjung Malaysia sahaja.', 'Peninsular Malaysia only.', '仅限马来西亚半岛。'] }],
 ] };
 
@@ -999,3 +1047,169 @@ QUIZ[5].push(
   Q(['Pokok layu walaupun tanah lembap. Apakah yang patut diperiksa sebelum menambah baja?', 'Plants wilt although the soil is moist. What should be checked before adding fertiliser?', '土壤湿润而植株仍萎蔫。追肥之前应先检查什么？'],
     [['Garam dalam tanah atau air, dan keadaan akar', 'Salt in the soil or water, and the state of the roots', '土壤或水中的盐分，以及根系状况'], ['Warna batang', 'The colour of the stem', '茎的颜色'], ['Bilangan daun', 'The number of leaves', '叶片数量'], ['Harga baja', 'The price of fertiliser', '肥料价格']],
     ['Garam menyukarkan akar menyerap air; menambah baja menambah garam lagi.', 'Salt makes it hard for roots to take up water; adding fertiliser adds more salt.', '盐分使根系难以吸水；再施肥只会增加盐分。']));
+
+/* ---------- Lessons added to cover the remaining syllabus topics, each from published sources ---------- */
+LESSONS['2-5'] = { book: '1.1.1', title: ['Lima jenis tanah yang biasa', 'Five common soil types', '五种常见的土壤'], body: [
+  ['p', ['Dalam percakapan harian dan dalam banyak buku teks, tanah dikumpulkan kepada lima jenis: pasir, kelodak, liat, lom dan tanah organik. Empat yang pertama ialah tekstur. Tanah organik, atau gambut, bukan kelas tekstur: ia dinamakan mengikut bahan organiknya.',
+         'In everyday speech and in many textbooks, soils are grouped into five types: sand, silt, clay, loam and organic soil. The first four are textures. Organic soil, or peat, is not a texture class: it is named for its organic matter.',
+         '在日常用语和许多课本中，土壤被分为五类：砂土、粉土、黏土、壤土和有机土。前四类属于质地。有机土（泥炭土）不是质地类别，而是因有机质而得名。']],
+  ['table', { head: [['Jenis', 'Type', '类型'], ['Saiz zarah', 'Particle size', '颗粒大小'], ['Air dan saliran', 'Water and drainage', '水分与排水'], ['Nutrien', 'Nutrients', '养分']],
+    rows: [
+      [['Pasir', 'Sand', '砂土'], '0.05 – 2 mm', ['Bersaliran cepat; perlu disiram kerap', 'Drains quickly; needs frequent watering', '排水快；需要经常浇水'], ['Rendah; mudah terlarut resap', 'Low; easily leached', '低；容易淋失']],
+      [['Kelodak', 'Silt', '粉土'], '0.002 – 0.05 mm', ['Memegang sedikit air sambil masih bersaliran; mudah terpadat dan terhakis', 'Holds some water while still draining; compacts and erodes easily', '能保持一定水分且仍可排水；容易压实和被侵蚀'], ['Sederhana', 'Moderate', '中等']],
+      [['Liat', 'Clay', '黏土'], '< 0.002 mm', ['Memegang banyak air; saliran boleh menjadi masalah', 'Holds a lot of water; drainage can be a problem', '保水多；排水可能成为问题'], ['Bergantung pada jenis liat', 'Depends on the clay type', '取决于黏土类型']],
+      [['Lom', 'Loam', '壤土'], ['Campuran pasir, kelodak dan liat', 'A mix of sand, silt and clay', '砂粒、粉粒和黏粒的混合'], ['Bersaliran baik dan memegang air secukupnya', 'Well drained and holds enough water', '排水良好且保水适度'], ['Subur dan mudah dikerjakan', 'Fertile and easily worked', '肥沃且易于耕作']],
+      [['Tanah organik (gambut)', 'Organic soil (peat)', '有机土（泥炭土）'], ['Kebanyakannya bahan organik', 'Mostly organic matter', '以有机质为主'], ['Memegang banyak lembapan', 'Holds much moisture', '保持大量水分'], ['Di Malaysia: berasid dan rendah nutrien', 'In Malaysia: acidic and low in nutrients', '在马来西亚：酸性且养分贫乏']],
+    ] }],
+  ['src', { s: 'Royal Horticultural Society, Soil types', u: 'https://www.rhs.org.uk/soil-composts-mulches/soil-types',
+    a: ['Panduan umum dari United Kingdom. Baris nutrien bagi liat dan gambut mengikut sumber Malaysia di bawah.', 'General guidance from the United Kingdom. The nutrient entries for clay and peat follow the Malaysian sources below.', '来自英国的一般指引。黏土和泥炭土的养分一栏依据下列马来西亚资料。'] }],
+  ['h', ['Dua perkara yang berbeza di Malaysia', 'Two things that differ in Malaysia', '在马来西亚有所不同的两点']],
+  ['ul', [
+    ['**Liat tidak semestinya subur.** Di negara beriklim sederhana, tanah liat memegang nutrien dengan baik. Kebanyakan liat di tanah tinggi Malaysia ialah kaolinit, yang memegang sedikit nutrien.',
+     '**Clay does not have to be fertile.** In temperate countries, clay soil holds nutrients well. Most clay in Malaysian upland soils is kaolinite, which holds few.',
+     '**黏土不一定肥沃。**在温带国家，黏土保肥力强。马来西亚高地土壤中的黏粒大多是高岭石，保肥力很低。'],
+    ['**Gambut tidak semestinya subur.** Gambut taman di negara lain boleh subur, tetapi gambut Malaysia mempunyai pH dalam air kira-kira 3.0 hingga 4.5 dan rendah nutrien.',
+     '**Peat does not have to be fertile.** Garden peat elsewhere can be fertile, but Malaysian peat has a pH in water of about 3.0 to 4.5 and is low in nutrients.',
+     '**泥炭土不一定肥沃。**其他地方的园艺泥炭可能很肥沃，但马来西亚的泥炭土水浸提 pH 约为 3.0 至 4.5，且养分贫乏。'],
+  ]],
+  ['src', { s: 'FFTC Agricultural Policy Platform, Malaysian problem soils; Asian Journal of Agriculture and Food Sciences (kaolinite study)', u: 'https://ap.fftc.org.tw/node/3178',
+    a: ['Malaysia.', 'Malaysia.', '马来西亚。'] }],
+  ['h', ['Tanaman dan jenis tanah', 'Crops and soil type', '作物与土壤类型']],
+  ['ul', [
+    ['**Tanah liat yang rata** sesuai untuk pengairan permukaan, dan petak bertakung ialah pilihan biasa untuk padi sawah.', '**Flat clay land** suits surface irrigation, and flooded basins are the usual choice for paddy rice.', '**平坦的黏质地**适合地面灌溉，淹水格田是水稻的常见选择。'],
+    ['**Gambut** sesuai untuk julat tanaman yang sempit, terutamanya yang berakar cetek dan berserabut. Nanas berjaya kerana tahan keasidan dan kesuburan rendah; sagu, ubi kayu dan ubi keledek juga menyesuaikan diri. Pokok yang berat di bahagian atas seperti kelapa sawit dan betik boleh condong kerana cengkaman akar yang lemah.',
+     '**Peat** suits a narrow range of crops, mainly those with shallow, fibrous roots. Pineapple succeeds because it tolerates acidity and low fertility; sago, cassava and sweet potato also adapt. Top-heavy trees such as oil palm and papaya can lean because the roots anchor poorly.',
+     '**泥炭土**只适合少数作物，主要是浅根、须根系的作物。黄梨因耐酸、耐瘠而表现良好；西谷、木薯和番薯也能适应。油棕、木瓜等头重的树木因根系固着力差而容易倾斜。'],
+    ['**Tanah berpasir** memerlukan pengairan yang sedikit tetapi kerap, bahan organik, dan baja yang diberi berperingkat.', '**Sandy soil** needs small, frequent irrigation, organic matter, and fertiliser in split doses.', '**砂质土**需要少量多次灌溉、添加有机质，并分次施肥。'],
+  ]],
+  ['src', { s: 'FFTC Agricultural Policy Platform (MARDI papers on peat); FAO, Irrigation Water Management Training Manual No. 5', u: 'https://ap.fftc.org.tw/node/3181',
+    a: ['Tanaman di tanah gambut: Malaysia. Pengairan: panduan umum FAO.', 'Crops on peat: Malaysia. Irrigation: general FAO guidance.', '泥炭土上的作物：马来西亚。灌溉：FAO 的一般指引。'] }],
+  ['tool', 'tekstur'],
+] };
+UNITS.find(u => u.n === 2).lessons.push('2-5');
+
+LESSONS['5-5'] = { book: '1.2.3', title: ['Pembajakan dan pengairan', 'Tillage and irrigation', '耕作与灌溉'], body: [
+  ['p', ['Lima kerja utama untuk memperbaiki keadaan tanah ialah pembajakan, pengapuran, pembajaan, pengairan dan penyaliran. Pengapuran, saliran dan pembajaan ada pelajaran sendiri; pelajaran ini meliputi dua yang selebihnya.',
+         'The five main jobs for improving soil condition are tillage, liming, fertilising, irrigation and drainage. Liming, drainage and fertilising have their own lessons; this one covers the other two.',
+         '改善土壤状况的五项主要工作是耕作、施石灰、施肥、灌溉和排水。施石灰、排水和施肥各有专门的课；本课讲其余两项。']],
+  ['h', ['Pembajakan', 'Tillage', '耕作']],
+  ['p', ['Pembajakan, juga dipanggil pemugaran, dilakukan untuk tiga tujuan utama: mengawal rumpai, menimbus sisa tanaman sebelumnya, dan menyediakan batas semaian yang baik.',
+         'Tillage is done for three main purposes: to control weeds, to bury the residue of the previous crop, and to prepare a good seedbed.',
+         '耕作主要有三个目的：防除杂草、掩埋前茬作物的残茬，以及整出良好的苗床。']],
+  ['table', { head: [['Peringkat', 'Stage', '阶段'], ['Apa yang dilakukan', 'What it does', '作用']],
+    rows: [
+      [['Pembajakan utama', 'Primary tillage', '初耕'], ['Bajak membalikkan tanah dan menimbus sisa; pahat dan pemecah hanya meretakkan tanah dan mengekalkan lebih banyak litupan sisa.', 'Ploughs invert the soil and bury residue; chisels and rippers only fracture it and keep more residue cover.', '犁把土壤翻转并掩埋残茬；凿式犁和深松机只松动土壤，保留较多残茬覆盖。']],
+      [['Pembajakan kedua', 'Secondary tillage', '次耕'], ['Menyediakan batas semaian: menghancurkan gumpalan, meratakan dan menggaul sisa.', 'Prepares the seedbed: breaks clods, levels and mixes in residue.', '整备苗床：打碎土块、平整土地并混入残茬。']],
+    ] }],
+  ['ul', [
+    ['Tanah yang dibajak dan terdedah lebih mudah terhakis dan kehilangan lembapan.', 'Tilled, bare soil erodes more easily and loses moisture.', '翻耕后裸露的土壤更容易被侵蚀并流失水分。'],
+    ['Lama-kelamaan, pembajakan menurunkan bahan organik tanah.', 'Over time, tillage lowers soil organic matter.', '长期耕作会降低土壤有机质。'],
+    ['Laluan jentera yang berulang memadatkan tanah, dan lapisan keras boleh terbentuk di bawah kedalaman bajak.', 'Repeated machinery passes compact the soil, and a hard pan can form below the tillage depth.', '机械反复碾压会压实土壤，耕作深度之下可能形成犁底层。'],
+    ['Pembajakan minimum mengurangkan kerja kepada yang perlu sahaja untuk batas semaian yang baik.', 'Minimum tillage cuts the work to what is needed for a good seedbed and no more.', '少耕只做整出良好苗床所必需的作业。'],
+  ]],
+  ['src', { s: 'University of Wisconsin, Corn Tillage Systems; eOrganic, Tillage', u: 'https://corn.agronomy.wisc.edu/Management/L007.aspx',
+    a: ['Prinsip umum daripada pertanian berjentera di kawasan beriklim sederhana.', 'General principles from mechanised farming in temperate regions.', '来自温带机械化农业的一般原理。'] }],
+  ['h', ['Pengairan', 'Irrigation', '灌溉']],
+  ['table', { head: [['Kaedah', 'Method', '方法'], ['Cara', 'How', '做法'], ['Paling sesuai', 'Suits best', '最适用']],
+    rows: [
+      [['Permukaan: petak, alur, jalur', 'Surface: basin, furrow, border', '地面灌溉：格田、沟灌、畦灌'], ['Air dialirkan di atas tanah', 'Water flows over the soil', '水在地面流动'], ['Tanah liat yang lambat menyerap; tanah rata. Petak untuk padi; alur untuk tanaman berbaris.', 'Clay soils that take in water slowly; level land. Basins for paddy; furrows for row crops.', '入渗慢的黏质土；平坦土地。格田用于水稻；沟灌用于行栽作物。']],
+      [['Renjis', 'Sprinkler', '喷灌'], ['Air disembur seperti hujan', 'Water is sprayed like rain', '像下雨一样喷洒'], ['Tanah berpasir; tanah curam atau tidak rata', 'Sandy soils; steep or uneven land', '砂质土；陡坡或不平整的土地']],
+      [['Titis', 'Drip', '滴灌'], ['Air dititiskan di pangkal setiap pokok', 'Water drips at the base of each plant', '在每株作物根部滴水'], ['Pokok, tanaman berbaris, tanah berpasir, air yang terhad atau agak masin', 'Trees, row crops, sandy soils, scarce or somewhat salty water', '树木、行栽作物、砂质土、水源有限或略含盐分的水']],
+    ] }],
+  ['ul', [
+    ['**Tanah berpasir** menyimpan sedikit air dan menyerap dengan cepat, jadi ia memerlukan pemberian yang kecil dan kerap. Renjis atau titis lebih sesuai daripada pengairan permukaan.', '**Sandy soils** store little water and take it in fast, so they need small, frequent applications. Sprinkler or drip suits them better than surface irrigation.', '**砂质土**储水少、入渗快，需要少量多次灌水。喷灌或滴灌比地面灌溉更合适。'],
+    ['**Air yang berkelodak** boleh menyumbat sistem renjis dan titis; pengairan permukaan lebih sesuai.', '**Water carrying sediment** can clog sprinkler and drip systems; surface irrigation suits it better.', '**含泥沙的水**会堵塞喷灌和滴灌系统，较适合地面灌溉。'],
+    ['**Kos dan buruh**: renjis dan titis memerlukan modal yang tinggi, jadi kebanyakannya digunakan untuk tanaman bernilai tinggi; pengairan permukaan memerlukan lebih banyak buruh.', '**Cost and labour**: sprinkler and drip need high capital, so they are mostly used for high-value crops; surface irrigation needs more labour.', '**成本与人工**：喷灌和滴灌投资高，多用于高价值作物；地面灌溉则需要较多人工。'],
+    ['Tiada satu kaedah yang terbaik. Uji pilihan dalam keadaan tempatan, dan pastikan peralatan boleh diselenggara.', 'No single method is best. Test the options under local conditions, and make sure the equipment can be maintained.', '没有一种方法是最好的。应在当地条件下试验各种方案，并确保设备能够得到维护。'],
+  ]],
+  ['src', { s: 'FAO, Irrigation Water Management Training Manual No. 5: Irrigation Methods, Chapter 7', u: 'https://www.fao.org/4/S8684E/s8684e08.htm',
+    a: ['Panduan umum; tidak khusus untuk Malaysia.', 'General guidance; not specific to Malaysia.', '一般指引；并非专门针对马来西亚。'] }],
+] };
+UNITS.find(u => u.n === 5).lessons.push('5-5');
+
+LESSONS['6-5'] = { book: '1.3.1', title: ['Baja organik cecair buatan sendiri', 'Home-made liquid organic fertilisers', '自制液体有机肥'], body: [
+  ['p', ['FPJ, FFJ, FAA dan larutan kalsium ialah input daripada Pertanian Semula Jadi Korea. Semuanya dibuat dengan menapai atau melarutkan bahan tempatan, kemudian dicairkan dengan banyak air sebelum digunakan.',
+         'FPJ, FFJ, FAA and calcium solutions are inputs from Korean Natural Farming. All are made by fermenting or dissolving local materials, then diluted heavily with water before use.',
+         'FPJ、FFJ、FAA 和钙溶液是韩国自然农法的投入品。它们都是用本地材料发酵或溶解制成，使用前须大量加水稀释。']],
+  ['note', ['Anggap input ini sebagai pelengkap. Kandungan nutriennya kecil dan berbeza bagi setiap kelompok, dan bagi sesetengahnya, seperti FFJ, bukti daripada kajian terkawal adalah terhad. Ia tidak menggantikan program baja yang berdasarkan analisis tanah dan daun.',
+            'Treat these inputs as supplements. Their nutrient content is small and differs from batch to batch, and for some, such as FFJ, evidence from controlled studies is limited. They do not replace a fertiliser programme based on soil and leaf analysis.',
+            '应把这些投入品视为补充。它们的养分含量很少，而且每批不同；其中一些（如 FFJ）缺乏对照试验的证据。它们不能取代基于土壤和叶片分析的施肥计划。']],
+  ['table', { head: [['Input', 'Input', '投入品'], ['Bahan', 'Made from', '原料'], ['Masa', 'Time', '时间'], ['Digunakan untuk', 'Used for', '用途'], ['Pencairan', 'Dilution', '稀释']],
+    rows: [
+      [['FPJ, jus tumbuhan tertapai', 'FPJ, fermented plant juice', 'FPJ，发酵植物汁'], ['Pucuk tumbuhan yang cepat membesar dan gula perang, sama berat', 'Growing tips of fast-growing plants and brown sugar, equal weights', '速生植物的嫩梢与红糖，等重'], ['3 hingga 7 hari', '3 to 7 days', '3 至 7 天'], ['Pertumbuhan tampang', 'Vegetative growth', '营养生长'], '1:800 – 1:1,000'],
+      [['FFJ, jus buah tertapai', 'FFJ, fermented fruit juice', 'FFJ，发酵果汁'], ['Buah masak yang manis dan gula, sama berat; bukan buah sitrus', 'Sweet ripe fruit and sugar, equal weights; not citrus', '成熟的甜水果与糖，等重；不用柑橘类'], ['7 hingga 10 hari', '7 to 10 days', '7 至 10 天'], ['Pembungaan dan pembentukan buah', 'Flowering and fruit set', '开花和坐果'], ['2 hingga 4 sudu besar segelen (kira-kira 8 hingga 16 ml seliter)', '2 to 4 tablespoons per gallon (about 8 to 16 ml per litre)', '每加仑 2 至 4 汤匙（约每升 8 至 16 毫升）']],
+      [['FAA, asid amino ikan', 'FAA, fish amino acid', 'FAA，鱼氨基酸'], ['Sisa ikan dan gula perang, sama berat', 'Fish waste and brown sugar, equal weights', '鱼下脚料与红糖，等重'], ['2 hingga 6 bulan', '2 to 6 months', '2 至 6 个月'], ['Nitrogen pada peringkat tampang; bukan semasa berbunga atau berbuah', 'Nitrogen in the vegetative stage; not at flowering or fruiting', '营养生长期的氮源；开花结果期不用'], '1:1,000'],
+      [['Kalsium larut air', 'Water-soluble calcium', '水溶性钙'], ['Kulit telur yang dipanggang, dalam cuka', 'Roasted eggshells, in vinegar', '烤过的蛋壳，浸于醋中'], ['Sehingga buih berhenti, 7 hingga 10 hari', 'Until bubbling stops, 7 to 10 days', '直到不再冒泡，7 至 10 天'], ['Pembungaan dan pembuahan', 'Flowering and fruiting', '开花和结果'], '1:1,000'],
+      [['Kalsium fosfat (CaP)', 'Calcium phosphate (CaP)', '磷酸钙 (CaP)'], ['Tulang yang dibakar hingga hitam, dalam cuka', 'Bones charred black, in vinegar', '烧至焦黑的骨头，浸于醋中'], ['Kira-kira 7 hari', 'About 7 days', '约 7 天'], ['Peringkat sebelum berbunga', 'The stage before flowering', '开花前的阶段'], ['Nisbah berbeza mengikut sumber', 'Ratios differ between sources', '各来源的比例不一']],
+    ] }],
+  ['src', { s: 'University of Hawai‘i CTAHR, Natural Farming fact sheets SA-7 (2013), SA-10 (2013), SA-12 (2014)', u: 'https://www.ctahr.hawaii.edu/oc/freepubs/pdf/sa-7.pdf',
+    a: ['FPJ, FAA dan kalsium larut air. Baris FFJ dan CaP daripada panduan pengembangan Filipina dan Natural Farming Hawaii, yang kurang rasmi.', 'FPJ, FAA and water-soluble calcium. The FFJ and CaP rows come from Philippine extension guidance and Natural Farming Hawaii, which are less formal.', 'FPJ、FAA 和水溶性钙。FFJ 和 CaP 两行出自菲律宾推广指引和 Natural Farming Hawaii，权威性较低。'] }],
+  ['h', ['Membuat FPJ', 'Making FPJ', '制作 FPJ']],
+  ['steps', [
+    ['Sebelum matahari terbit, kutip pucuk (5 hingga 8 cm) tumbuhan yang sihat dan cepat membesar, seperti pucuk ubi keledek, labu atau kekacang. Jangan kutip semasa atau sejurus selepas hujan, dan jangan basuh.',
+     'Before sunrise, collect the growing tips (5 to 8 cm) of healthy, fast-growing plants, such as sweet potato, pumpkin or bean shoots. Do not collect during or just after rain, and do not rinse them.',
+     '日出之前，采集健康速生植物的嫩梢（5 至 8 厘米），例如番薯、南瓜或豆类的嫩梢。不要在下雨时或雨后不久采集，也不要清洗。'],
+    ['Potong, timbang, dan gaulkan dengan gula perang yang sama berat sehingga bersalut.', 'Cut them up, weigh them, and toss with an equal weight of brown sugar until coated.', '切段、称重，与等重的红糖拌匀，使其表面裹上糖。'],
+    ['Padatkan ke dalam bekas kaca atau plastik gred makanan, bukan logam. Tutup mulut bekas dengan kain yang telap udara dan ikat.', 'Pack into a glass or food-grade plastic container, not metal. Cover the mouth with a breathable cloth and tie it on.', '装入玻璃或食品级塑料容器（不要用金属）压实，用透气的布盖住容器口并扎紧。'],
+    ['Selepas 24 jam, campuran sepatutnya mendap hingga dua pertiga bekas. Tambah atau kurangkan supaya tepat dua pertiga.', 'After 24 hours the mixture should have settled to two thirds of the container. Add or remove some so it is two thirds full.', '24 小时后，混合物应沉降到容器的三分之二处。可增减材料使其刚好占三分之二。'],
+    ['Biarkan menapai di tempat teduh yang berangin selama 3 hingga 7 hari. Ia siap apabila bahan tumbuhan terapung, ada bau alkohol yang ringan, dan cecairnya manis.', 'Leave it to ferment in a shaded, ventilated place for 3 to 7 days. It is ready when the plant material floats, there is a light alcohol smell, and the liquid tastes sweet.', '置于阴凉通风处发酵 3 至 7 天。当植物材料上浮、有淡淡的酒味且液体带甜时即告完成。'],
+    ['Tapis dan simpan cecair dalam bekas dengan penutup yang longgar.', 'Strain, and store the liquid in a container with a loose lid.', '过滤后，把液体装入盖子松开的容器中保存。'],
+  ]],
+  ['h', ['Keselamatan', 'Safety', '安全事项']],
+  ['ul', [
+    ['**Jangan ketatkan penutup.** Mikrob masih hidup dan menghasilkan gas; bekas yang ditutup ketat boleh meletup.', '**Never tighten the lid.** The microbes are alive and keep producing gas; a tightly closed container can burst.', '**切勿拧紧盖子。**微生物仍然存活并持续产气，密闭的容器可能爆裂。'],
+    ['Jangan gunakan tumbuhan beracun. Jika ragu, dapatkan pengecaman daripada pejabat pertanian.', 'Do not use poisonous plants. If in doubt, have the plant identified by the agriculture office.', '不要使用有毒植物。如有疑问，请农业办事处鉴定。'],
+    ['Untuk FAA, timbus semua sisa ikan di bawah gula, tutup dengan kain untuk menghalang serangga, dan simpan jauh daripada haiwan.', 'For FAA, bury all the fish under sugar, cover with cloth to keep insects out, and store it away from animals.', '制作 FAA 时，要用糖把所有鱼料盖住，用布罩住以防昆虫，并存放在动物接触不到的地方。'],
+    ['Sembur sebagai kabus halus pada awal pagi atau selepas matahari terbenam, bukan di bawah matahari terik, dan jangan sembur sehingga menitis.', 'Spray as a light mist in the early morning or after sundown, not in full sun, and not so heavily that it drips.', '在清晨或日落后喷成细雾，不要在烈日下喷，也不要喷到滴水。'],
+    ['Simpan setiap input secara berasingan dan campurkan hanya semasa hendak digunakan.', 'Store each input separately and mix them only at the time of use.', '各种投入品应分开存放，使用时才混合。'],
+  ]],
+  ['src', { s: 'University of Hawai‘i CTAHR, Natural Farming: Fermented Plant Juice (SA-7, 2013); Fish Amino Acid (SA-12, 2014)', u: 'https://www.ctahr.hawaii.edu/oc/freepubs/pdf/sa-12.pdf',
+    a: ['Kaedah yang diterbitkan untuk Hawaii; masa penapaian bergantung pada suhu.', 'Methods published for Hawaii; fermentation time depends on temperature.', '为夏威夷发布的方法；发酵时间取决于温度。'] }],
+] };
+UNITS.find(u => u.n === 6).lessons.push('6-5');
+UNITS.find(u => u.n === 6).blurb = ['Nutrien, tanda kekurangan, jenis baja, baja cecair buatan sendiri, cara membaja dan pengiraan.', 'Nutrients, deficiency signs, fertiliser types, home-made liquid fertilisers, application and calculations.', '养分、缺乏症状、肥料种类、自制液体肥、施肥方法和用量计算。'];
+
+/* the risks of each kind of fertiliser, added to the lesson on fertiliser types */
+LESSONS['6-2'].body.push(
+  ['h', ['Risiko bahan organik', 'Risks of organic materials', '有机材料的风险']],
+  ['ul', [
+    ['**Biji rumpai**: pencernaan ternakan tidak memusnahkan semua biji benih, jadi baja kandang boleh membawa rumpai ke ladang.', '**Weed seeds**: livestock digestion does not destroy every seed, so manure can carry weeds into the field.', '**杂草种子**：牲畜的消化并不能杀死所有种子，因此厩肥可能把杂草带入田间。'],
+    ['**Patogen**: baja kandang mentah boleh membawa E. coli, Salmonella dan Listeria. Ini paling penting bagi sayur yang dimakan mentah.', '**Pathogens**: raw manure can carry E. coli, Salmonella and Listeria. This matters most for vegetables eaten raw.', '**病原菌**：生粪可能带有大肠杆菌、沙门氏菌和李斯特菌，对生食蔬菜尤其重要。'],
+    ['**Akar dan daun terbakar**: baja kandang segar tinggi ammonia dan garam.', '**Root and leaf burn**: fresh manure is high in ammonia and salts.', '**烧根烧叶**：鲜粪含氨和盐分高。'],
+    ['**Sisa racun rumpai** dalam baja kandang atau jerami boleh merosakkan tanaman.', '**Herbicide residues** in manure or straw can damage crops.', '厩肥或稻草中的**除草剂残留**可能伤害作物。'],
+  ]],
+  ['p', ['Pengkomposan yang betul mengurangkan risiko ini. Timbunan perlu menjadi panas, sekitar 55 hingga 68 °C, dan dibalikkan supaya semua bahan melalui haba itu, kemudian dibiarkan matang sebelum digunakan.',
+         'Proper composting reduces these risks. The heap has to get hot, around 55 to 68 °C, and be turned so that all the material passes through that heat, then left to mature before use.',
+         '正确堆肥可降低这些风险。堆体须升温至约 55 至 68 °C，并经翻堆使所有物料都经过高温，之后还要熟化才可使用。']],
+  ['src', { s: 'Colorado State University Extension, Using manure in gardens; University of Arizona Extension; University of Connecticut Soil Testing Laboratory', u: 'https://extension.colostate.edu/resource/using-manure-in-colorado-gardens/',
+    a: ['Panduan umum; suhu yang diberi berbeza sedikit antara sumber.', 'General guidance; the temperatures given differ slightly between sources.', '一般指引；各来源给出的温度略有不同。'] }],
+  ['h', ['Apabila baja kimia digunakan berlebihan', 'When chemical fertiliser is overused', '化肥过量使用的后果']],
+  ['ul', [
+    ['**Keasidan tanah**: baja nitrogen berasaskan ammonium menjadikan tanah lebih berasid dari tahun ke tahun.', '**Soil acidity**: ammonium-based nitrogen fertilisers make the soil more acidic year after year.', '**土壤酸化**：铵态氮肥会使土壤逐年变酸。'],
+    ['**Pencemaran air**: nitrat terlarut resap ke dalam air bawah tanah, dan fosforus yang dihanyutkan ke sungai serta tasik menyebabkan ledakan alga.', '**Water pollution**: nitrate leaches into groundwater, and phosphorus washed into rivers and lakes causes algal blooms.', '**水体污染**：硝酸盐淋入地下水，被冲入河流湖泊的磷则引起藻类暴发。'],
+    ['**Kecederaan garam**: baja yang terlalu banyak atau terlalu dekat dengan benih dan akar menarik air keluar daripadanya.', '**Salt injury**: too much fertiliser, or fertiliser too close to seeds and roots, draws water out of them.', '**盐害**：肥料过多，或离种子和根太近，会把其中的水分吸走。'],
+    ['**Kos**: nutrien yang tidak diambil oleh tanaman ialah wang yang terbuang.', '**Cost**: nutrients the crop does not take up are money wasted.', '**成本**：作物没有吸收的养分就是浪费的金钱。'],
+  ]],
+  ['src', { s: 'Agriculture Victoria, Soil acidity; University of Hawai‘i CTAHR SA-12 (nitrate pollution); Top Crop Manager (salt injury)', u: 'https://agriculture.vic.gov.au/farm-management/soil/soil-acidity',
+    a: ['Kesan umum; magnitudnya bergantung pada tanah, hujan dan kadar.', 'General effects; their size depends on soil, rainfall and rate.', '一般性影响；其程度取决于土壤、降雨和用量。'] }],
+);
+
+BOOK.find(b => b.n === '1.1.1').to.push('2-5');
+BOOK.find(b => b.n === '1.2.3').to.push('5-5');
+BOOK.find(b => b.n === '1.3.1').to.push('6-5');
+
+QUIZ[2].push(
+  Q(['Tanah mengandungi 66% pasir, 20% kelodak dan 14% liat. Apakah kelas teksturnya?', 'A soil has 66% sand, 20% silt and 14% clay. What is its texture class?', '某土壤含 66% 砂粒、20% 粉粒和 14% 黏粒，属于哪一质地类别？'],
+    [['Lom berpasir', 'Sandy loam', '砂质壤土'], ['Lom liat berpasir', 'Sandy clay loam', '砂质黏壤土'], ['Pasir berlom', 'Loamy sand', '壤质砂土'], ['Lom', 'Loam', '壤土']],
+    ['Lom liat berpasir memerlukan sekurang-kurangnya 20% liat; sampel ini hanya 14%.', 'Sandy clay loam needs at least 20% clay; this sample has only 14%.', '砂质黏壤土要求黏粒至少 20%，而此样本只有 14%。']));
+QUIZ[5].push(
+  Q(['Kaedah pengairan yang manakah paling sesuai untuk tanah berpasir?', 'Which irrigation method suits sandy soil best?', '哪一种灌溉方法最适合砂质土？'],
+    [['Renjis atau titis, sedikit tetapi kerap', 'Sprinkler or drip, little and often', '喷灌或滴灌，少量多次'], ['Petak bertakung', 'Flooded basins', '淹水格田'], ['Alur panjang', 'Long furrows', '长沟灌'], ['Tiada pengairan', 'No irrigation', '不灌溉']],
+    ['Tanah berpasir menyerap air dengan cepat dan menyimpan sedikit, jadi air permukaan hilang sebelum sampai ke hujung ladang.', 'Sandy soil takes in water fast and stores little, so surface water is lost before it reaches the end of the field.', '砂质土入渗快、储水少，地面水还没流到田尾就渗失了。']));
+QUIZ[6].push(
+  Q(['Mengapa penutup bekas FPJ tidak boleh diketatkan?', 'Why must the lid of an FPJ container never be tightened?', '为什么 FPJ 容器的盖子不能拧紧？'],
+    [['Mikrob terus menghasilkan gas dan bekas boleh meletup', 'The microbes keep producing gas and the container can burst', '微生物持续产气，容器可能爆裂'], ['Cahaya perlu masuk', 'Light has to get in', '需要透光'], ['Gula akan menghablur', 'The sugar would crystallise', '糖会结晶'], ['Air akan tersejat terlalu cepat', 'The water would evaporate too fast', '水分会蒸发太快']],
+    ['Penapaian berterusan selepas ditapis, jadi gas mesti dapat keluar.', 'Fermentation goes on after straining, so the gas has to escape.', '过滤之后发酵仍在继续，因此必须让气体排出。']),
+  Q(['Mengapa baja kandang mentah berisiko pada sayur yang dimakan mentah?', 'Why is raw manure a risk on vegetables eaten raw?', '为什么生粪对生食蔬菜有风险？'],
+    [['Ia boleh membawa patogen seperti E. coli dan Salmonella', 'It can carry pathogens such as E. coli and Salmonella', '它可能带有大肠杆菌、沙门氏菌等病原菌'], ['Ia menjadikan sayur pahit', 'It makes the vegetables bitter', '它会使蔬菜变苦'], ['Ia menurunkan pH kepada 3', 'It lowers the pH to 3', '它把 pH 降到 3'], ['Ia tidak mengandungi nutrien', 'It contains no nutrients', '它不含养分']],
+    ['Pengkomposan yang betul memanaskan bahan dan memusnahkan patogen serta biji rumpai.', 'Proper composting heats the material and destroys pathogens and weed seeds.', '正确堆肥会使物料升温，杀死病原菌和杂草种子。']));
