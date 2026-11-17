@@ -430,6 +430,7 @@
   function slopeValues() {
     const rise = Number(slope.rise), run = Number(slope.run);
     if (String(slope.rise).trim() === '' || !Number.isFinite(rise) || rise < 0 || !Number.isFinite(run) || run <= 0) return null;
+    if (!Number.isFinite(rise / run)) return null;   // numbers too extreme to divide
     return { rise, run };
   }
   function slopeResult() {
@@ -443,8 +444,8 @@
         <p class="big">${num(pct)}% · ${num(deg)}°</p>
       </div>
       <ul class="res plain-res">
-        <li><span>${esc(t('slopeDo'))}</span><b>${esc(tr(SLOPE_DO.find(x => pct < x.max).text))}</b></li>
-        <li><span>${esc(t('slopePalm'))}</span><b>${esc(tr(SLOPE_PALM.find(x => deg <= x.max).name))}</b></li>
+        <li><span>${esc(t('slopeDo'))}</span><b>${esc(tr((SLOPE_DO.find(x => pct < x.max) || SLOPE_DO[SLOPE_DO.length - 1]).text))}</b></li>
+        <li><span>${esc(t('slopePalm'))}</span><b>${esc(tr((SLOPE_PALM.find(x => deg <= x.max) || SLOPE_PALM[SLOPE_PALM.length - 1]).name))}</b></li>
       </ul>
       <details open><summary>${esc(t('working'))}</summary><p class="work">${num(rise, 2)} ÷ ${num(run, 2)} × 100 = ${num(pct)}%</p></details>
       <p class="hint">${esc(t('slopeNote'))}</p>`;
@@ -478,7 +479,12 @@
   const HA = { ha: 1, m2: 1 / 10000, acre: 0.4047 };
   const areaHa = () => Math.max(0, Number(fert.area) || 0) * HA[fert.unit];
   const prod = id => PRODUCTS.find(p => p.id === id);
-  const kg = v => `${num(v, v < 10 ? 2 : 1)} kg`;
+  /* weights are stored in kilograms at full precision and rounded only here; small amounts read better in grams */
+  const kg = v => {
+    if (v > 0 && v < 0.001) return `${num(v * 1e6, 3)} mg`;
+    if (v > 0 && v < 1) { const g = v * 1000; return `${num(g, g < 10 ? 2 : 1)} g`; }
+    return `${num(v, v < 10 ? 2 : 1)} kg`;
+  };
   const numIn = (label, key, extra = '') => `<label>${label}<input type="number" inputmode="decimal" min="0" step="any" data-f="${key}" value="${esc(fert[key])}" ${extra}></label>`;
   function areaFields() {
     return `<div class="row2">${numIn(esc(t('area')), 'area')}
@@ -675,7 +681,7 @@
       const v = slopeValues();
       if (v) list = [makeEntry(plot.id, date, kind, v)];
     } else if (kind === 'fert') {
-      list = fertLines(String(f.get('what') || '')).map(l => makeEntry(plot.id, date, 'fert', { what: l.what, kg: Math.round(l.kg * 100) / 100 }));
+      list = fertLines(String(f.get('what') || '')).map(l => makeEntry(plot.id, date, 'fert', { what: l.what, kg: l.kg }));
     }
     const stored = list.length > 0 && addEntries(list);
     if (stored) store.set('lastPlot', plot.id);

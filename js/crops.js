@@ -67,13 +67,13 @@ const SLOPE_PALM = [   // terrain in degrees, mineral soils
   { max: 12, name: ['Julat yang diingini', 'Desirable range', '理想范围'] },
   { max: 16, name: ['Had kecil', 'Minor limitation', '轻度限制'] },
   { max: 24, name: ['Had serius', 'Serious limitation', '严重限制'] },
-  { max: 999, name: ['Had sangat serius', 'Very serious limitation', '极严重限制'] },
+  { max: Infinity, name: ['Had sangat serius', 'Very serious limitation', '极严重限制'] },
 ];
 const SLOPE_DO = [     // slope in percent
   { max: 9, text: ['Tiada langkah khas; kekalkan litupan tanah.', 'No special measures; keep the ground covered.', '无特别措施；保持地面覆盖。'] },
   { max: 16, text: ['Susun pelepah mengikut kontur dan gali lubang kelodak.', 'Stack fronds along the contour and dig silt pits.', '沿等高线堆放叶柄并挖集泥坑。'] },
   { max: 40, text: ['Teres dan kekacang penutup bumi.', 'Terraces and legume cover crops.', '修梯田并种植豆科覆盖作物。'] },
-  { max: 9999, text: ['Tidak ditanam.', 'Not planted.', '不种植。'] },
+  { max: Infinity, text: ['Tidak ditanam.', 'Not planted.', '不种植。'] },
 ];
 
 const ORGANIC_PRESETS = [
