@@ -11,7 +11,7 @@ Object.assign(UI, {
   rise: ['Beza tinggi (m)', 'Rise (m)', '垂直高差（米）'],
   run: ['Jarak mendatar (m)', 'Horizontal run (m)', '水平距离（米）'],
   slope: ['Cerun', 'Slope', '坡度'],
-  enterSlope: ['Masukkan beza tinggi dan jarak mendatar yang lebih daripada 0.', 'Enter a rise and a run greater than 0.', '请输入大于 0 的高差和水平距离。'],
+  enterSlope: ['Masukkan beza tinggi (0 atau lebih) dan jarak mendatar yang lebih daripada 0.', 'Enter a rise of 0 or more and a run greater than 0.', '请输入高差（0 或以上）和大于 0 的水平距离。'],
   slopePalm: ['Had tanah untuk kelapa sawit', 'Soil limitation for oil palm', '对油棕的土地限制'],
   slopeDo: ['Langkah pemuliharaan', 'Conservation measures', '保育措施'],
   slopeNote: ['Kelas kelapa sawit mengikut satu skema kesesuaian tanah Malaysia; langkah pemuliharaan mengikut satu panduan pekebun kecil kelapa sawit.', 'Oil palm classes follow one Malaysian land suitability scheme; the measures follow one oil palm smallholder guide.', '油棕等级依据马来西亚的一套土地适宜性标准；保育措施依据一份油棕小园主指南。'],

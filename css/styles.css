@@ -341,3 +341,7 @@ input[type="text"], input[type="date"], textarea {
 .latest b { font-size: 1rem; text-align: right; overflow-wrap: anywhere; }
 .latest small { display: block; font-weight: 400; color: var(--muted); }
 .tabs a { min-width: 0; }
+
+.storewarn { max-width: 860px; margin: 12px auto 0; padding: 12px 16px; background: var(--bad); color: #fff; font-weight: 600; border-radius: var(--r); }
+.storewarn[hidden] { display: none; }
+@media (max-width: 892px) { .storewarn { margin-left: 16px; margin-right: 16px; } }

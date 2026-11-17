@@ -8,7 +8,17 @@
       try { const v = localStorage.getItem('soil.' + key); return v === null ? fallback : JSON.parse(v); }
       catch (e) { return fallback; }
     },
-    set(key, value) { try { localStorage.setItem('soil.' + key, JSON.stringify(value)); } catch (e) { /* private mode */ } },
+    /* returns false when the browser refuses the write (blocked, private mode or full) */
+    set(key, value) {
+      let ok = true;
+      try { localStorage.setItem('soil.' + key, JSON.stringify(value)); } catch (e) { ok = false; }
+      store.broken = !ok;
+      const warn = document.getElementById('storewarn');
+      if (warn) { warn.hidden = ok; if (!ok) warn.textContent = store.warning(); }
+      return ok;
+    },
+    broken: false,
+    warning: () => '',
   };
 
   /* ---------- language ---------- */
@@ -31,9 +41,10 @@
     return v === undefined ? x[EN] : v;
   }
   const t = key => tr(UI[key]);
+  store.warning = () => t('storeWarn');
   const fill = (key, vars) => t(key).replace(/\{(\w+)\}/g, (m, k) => vars[k]);
 
-  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   /* escape, then turn **bold** into <strong> */
   const rich = x => esc(tr(x)).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   const num = (v, d = 1) => Number(v).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-GB', { maximumFractionDigits: d, minimumFractionDigits: 0 });
@@ -42,11 +53,21 @@
   const ALL_LESSONS = UNITS.flatMap(u => u.lessons);
   let done = store.get('done', []).filter(id => ALL_LESSONS.includes(id));
   let best = store.get('best2', {});
+  if (!best || typeof best !== 'object' || Array.isArray(best)) best = {};
+  for (const k of Object.keys(best)) if (!Number.isInteger(best[k]) || best[k] < 0) delete best[k];
   let horizon = 'A';
   let quiz = null; // { n, qs, i, score, picked, order }
   let glossQuery = '';
   let rec = store.get('rec', null) || { plots: [], entries: [] };
   const saveRec = () => store.set('rec', rec);
+  /* change the records, and undo the change if the browser cannot store it */
+  function commitRec(mutate) {
+    const before = JSON.stringify(rec);
+    mutate();
+    if (saveRec()) return true;
+    rec = JSON.parse(before);
+    return false;
+  }
   const def = { where: null, pick: null };
   const tex = { sand: 40, clay: 20 };
   let ph = 5.0;
@@ -60,6 +81,17 @@
     bag: 50, bg: [15, 15, 15], price: '',
     trate: 4.5, tapps: 4, ttrees: 100,
   }, store.get('fert', null) || {});
+  /* stored calculator settings may be stale or tampered with: force them back into shape */
+  (function tidyFert() {
+    const triple = v => Array.isArray(v) && v.length === 3 ? v.map(x => (Number.isFinite(Number(x)) ? Number(x) : 0)) : [15, 15, 15];
+    if (!['straight', 'compound', 'plant', 'tree', 'bag'].includes(fert.mode)) fert.mode = 'straight';
+    if (!['ha', 'm2', 'acre'].includes(fert.unit)) fert.unit = 'ha';
+    if (!['n', 'p', 'k'].includes(fert.basis)) fert.basis = 'n';
+    fert.g = triple(fert.g); fert.bg = triple(fert.bg);
+    [['pn', 'n', 'urea'], ['pp', 'p', 'tsp'], ['pk', 'k', 'mop']].forEach(([key, field, fallback]) => {
+      if (!PRODUCTS.some(x => x.id === fert[key] && x[field] > 0)) fert[key] = fallback;
+    });
+  })();
 
   const unitOf = id => UNITS.find(u => u.lessons.includes(id));
   const main = document.getElementById('main');
@@ -189,7 +221,7 @@
         <ul class="lessonlist">
           ${u.lessons.map(id => `<li><a href="#/nota/${id}"><span class="ltitle">${esc(tr(LESSONS[id].title))}</span>${done.includes(id) ? `<span class="tick" aria-label="${esc(t('done'))}">✓</span>` : ''}</a></li>`).join('')}
           <li><a class="extra" href="#/amali/${u.n}"><span class="tag">${esc(t('activity'))}</span><span class="ltitle">${esc(tr(ACTIVITIES[u.n].title))}</span></a></li>
-          <li><a class="extra" href="#/kuiz/${u.n}"><span class="tag">${esc(t('quiz'))}</span><span class="ltitle">${quizSize(u.n)} ${esc(t('questions'))}</span>${best[u.n] !== undefined ? `<span class="tick">${esc(t('best'))} ${best[u.n]}/${quizSize(u.n)}</span>` : ''}</a></li>
+          <li><a class="extra" href="#/kuiz/${u.n}"><span class="tag">${esc(t('quiz'))}</span><span class="ltitle">${quizSize(u.n)} ${esc(t('questions'))}</span>${best[u.n] !== undefined ? `<span class="tick">${esc(t('best'))} ${esc(best[u.n])}/${quizSize(u.n)}</span>` : ''}</a></li>
         </ul>
       </div>`).join('')}
       <p class="booklink"><a href="#/buku">${esc(t('bookIndex'))}</a></p>
@@ -401,9 +433,16 @@
   }
 
   /* ----- slope tool ----- */
+  /* a rise of 0 is flat ground and is valid; a blank rise is not */
+  function slopeValues() {
+    const rise = Number(slope.rise), run = Number(slope.run);
+    if (String(slope.rise).trim() === '' || !Number.isFinite(rise) || rise < 0 || !Number.isFinite(run) || run <= 0) return null;
+    return { rise, run };
+  }
   function slopeResult() {
-    const rise = Number(slope.rise) || 0, run = Number(slope.run) || 0;
-    if (rise <= 0 || run <= 0) return `<p class="empty">${esc(t('enterSlope'))}</p>`;
+    const v = slopeValues();
+    if (!v) return `<p class="empty">${esc(t('enterSlope'))}</p>`;
+    const { rise, run } = v;
     const pct = rise / run * 100;
     const deg = Math.atan(rise / run) * 180 / Math.PI;
     return `<div class="readout">
@@ -455,7 +494,7 @@
   }
   function gradeFields(key) {
     return `<fieldset class="grade"><legend>${esc(t('grade'))}</legend>
-      <div class="row3">${['N', 'P₂O₅', 'K₂O'].map((s, i) => `<label>${s}<input type="number" inputmode="decimal" min="0" max="100" step="any" data-g="${key}" data-i="${i}" value="${fert[key][i]}"></label>`).join('')}</div>
+      <div class="row3">${['N', 'P₂O₅', 'K₂O'].map((s, i) => `<label>${s}<input type="number" inputmode="decimal" min="0" max="100" step="any" data-g="${key}" data-i="${i}" value="${esc(fert[key][i])}"></label>`).join('')}</div>
       <div class="presets">${COMPOUND_PRESETS.map(p => `<button type="button" data-preset="${key}:${p.join('-')}">${p.join('-')}</button>`).join('')}</div>
     </fieldset>`;
   }
@@ -482,9 +521,20 @@
     return `<div class="row2">${numIn(esc(t('bagWeight')), 'bag')}${numIn(esc(t('price')), 'price')}</div>` + gradeFields('bg') +
       `<p class="label">${esc(t('organicPresets'))}</p><div class="presets">${ORGANIC_PRESETS.map(o => `<button type="button" data-preset="bg:${o.g.join('-')}">${esc(tr(o.name))}</button>`).join('')}</div>`;
   }
+  /* percentages typed into the calculator must be real percentages */
+  function fertProblem() {
+    const pctOk = v => Number.isFinite(Number(v)) && Number(v) >= 0 && Number(v) <= 100;
+    const gradeOk = g => g.every(pctOk) && g.reduce((sum, v) => sum + Number(v), 0) <= 100;
+    if (fert.mode === 'compound' && !gradeOk(fert.g)) return 'pctBad';
+    if (fert.mode === 'bag' && !gradeOk(fert.bg)) return 'pctBad';
+    if (fert.mode === 'plant' && String(fert.pct).trim() !== '' && !pctOk(fert.pct)) return 'pctBad';
+    return null;
+  }
   function fertResult() {
     const a = areaHa();
     const empty = `<p class="empty">${esc(t('enterRate'))}</p>`;
+    const problem = fertProblem();
+    if (problem) return `<p class="err" role="alert">${esc(t(problem))}</p>`;
     if (fert.mode === 'straight') {
       const lines = [['N', 'n', 'pn'], ['P₂O₅', 'p', 'pp'], ['K₂O', 'k', 'pk']].map(([sym, rk, pk]) => {
         const rate = Number(fert[rk]) || 0;
@@ -578,12 +628,12 @@
     if (e.kind === 'fert') return `${d.what}: ${kg(Number(d.kg))}`;
     return String(d.text || '');
   }
-  function addEntry(plot, date, kind, data) {
-    rec.entries.push({ id: newId(), plot, date: /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : today(), kind, data });
-    saveRec();
-  }
+  const makeEntry = (plot, date, kind, data) => ({ id: newId(), plot, date: /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : today(), kind, data });
+  /* returns false if the entries could not be stored */
+  const addEntries = list => commitRec(() => { rec.entries.push(...list); });
   /* the lines the fertiliser calculator would apply right now */
   function fertLines(material) {
+    if (fertProblem()) return [];
     const a = areaHa();
     if (fert.mode === 'straight') {
       return [['n', 'pn'], ['p', 'pp'], ['k', 'pk']].map(([rk, pk]) => {
@@ -612,7 +662,7 @@
     const needsName = kind === 'fert' && (fert.mode === 'plant' || fert.mode === 'tree');
     return `<form class="savebar" data-save="${kind}">
       <div class="row2">
-        <label>${esc(t('plots'))}<select name="plot">${rec.plots.map(p => `<option value="${p.id}" ${p.id === last ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>
+        <label>${esc(t('plots'))}<select name="plot">${rec.plots.map(p => `<option value="${esc(p.id)}" ${p.id === last ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>
         <label>${esc(t('date'))}<input type="date" name="date" value="${today()}"></label>
       </div>
       ${needsName ? `<label>${esc(t('what'))}<input type="text" name="what" maxlength="60"></label>` : ''}
@@ -625,19 +675,20 @@
     const msg = form.querySelector('.savemsg');
     if (!plot) return;
     const date = f.get('date');
-    let ok = true;
-    if (kind === 'texture') addEntry(plot.id, date, kind, { sand: tex.sand, clay: tex.clay });
-    else if (kind === 'ph') addEntry(plot.id, date, kind, { ph });
+    let list = [];
+    if (kind === 'texture') list = [makeEntry(plot.id, date, kind, { sand: tex.sand, clay: tex.clay })];
+    else if (kind === 'ph') list = [makeEntry(plot.id, date, kind, { ph })];
     else if (kind === 'slope') {
-      const rise = Number(slope.rise) || 0, run = Number(slope.run) || 0;
-      if (rise > 0 && run > 0) addEntry(plot.id, date, kind, { rise, run }); else ok = false;
+      const v = slopeValues();
+      if (v) list = [makeEntry(plot.id, date, kind, v)];
     } else if (kind === 'fert') {
-      const lines = fertLines(String(f.get('what') || ''));
-      if (lines.length) lines.forEach(l => addEntry(plot.id, date, 'fert', { what: l.what, kg: Math.round(l.kg * 100) / 100 })); else ok = false;
+      list = fertLines(String(f.get('what') || '')).map(l => makeEntry(plot.id, date, 'fert', { what: l.what, kg: Math.round(l.kg * 100) / 100 }));
     }
-    if (ok) store.set('lastPlot', plot.id);
-    msg.className = 'savemsg ' + (ok ? 'ok' : 'err');
-    msg.innerHTML = ok ? `${esc(fill('savedTo', { p: plot.name }))} <a href="#/rekod/${plot.id}">${esc(t('navRecords'))}</a>` : esc(t('nothingToSave'));
+    const stored = list.length > 0 && addEntries(list);
+    if (stored) store.set('lastPlot', plot.id);
+    msg.className = 'savemsg ' + (stored ? 'ok' : 'err');
+    msg.innerHTML = stored ? `${esc(fill('savedTo', { p: plot.name }))} <a href="#/rekod/${esc(plot.id)}">${esc(t('navRecords'))}</a>`
+      : esc(t(list.length ? 'saveFailed' : (kind === 'fert' && fertProblem()) || 'nothingToSave'));
   }
 
   function latestOf(id, kind) { return entriesOf(id).find(e => e.kind === kind); }
@@ -649,7 +700,7 @@
       <h2>${esc(t('plots'))}</h2>
       ${rec.plots.length ? `<ul class="quizlist">${rec.plots.map(p => {
         const n = entriesOf(p.id).length, phE = latestOf(p.id, 'ph');
-        return `<li><a href="#/rekod/${p.id}"><span class="ltitle"><b>${esc(p.name)}</b><small>${[p.crop, p.area ? `${p.area} ${t(p.unit)}` : '', `${n} ${t('entries')}`, phE ? `pH ${Number(phE.data.ph).toFixed(1)}` : ''].filter(Boolean).map(esc).join(' · ')}</small></span></a></li>`;
+        return `<li><a href="#/rekod/${esc(p.id)}"><span class="ltitle"><b>${esc(p.name)}</b><small>${[p.crop, p.area ? `${p.area} ${t(p.unit)}` : '', `${n} ${t('entries')}`, phE ? `pH ${Number(phE.data.ph).toFixed(1)}` : ''].filter(Boolean).map(esc).join(' · ')}</small></span></a></li>`;
       }).join('')}</ul>` : `<p class="empty">${esc(t('noPlots'))}</p>`}
       <form class="tool recform" id="plotform">
         <h2 class="first">${esc(t('addPlot'))}</h2>
@@ -688,9 +739,9 @@
       <h2>${esc(t('log'))}</h2>
       ${list.length ? `<ul class="loglist">${list.map(e => `<li>
         <div><small>${esc(e.date)} · ${esc(t(KIND_KEY[e.kind] || 'kNote'))}</small><span>${esc(entryText(e))}</span></div>
-        <button type="button" class="delbtn" data-delentry="${e.id}" aria-label="${esc(t('del'))}: ${esc(entryText(e))}">${esc(t('del'))}</button>
+        <button type="button" class="delbtn" data-delentry="${esc(e.id)}" aria-label="${esc(t('del'))}: ${esc(entryText(e))}">${esc(t('del'))}</button>
       </li>`).join('')}</ul>` : `<p class="empty">${esc(t('noEntries'))}</p>`}
-      <form class="tool recform" id="appform" data-plot="${p.id}">
+      <form class="tool recform" id="appform" data-plot="${esc(p.id)}">
         <h2 class="first">${esc(t('addApp'))}</h2>
         <label>${esc(t('date'))}<input type="date" name="date" value="${today()}"></label>
         <div class="row2">
@@ -700,7 +751,7 @@
         <button class="btn" type="submit">${esc(t('save'))}</button>
         <p class="err" role="alert" hidden>${esc(t('appNeeded'))}</p>
       </form>
-      <form class="tool recform" id="noteform" data-plot="${p.id}">
+      <form class="tool recform" id="noteform" data-plot="${esc(p.id)}">
         <h2 class="first">${esc(t('addNote'))}</h2>
         <label>${esc(t('date'))}<input type="date" name="date" value="${today()}"></label>
         <label>${esc(t('note'))}<textarea name="text" rows="3" maxlength="500"></textarea></label>
@@ -708,8 +759,8 @@
         <p class="err" role="alert" hidden>${esc(t('noteNeeded'))}</p>
       </form>
       <div class="lesson-end">
-        <button type="button" class="btn ghost" data-csv="${p.id}">${esc(t('csv'))}</button>
-        <button type="button" class="btn ghost danger" data-delplot="${p.id}">${esc(t('delPlot'))}</button>
+        <button type="button" class="btn ghost" data-csv="${esc(p.id)}">${esc(t('csv'))}</button>
+        <button type="button" class="btn ghost danger" data-delplot="${esc(p.id)}">${esc(t('delPlot'))}</button>
       </div>
     </section>`;
   }
@@ -731,18 +782,19 @@
   function cleanBackup(obj) {
     if (!obj || !Array.isArray(obj.plots) || !Array.isArray(obj.entries)) return null;
     const str = (v, n) => String(v == null ? '' : v).slice(0, n);
-    const plots = obj.plots.filter(p => p && p.id && p.name).map(p => ({ id: str(p.id, 40), name: str(p.name, 60), crop: str(p.crop, 60), area: Number(p.area) > 0 ? Number(p.area) : '', unit: HA[p.unit] ? p.unit : 'ha', trees: Number(p.trees) > 0 ? Math.round(Number(p.trees)) : '' }));
+    const okId = v => typeof v === 'string' && /^[a-z0-9]{1,40}$/i.test(v);
+    const plots = obj.plots.filter(p => p && okId(p.id) && p.name).map(p => ({ id: p.id, name: str(p.name, 60), crop: str(p.crop, 60), area: Number(p.area) > 0 ? Number(p.area) : '', unit: HA[p.unit] ? p.unit : 'ha', trees: Number(p.trees) > 0 ? Math.round(Number(p.trees)) : '' }));
     const ids = new Set(plots.map(p => p.id));
     const fin = v => Number.isFinite(Number(v));
-    const entries = obj.entries.filter(e => e && ids.has(String(e.plot)) && KIND_KEY[e.kind] && e.data && typeof e.data === 'object').map(e => {
+    const entries = obj.entries.filter(e => e && okId(e.plot) && ids.has(e.plot) && Object.prototype.hasOwnProperty.call(KIND_KEY, e.kind) && e.data && typeof e.data === 'object').map(e => {
       const d = e.data;
       let data = null;
       if (e.kind === 'texture' && fin(d.sand) && fin(d.clay) && d.sand >= 0 && d.clay >= 0 && Number(d.sand) + Number(d.clay) <= 100) data = { sand: Number(d.sand), clay: Number(d.clay) };
       else if (e.kind === 'ph' && fin(d.ph) && d.ph >= 0 && d.ph <= 14) data = { ph: Number(d.ph) };
-      else if (e.kind === 'slope' && Number(d.rise) > 0 && Number(d.run) > 0) data = { rise: Number(d.rise), run: Number(d.run) };
+      else if (e.kind === 'slope' && d.rise !== '' && d.rise !== null && fin(d.rise) && Number(d.rise) >= 0 && Number(d.run) > 0) data = { rise: Number(d.rise), run: Number(d.run) };
       else if (e.kind === 'fert' && Number(d.kg) > 0) data = { what: str(d.what, 60), kg: Number(d.kg) };
       else if (e.kind === 'note') data = { text: str(d.text, 500) };
-      return data && { id: str(e.id, 40) || newId(), plot: String(e.plot), date: /^\d{4}-\d{2}-\d{2}$/.test(e.date) ? e.date : today(), kind: e.kind, data };
+      return data && { id: okId(e.id) ? e.id : newId(), plot: e.plot, date: /^\d{4}-\d{2}-\d{2}$/.test(e.date) ? e.date : today(), kind: e.kind, data };
     }).filter(Boolean);
     return { plots, entries };
   }
@@ -804,7 +856,7 @@
     const size = quizSize(u.n);
     if (!quiz || quiz.n !== u.n) {
       return `<section class="page quiz">${head}
-        <p>${size} ${esc(t('questions'))}${best[u.n] !== undefined ? ` · ${esc(t('best'))} ${best[u.n]}/${size}` : ''}</p>
+        <p>${size} ${esc(t('questions'))}${best[u.n] !== undefined ? ` · ${esc(t('best'))} ${esc(best[u.n])}/${size}` : ''}</p>
         <button type="button" class="btn" data-start="${u.n}">${esc(t('start'))}</button>
       </section>`;
     }
@@ -879,13 +931,12 @@
       store.set('done', done); render(true); return;
     }
     if (d.delentry) {
-      if (window.confirm(t('confirmDelEntry'))) { rec.entries = rec.entries.filter(x => x.id !== d.delentry); saveRec(); render(true); }
+      if (window.confirm(t('confirmDelEntry'))) { commitRec(() => { rec.entries = rec.entries.filter(x => x.id !== d.delentry); }); render(true); }
       return;
     }
     if (d.delplot) {
       if (window.confirm(t('confirmDelPlot'))) {
-        rec.plots = rec.plots.filter(x => x.id !== d.delplot); rec.entries = rec.entries.filter(x => x.plot !== d.delplot);
-        saveRec(); location.hash = '#/rekod';
+        if (commitRec(() => { rec.plots = rec.plots.filter(x => x.id !== d.delplot); rec.entries = rec.entries.filter(x => x.plot !== d.delplot); })) location.hash = '#/rekod';
       }
       return;
     }
@@ -942,17 +993,22 @@
       e.preventDefault();
       const f = new FormData(form), err = form.querySelector('.err');
       const text = k => String(f.get(k) || '').trim();
-      let ok = false;
+      const needed = { plotform: 'nameNeeded', appform: 'appNeeded', noteform: 'noteNeeded' }[form.id];
+      let valid = false, stored = false;
       if (form.id === 'plotform' && text('name')) {
+        valid = true;
         const id = newId();
-        rec.plots.push({ id, name: text('name'), crop: text('crop'), area: Number(f.get('area')) > 0 ? Number(f.get('area')) : '', unit: f.get('unit'), trees: Number(f.get('trees')) > 0 ? Math.round(Number(f.get('trees'))) : '' });
-        saveRec(); store.set('lastPlot', id); ok = true;
-      } else if (form.id === 'appform' && text('what') && Number(f.get('kg')) > 0) {
-        addEntry(form.dataset.plot, f.get('date'), 'fert', { what: text('what'), kg: Number(f.get('kg')) }); ok = true;
-      } else if (form.id === 'noteform' && text('text')) {
-        addEntry(form.dataset.plot, f.get('date'), 'note', { text: text('text') }); ok = true;
+        stored = commitRec(() => { rec.plots.push({ id, name: text('name').slice(0, 60), crop: text('crop').slice(0, 60), area: Number(f.get('area')) > 0 ? Number(f.get('area')) : '', unit: HA[f.get('unit')] ? f.get('unit') : 'ha', trees: Number(f.get('trees')) > 0 ? Math.round(Number(f.get('trees'))) : '' }); });
+        if (stored) store.set('lastPlot', id);
+      } else if (form.id === 'appform' && plotById(form.dataset.plot) && text('what') && Number(f.get('kg')) > 0) {
+        valid = true;
+        stored = addEntries([makeEntry(form.dataset.plot, f.get('date'), 'fert', { what: text('what').slice(0, 60), kg: Number(f.get('kg')) })]);
+      } else if (form.id === 'noteform' && plotById(form.dataset.plot) && text('text')) {
+        valid = true;
+        stored = addEntries([makeEntry(form.dataset.plot, f.get('date'), 'note', { text: text('text').slice(0, 500) })]);
       }
-      if (ok) render(true); else err.hidden = false;
+      if (stored) render(true);
+      else { err.textContent = t(valid ? 'saveFailed' : needed); err.hidden = false; }
       return;
     }
     if (e.target.id !== 'jar') return;
@@ -975,13 +1031,19 @@
     reader.onload = () => {
       let clean = null;
       try { clean = cleanBackup(JSON.parse(reader.result)); } catch (err) { clean = null; }
-      if (clean && window.confirm(t('confirmRestore'))) { rec = clean; saveRec(); render(true); document.getElementById('recmsg').textContent = t('restoreOk'); }
-      else if (!clean) { const m = document.getElementById('recmsg'); m.className = 'savemsg err'; m.textContent = t('restoreBad'); }
+      if (clean && window.confirm(t('confirmRestore'))) {
+        const stored = commitRec(() => { rec = clean; });
+        render(true);
+        const m = document.getElementById('recmsg');
+        m.className = 'savemsg ' + (stored ? 'ok' : 'err'); m.textContent = t(stored ? 'restoreOk' : 'saveFailed');
+      } else if (!clean) { const m = document.getElementById('recmsg'); m.className = 'savemsg err'; m.textContent = t('restoreBad'); }
     };
     reader.readAsText(e.target.files[0]);
     e.target.value = '';
   });
 
+  rec = cleanBackup(rec) || { plots: [], entries: [] };
+  store.set('probe', 1);
   render(false);
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
     navigator.serviceWorker.register('sw.js').catch(() => {});
