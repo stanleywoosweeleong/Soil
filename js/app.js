@@ -479,13 +479,20 @@
   const HA = { ha: 1, m2: 1 / 10000, acre: 0.4047 };
   const areaHa = () => Math.max(0, Number(fert.area) || 0) * HA[fert.unit];
   const prod = id => PRODUCTS.find(p => p.id === id);
-  /* weights are stored in kilograms at full precision and rounded only here; small amounts read better in grams */
-  const kg = v => {
-    if (v > 0 && v < 0.001) return `${num(v * 1e6, 3)} mg`;
-    if (v > 0 && v < 1) { const g = v * 1000; return `${num(g, g < 10 ? 2 : 1)} g`; }
-    return `${num(v, v < 10 ? 2 : 1)} kg`;
-  };
-  const numIn = (label, key, extra = '') => `<label>${label}<input type="number" inputmode="decimal" min="0" step="any" data-f="${key}" value="${esc(fert[key])}" ${extra}></label>`;
+  /* Every quantity on screen goes through fmt(): four significant figures, or the whole number from 1,000 up.
+     shownAs() is the value that text represents, so a line can say "≈" whenever what is printed was rounded. */
+  const shownAs = v => (Math.abs(v) >= 1000 ? Math.round(v) : Number(Number(v).toPrecision(4)));
+  const fmt = v => Number(shownAs(v)).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-GB', { maximumFractionDigits: 10 });
+  const isExact = v => Math.abs(shownAs(v) - v) <= 1e-9 * Math.max(1, Math.abs(v));
+  /* "=" only when the result and every operand are printed exactly */
+  const eq = (result, ...operands) => (isExact(result) && operands.every(isExact) ? '=' : '≈');
+  /* weights are stored in kilograms at full precision; the unit is chosen so small amounts stay readable */
+  const massParts = v => (v > 0 && v < 0.001 ? [v * 1e6, 'mg'] : v > 0 && v < 1 ? [v * 1000, 'g'] : [v, 'kg']);
+  const kg = v => { const [n, unit] = massParts(v); return `${fmt(n)} ${unit}`; };
+  const massExact = v => isExact(massParts(v)[0]);
+  /* a count typed by the user: a whole number of 1 or more */
+  const isCount = v => String(v).trim() !== '' && Number.isInteger(Number(v)) && Number(v) >= 1;
+  const numIn = (label, key, extra = '', whole = false) => `<label>${label}<input type="number" inputmode="${whole ? 'numeric' : 'decimal'}" min="${whole ? 1 : 0}" step="${whole ? 1 : 'any'}" data-f="${key}" value="${esc(fert[key])}" ${extra}></label>`;
   function areaFields() {
     return `<div class="row2">${numIn(esc(t('area')), 'area')}
       <label><span class="vh">${esc(t('area'))}</span><select data-f="unit">${['ha', 'm2', 'acre'].map(u => `<option value="${u}" ${fert.unit === u ? 'selected' : ''}>${esc(t(u))}</option>`).join('')}</select></label>
@@ -512,10 +519,10 @@
       </div>`;
     }
     if (fert.mode === 'plant') {
-      return `<div class="row2">${numIn(esc(t('perPlantNeed')), 'need')}${numIn(esc(t('pct')), 'pct', 'max="100"')}</div>${numIn(esc(t('plants')), 'plants')}`;
+      return `<div class="row2">${numIn(esc(t('perPlantNeed')), 'need')}${numIn(esc(t('pct')), 'pct', 'max="100"')}</div>${numIn(esc(t('plants')), 'plants', '', true)}`;
     }
     if (fert.mode === 'tree') {
-      return `<div class="row2">${numIn(esc(t('treeRate')), 'trate')}${numIn(esc(t('apps')), 'tapps')}</div>${numIn(esc(t('trees')), 'ttrees')}`;
+      return `<div class="row2">${numIn(esc(t('treeRate')), 'trate')}${numIn(esc(t('apps')), 'tapps', '', true)}</div>${numIn(esc(t('trees')), 'ttrees', '', true)}`;
     }
     return `<div class="row2">${numIn(esc(t('bagWeight')), 'bag')}${numIn(esc(t('price')), 'price')}</div>` + gradeFields('bg') +
       `<p class="label">${esc(t('organicPresets'))}</p><div class="presets">${ORGANIC_PRESETS.map(o => `<button type="button" data-preset="bg:${o.g.join('-')}">${esc(tr(o.name))}</button>`).join('')}</div>`;
@@ -527,6 +534,9 @@
     if (fert.mode === 'compound' && !gradeOk(fert.g)) return 'pctBad';
     if (fert.mode === 'bag' && !gradeOk(fert.bg)) return 'pctBad';
     if (fert.mode === 'plant' && String(fert.pct).trim() !== '' && !pctOk(fert.pct)) return 'pctBad';
+    const blank = v => String(v).trim() === '';
+    if (fert.mode === 'plant' && !blank(fert.plants) && !isCount(fert.plants)) return 'countBad';
+    if (fert.mode === 'tree' && ((!blank(fert.tapps) && !isCount(fert.tapps)) || (!blank(fert.ttrees) && !isCount(fert.ttrees)))) return 'countBad';
     return null;
   }
   function fertResult() {
@@ -534,62 +544,68 @@
     const empty = `<p class="empty">${esc(t('enterRate'))}</p>`;
     const problem = fertProblem();
     if (problem) return `<p class="err" role="alert">${esc(t(problem))}</p>`;
+    const syms = ['N', 'P₂O₅', 'K₂O'];
+    const work = lines => `<details open><summary>${esc(t('working'))}</summary><ol class="work">${lines.map(l => `<li>${l}</li>`).join('')}</ol></details>`;
+    const bags = v => `${num(v / 50, 1)} ${esc(t('bags50'))}`;
     if (fert.mode === 'straight') {
       const lines = [['N', 'n', 'pn'], ['P₂O₅', 'p', 'pp'], ['K₂O', 'k', 'pk']].map(([sym, rk, pk]) => {
         const rate = Number(fert[rk]) || 0;
         if (rate <= 0) return null;
         const p = prod(fert[pk]);
-        const perHa = rate / (p[rk] / 100);
-        return { sym, rate, p, pctv: p[rk], perHa, total: perHa * a };
+        const frac = p[rk] / 100, perHa = rate / frac;
+        return { sym, rate, p, frac, perHa, total: perHa * a };
       }).filter(Boolean);
       if (!lines.length) return empty;
       return `<h2>${esc(t('result'))}</h2>
-        <ul class="res">${lines.map(l => `<li><span>${esc(tr(l.p.name))}</span><b>${kg(l.total)}</b><small>${num(l.perHa)} ${esc(t('perHa'))} · ${num(l.total / 50, 1)} ${esc(t('bags50'))}</small></li>`).join('')}</ul>
-        <details open><summary>${esc(t('working'))}</summary><ol class="work">${lines.map(l =>
-          `<li>${l.sym}: ${num(l.rate)} ÷ ${(l.pctv / 100).toFixed(2)} = ${num(l.perHa)} ${esc(t('perHa'))}; × ${num(a, 4)} ha = ${kg(l.total)}</li>`).join('')}</ol></details>`;
+        <ul class="res">${lines.map(l => `<li><span>${esc(tr(l.p.name))}</span><b>${kg(l.total)}</b><small>${fmt(l.perHa)} ${esc(t('perHa'))} · ${bags(l.total)}</small></li>`).join('')}</ul>
+        ${work(lines.map(l => `${l.sym}: ${fmt(l.rate)} ÷ ${fmt(l.frac)} ${eq(l.perHa, l.rate, l.frac)} ${fmt(l.perHa)} ${esc(t('perHa'))}; × ${fmt(a)} ha ${massExact(l.total) && isExact(l.perHa) && isExact(a) ? '=' : '≈'} ${kg(l.total)}`))}`;
     }
-    const syms = ['N', 'P₂O₅', 'K₂O'];
     if (fert.mode === 'compound') {
       const idx = { n: 0, p: 1, k: 2 }[fert.basis];
       const g = fert.g.map(v => Number(v) || 0);
       const rate = Number(fert.crate) || 0;
       if (rate <= 0) return empty;
       if (g[idx] <= 0) return `<p class="empty">${esc(t('gradeZero'))}</p>`;
-      const perHa = rate / (g[idx] / 100), total = perHa * a;
+      const frac = g[idx] / 100, perHa = rate / frac, total = perHa * a;
       return `<h2>${esc(t('result'))}</h2>
-        <ul class="res"><li><span>NPK ${g.join('-')}</span><b>${kg(total)}</b><small>${num(perHa)} ${esc(t('perHa'))} · ${num(total / 50, 1)} ${esc(t('bags50'))}</small></li></ul>
-        <p><b>${esc(t('alsoSupplies'))}</b> (${esc(t('perHa'))}): ${syms.map((s, i) => `${s} ${num(perHa * g[i] / 100)}`).join(' · ')}</p>
-        <details open><summary>${esc(t('working'))}</summary><ol class="work">
-          <li>${syms[idx]}: ${num(rate)} ÷ ${(g[idx] / 100).toFixed(2)} = ${num(perHa)} ${esc(t('perHa'))}</li>
-          <li>${num(perHa)} × ${num(a, 4)} ha = ${kg(total)}</li></ol></details>`;
+        <ul class="res"><li><span>NPK ${g.join('-')}</span><b>${kg(total)}</b><small>${fmt(perHa)} ${esc(t('perHa'))} · ${bags(total)}</small></li></ul>
+        <p><b>${esc(t('alsoSupplies'))}</b> (${esc(t('perHa'))}): ${syms.map((sym, i) => `${sym} ${fmt(perHa * g[i] / 100)}`).join(' · ')}</p>
+        ${work([
+          `${syms[idx]}: ${fmt(rate)} ÷ ${fmt(frac)} ${eq(perHa, rate, frac)} ${fmt(perHa)} ${esc(t('perHa'))}`,
+          `${fmt(perHa)} × ${fmt(a)} ha ${massExact(total) && isExact(perHa) && isExact(a) ? '=' : '≈'} ${kg(total)}`,
+        ])}`;
     }
     if (fert.mode === 'plant') {
-      const need = Number(fert.need) || 0, pctv = Number(fert.pct) || 0, n = Math.max(0, Number(fert.plants) || 0);
-      if (need <= 0 || pctv <= 0) return empty;
-      const each = need / (pctv / 100), total = each * n / 1000;
+      const need = Number(fert.need) || 0, pctv = Number(fert.pct) || 0;
+      if (need <= 0 || pctv <= 0 || !isCount(fert.plants)) return empty;
+      const n = Number(fert.plants);
+      const frac = pctv / 100, each = need / frac / 1000, total = each * n;   // kilograms
       return `<h2>${esc(t('result'))}</h2>
         <ul class="res">
-          <li><span>${esc(t('perPlant'))}</span><b>${num(each)} g</b></li>
-          <li><span>${esc(t('total'))}</span><b>${kg(total)}</b><small>${num(total / 50, 1)} ${esc(t('bags50'))}</small></li>
+          <li><span>${esc(t('perPlant'))}</span><b>${kg(each)}</b></li>
+          <li><span>${esc(t('total'))}</span><b>${kg(total)}</b><small>${bags(total)}</small></li>
         </ul>
-        <details open><summary>${esc(t('working'))}</summary><ol class="work">
-          <li>${num(need)} ÷ ${(pctv / 100).toFixed(2)} = ${num(each)} g</li>
-          <li>${num(each)} × ${num(n, 0)} = ${num(each * n, 0)} g = ${kg(total)}</li></ol></details>`;
+        ${work([
+          `${fmt(need)} g ÷ ${fmt(frac)} ${massExact(each) && isExact(need) && isExact(frac) ? '=' : '≈'} ${kg(each)}`,
+          `${kg(each)} × ${fmt(n)} ${massExact(total) && massExact(each) ? '=' : '≈'} ${kg(total)}`,
+        ])}`;
     }
     if (fert.mode === 'tree') {
-      const rate = Number(fert.trate) || 0, apps = Math.max(0, Math.round(Number(fert.tapps) || 0)), n = Math.max(0, Number(fert.ttrees) || 0);
-      if (rate <= 0 || apps <= 0) return empty;
+      const rate = Number(fert.trate) || 0;
+      if (rate <= 0 || !isCount(fert.tapps) || !isCount(fert.ttrees)) return empty;
+      const apps = Number(fert.tapps), n = Number(fert.ttrees);
       const each = rate / apps, round = each * n, year = rate * n;
       return `<h2>${esc(t('result'))}</h2>
         <ul class="res">
-          <li><span>${esc(t('perApp'))}</span><b>${each < 1 ? num(each * 1000, 0) + ' g' : kg(each)}</b></li>
-          <li><span>${esc(t('perRound'))}</span><b>${kg(round)}</b><small>${num(round / 50, 1)} ${esc(t('bags50'))}</small></li>
-          <li><span>${esc(t('perYear'))}</span><b>${kg(year)}</b><small>${num(year / 50, 1)} ${esc(t('bags50'))}</small></li>
+          <li><span>${esc(t('perApp'))}</span><b>${kg(each)}</b></li>
+          <li><span>${esc(t('perRound'))}</span><b>${kg(round)}</b><small>${bags(round)}</small></li>
+          <li><span>${esc(t('perYear'))}</span><b>${kg(year)}</b><small>${bags(year)}</small></li>
         </ul>
-        <details open><summary>${esc(t('working'))}</summary><ol class="work">
-          <li>${num(rate, 2)} ÷ ${apps} = ${num(each, 3)} kg</li>
-          <li>${num(each, 3)} × ${num(n, 0)} = ${kg(round)}</li>
-          <li>${num(rate, 2)} × ${num(n, 0)} = ${kg(year)}</li></ol></details>`;
+        ${work([
+          `${fmt(rate)} kg ÷ ${fmt(apps)} ${massExact(each) && isExact(rate) ? '=' : '≈'} ${kg(each)}`,
+          `${kg(each)} × ${fmt(n)} ${massExact(round) && massExact(each) ? '=' : '≈'} ${kg(round)}`,
+          `${fmt(rate)} kg × ${fmt(n)} ${massExact(year) && isExact(rate) ? '=' : '≈'} ${kg(year)}`,
+        ])}`;
     }
     const w = Number(fert.bag) || 0;
     const g = fert.bg.map(v => Number(v) || 0);
@@ -598,9 +614,9 @@
     const sum = amt[0] + amt[1] + amt[2];
     const price = Number(fert.price) || 0;
     return `<h2>${esc(t('contains'))}</h2>
-      <ul class="res">${syms.map((s, i) => `<li><span>${s}</span><b>${kg(amt[i])}</b><small>${num(w)} × ${num(g[i] / 100, 3)}</small></li>`).join('')}</ul>
-      <p><b>${esc(t('elemental'))}:</b> P ${kg(amt[1] * 0.436)} (P₂O₅ × 0.436) · K ${kg(amt[2] * 0.83)} (K₂O × 0.83)</p>
-      ${price > 0 && sum > 0 ? `<ul class="res"><li><span>${esc(t('costPerKg'))}</span><b>${num(price / sum, 2)}</b><small>${num(price, 2)} ÷ ${num(sum, 2)} kg. ${esc(t('costNote'))}</small></li></ul>` : ''}`;
+      <ul class="res">${syms.map((sym, i) => `<li><span>${sym}</span><b>${kg(amt[i])}</b><small>${fmt(w)} kg × ${fmt(g[i] / 100)} ${massExact(amt[i]) && isExact(w) ? '=' : '≈'} ${kg(amt[i])}</small></li>`).join('')}</ul>
+      <p><b>${esc(t('elemental'))}:</b> P ${massExact(amt[1] * 0.436) ? '' : '≈ '}${kg(amt[1] * 0.436)} (P₂O₅ × 0.436) · K ${massExact(amt[2] * 0.83) ? '' : '≈ '}${kg(amt[2] * 0.83)} (K₂O × 0.83)</p>
+      ${price > 0 && sum > 0 ? `<ul class="res"><li><span>${esc(t('costPerKg'))}</span><b>${isExact(price / sum) ? '' : '≈ '}${fmt(price / sum)}</b><small>${fmt(price)} ÷ ${kg(sum)}. ${esc(t('costNote'))}</small></li></ul>` : ''}`;
   }
   function toolFert() {
     return `<p class="tool-desc">${esc(t('tFertDesc'))}</p>
@@ -646,11 +662,11 @@
     }
     const what = material.trim() || t('product');
     if (fert.mode === 'plant') {
-      const need = Number(fert.need) || 0, pctv = Number(fert.pct) || 0, n = Number(fert.plants) || 0;
+      const need = Number(fert.need) || 0, pctv = Number(fert.pct) || 0, n = isCount(fert.plants) ? Number(fert.plants) : 0;
       return need > 0 && pctv > 0 && n > 0 ? [{ what, kg: need / (pctv / 100) * n / 1000 }] : [];
     }
     if (fert.mode === 'tree') {
-      const rate = Number(fert.trate) || 0, apps = Math.round(Number(fert.tapps) || 0), n = Number(fert.ttrees) || 0;
+      const rate = Number(fert.trate) || 0, apps = isCount(fert.tapps) ? Number(fert.tapps) : 0, n = isCount(fert.ttrees) ? Number(fert.ttrees) : 0;
       return rate > 0 && apps > 0 && n > 0 ? [{ what, kg: rate / apps * n }] : [];
     }
     return [];
@@ -994,10 +1010,11 @@
       const text = k => String(f.get(k) || '').trim();
       const needed = { plotform: 'nameNeeded', appform: 'appNeeded', noteform: 'noteNeeded' }[form.id];
       let valid = false, stored = false;
-      if (form.id === 'plotform' && text('name')) {
+      const treesOk = text('trees') === '' || isCount(text('trees'));
+      if (form.id === 'plotform' && text('name') && treesOk) {
         valid = true;
         const id = newId();
-        stored = commitRec(() => { rec.plots.push({ id, name: text('name').slice(0, 60), crop: text('crop').slice(0, 60), area: Number(f.get('area')) > 0 ? Number(f.get('area')) : '', unit: HA[f.get('unit')] ? f.get('unit') : 'ha', trees: Number(f.get('trees')) > 0 ? Math.round(Number(f.get('trees'))) : '' }); });
+        stored = commitRec(() => { rec.plots.push({ id, name: text('name').slice(0, 60), crop: text('crop').slice(0, 60), area: Number(f.get('area')) > 0 ? Number(f.get('area')) : '', unit: HA[f.get('unit')] ? f.get('unit') : 'ha', trees: isCount(text('trees')) ? Number(text('trees')) : '' }); });
         if (stored) store.set('lastPlot', id);
       } else if (form.id === 'appform' && plotById(form.dataset.plot) && text('what') && Number(f.get('kg')) > 0) {
         valid = true;
@@ -1007,7 +1024,7 @@
         stored = addEntries([makeEntry(form.dataset.plot, f.get('date'), 'note', { text: text('text').slice(0, 500) })]);
       }
       if (stored) render(true);
-      else { err.textContent = t(valid ? 'saveFailed' : needed); err.hidden = false; }
+      else { err.textContent = t(valid ? 'saveFailed' : (form.id === 'plotform' && text('name') && !treesOk) ? 'countBad' : needed); err.hidden = false; }
       return;
     }
     if (e.target.id !== 'jar') return;
