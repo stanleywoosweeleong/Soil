@@ -1,6 +1,6 @@
 /* Network first, falling back to this version's cache, so updates arrive as soon as the device is online. */
 const PREFIX = 'soil-';
-const CACHE = PREFIX + 'v7';
+const CACHE = PREFIX + 'v8';
 const FILES = ['./', 'index.html', 'css/styles.css', 'js/content.js', 'js/units.js', 'js/crops.js', 'js/records.js', 'js/app.js', 'icon.svg', 'manifest.webmanifest'];
 
 self.addEventListener('install', e => {

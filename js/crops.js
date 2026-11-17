@@ -77,7 +77,6 @@ const SLOPE_DO = [     // slope in percent
 ];
 
 const ORGANIC_PRESETS = [
-  { g: [2.2, 1.8, 1.1], name: ['Tahi ayam', 'Poultry manure', '鸡粪'] },
   { g: [1.4, 0.4, 2.0], name: ['Tahi lembu', 'Cattle manure', '牛粪'] },
   { g: [0.5, 0.2, 0.5], name: ['Baja kandang reput', 'Rotted farmyard manure', '腐熟厩肥'] },
 ];
@@ -185,9 +184,9 @@ LESSONS['7-2'] = { book: '', title: ['Durian', 'Durian', '榴莲'], body: [
   ['ul', [
     ['Peringkat awal menekankan nitrogen dan fosforus; pokok yang berbuah beralih kepada gred yang tinggi kalium.', 'The early years emphasise nitrogen and phosphorus; bearing trees move to high-potassium grades.', '幼龄期侧重氮和磷；结果树转用高钾配比。'],
     ['Baja ditabur di sekeliling kanopi, sedikit melepasi jejarinya. Di tanah curam, baja dimasukkan ke dalam lubang di sekeliling kanopi dan ditimbus.', 'Fertiliser is broadcast around the canopy, slightly beyond its radius. On steep land, it goes into holes around the canopy and is covered.', '肥料撒施在树冠周围，略超出树冠半径。在陡坡地，则放入树冠周围的穴中并覆土。'],
-    ['Sumber itu juga menyenaraikan 15 hingga 30 kg tahi ayam atau tahi lembu sepokok setahun. Gunakan hanya baja kandang yang telah dikompos sepenuhnya, dan kira nutriennya sebagai sebahagian daripada program, bukan sebagai tambahan kepada program baja mineral yang penuh.',
-     'The source also lists 15 to 30 kg of chicken or cow dung per tree per year. Use only fully composted manure, and count its nutrients as part of the programme, not on top of a full mineral fertiliser programme.',
-     '该来源还列出每株每年 15 至 30 公斤鸡粪或牛粪。只可使用充分腐熟的粪肥，并把其养分计入施肥计划之内，而不是在完整的化肥计划之外额外追加。'],
+    ['Sumber itu juga menyenaraikan 15 hingga 30 kg tahi lembu sepokok setahun. Gunakan hanya baja kandang yang telah dikompos sepenuhnya, dan kira nutriennya sebagai sebahagian daripada program, bukan sebagai tambahan kepada program baja mineral yang penuh.',
+     'The source also lists 15 to 30 kg of cow dung per tree per year. Use only fully composted manure, and count its nutrients as part of the programme, not on top of a full mineral fertiliser programme.',
+     '该来源还列出每株每年 15 至 30 公斤牛粪。只可使用充分腐熟的粪肥，并把其养分计入施肥计划之内，而不是在完整的化肥计划之外额外追加。'],
   ]],
   ['tool', 'baja'],
 ] };
@@ -320,7 +319,6 @@ LESSONS['6-2'].body.push(
   ['h', ['Kandungan nutrien baja organik', 'Nutrients in organic manures', '有机肥的养分含量']],
   ['table', { head: [['Bahan', 'Material', '材料'], 'N', 'P₂O₅', 'K₂O'],
     rows: [
-      [['Tahi ayam', 'Poultry manure', '鸡粪'], '2.2', '1.8', '1.1'],
       [['Tahi lembu', 'Cattle manure', '牛粪'], '1.4', '0.4', '2.0'],
       [['Baja kandang yang reput sepenuhnya', 'Well-rotted farmyard manure', '充分腐熟的厩肥'], '0.5', '0.2', '0.5'],
     ] }],
