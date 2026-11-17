@@ -48,12 +48,15 @@
   const def = { where: null, pick: null };
   const tex = { sand: 40, clay: 20 };
   let ph = 5.0;
+  const phx = { crop: 'gen', tex: 'sloam' };
+  const slope = { rise: '', run: '' };
   const fert = Object.assign({
     mode: 'straight', area: 1, unit: 'ha',
     n: 100, p: 40, k: 60, pn: 'urea', pp: 'tsp', pk: 'mop',
     g: [15, 15, 15], basis: 'n', crate: 60,
     need: 20, pct: 60, plants: 300,
     bag: 50, bg: [15, 15, 15], price: '',
+    trate: 4.5, tapps: 4, ttrees: 100,
   }, store.get('fert', null) || {});
 
   const unitOf = id => UNITS.find(u => u.lessons.includes(id));
@@ -138,8 +141,8 @@
   }
 
   const FIGS = { profile: figProfile, composition: figComposition, structure: figStructure, phscale: figPhScale };
-  const TOOLS = ['tekstur', 'ph', 'tanda', 'baja'];
-  const TOOL_KEYS = { tekstur: 'tTexture', ph: 'tPh', tanda: 'tDef', baja: 'tFert' };
+  const TOOLS = ['tekstur', 'ph', 'cerun', 'tanda', 'baja'];
+  const TOOL_KEYS = { tekstur: 'tTexture', ph: 'tPh', cerun: 'tSlope', tanda: 'tDef', baja: 'tFert' };
 
   /* ---------- lesson blocks ---------- */
   function block(b) {
@@ -260,7 +263,7 @@
 
   function pageTools(which) {
     const cur = TOOLS.includes(which) ? which : 'tekstur';
-    const body = { tekstur: toolTexture, ph: toolPh, tanda: toolDef, baja: toolFert }[cur]();
+    const body = { tekstur: toolTexture, ph: toolPh, cerun: toolSlope, tanda: toolDef, baja: toolFert }[cur]();
     return `<section class="page">
       <h1>${esc(t('navTools'))}</h1>
       <p class="lede">${esc(t('toolsIntro'))}</p>
@@ -359,7 +362,25 @@
         <li><span>${esc(t('phLimited'))}</span><b>${b.limited || esc(t('phNone'))}</b></li>
         <li><span>${esc(t('phExcess'))}</span><b>${b.excess || esc(t('phNone'))}</b></li>
       </ul>
-      <p class="hint">${esc(t('availNote'))}</p>`;
+      <p class="hint">${esc(t('availNote'))}</p>
+      ${limeCard()}`;
+  }
+  function limeCard() {
+    const crop = CROP_PH.find(c => c.id === phx.crop);
+    const [lo, hi] = crop.range;
+    let body;
+    if (ph > hi) body = `<p>${esc(t('aboveRange'))}</p>`;
+    else if (ph >= lo) body = `<p>${esc(t('inRange'))}</p>`;
+    else {
+      const f = LIME_TEX.find(x => x.id === phx.tex).f;
+      const to = Math.min(lo, ph + 1);
+      const tonnes = (to - ph) * f;
+      body = `<p class="big">${num(tonnes)} t/ha</p>
+        <p>${esc(fill('limeText', { a: ph.toFixed(1), b: to.toFixed(1), t: num(tonnes) }))}${to < lo ? ' ' + esc(t('limeMore')) : ''}</p>
+        <details><summary>${esc(t('working'))}</summary><p class="work">(${to.toFixed(1)} − ${ph.toFixed(1)}) × ${f} = ${num(tonnes)} t/ha</p><p class="hint">${esc(t('limeNote'))}</p></details>`;
+    }
+    return `<h2>${esc(t('limeEst'))}</h2>
+      <p class="label">${esc(tr(crop.name))}: ${esc(t('target'))} ${lo.toFixed(1)} – ${hi.toFixed(1)}</p>${body}`;
   }
   function toolPh() {
     return `<p class="tool-desc">${esc(t('tPhDesc'))}</p>
@@ -367,7 +388,35 @@
         <input type="range" id="r-ph" min="3" max="9" step="0.1" value="${ph}" style="--track:${PH_GRADIENT}">
         ${phTicks()}
       </label>
+      <div class="row2">
+        <label>${esc(t('crop'))}<select data-phx="crop">${CROP_PH.map(c => `<option value="${c.id}" ${phx.crop === c.id ? 'selected' : ''}>${esc(tr(c.name))}</option>`).join('')}</select></label>
+        <label>${esc(t('soilTex'))}<select data-phx="tex">${LIME_TEX.map(c => `<option value="${c.id}" ${phx.tex === c.id ? 'selected' : ''}>${esc(tr(c.name))}</option>`).join('')}</select></label>
+      </div>
       <div id="phout" aria-live="polite">${phResult()}</div>`;
+  }
+
+  /* ----- slope tool ----- */
+  function slopeResult() {
+    const rise = Number(slope.rise) || 0, run = Number(slope.run) || 0;
+    if (rise <= 0 || run <= 0) return `<p class="empty">${esc(t('enterSlope'))}</p>`;
+    const pct = rise / run * 100;
+    const deg = Math.atan(rise / run) * 180 / Math.PI;
+    return `<div class="readout">
+        <p class="label">${esc(t('slope'))}</p>
+        <p class="big">${num(pct)}% · ${num(deg)}°</p>
+      </div>
+      <ul class="res plain-res">
+        <li><span>${esc(t('slopeDo'))}</span><b>${esc(tr(SLOPE_DO.find(x => pct < x.max).text))}</b></li>
+        <li><span>${esc(t('slopePalm'))}</span><b>${esc(tr(SLOPE_PALM.find(x => deg <= x.max).name))}</b></li>
+      </ul>
+      <details open><summary>${esc(t('working'))}</summary><p class="work">${num(rise, 2)} ÷ ${num(run, 2)} × 100 = ${num(pct)}%</p></details>
+      <p class="hint">${esc(t('slopeNote'))}</p>`;
+  }
+  function toolSlope() {
+    const f = (key) => `<label>${esc(t(key))}<input type="number" inputmode="decimal" min="0" step="any" data-slope="${key}" value="${esc(slope[key])}"></label>`;
+    return `<p class="tool-desc">${esc(t('tSlopeDesc'))}</p>
+      <div class="row2">${f('rise')}${f('run')}</div>
+      <div id="slopeout" aria-live="polite">${slopeResult()}</div>`;
   }
 
   /* ----- deficiency key ----- */
@@ -421,7 +470,11 @@
     if (fert.mode === 'plant') {
       return `<div class="row2">${numIn(esc(t('perPlantNeed')), 'need')}${numIn(esc(t('pct')), 'pct', 'max="100"')}</div>${numIn(esc(t('plants')), 'plants')}`;
     }
-    return `<div class="row2">${numIn(esc(t('bagWeight')), 'bag')}${numIn(esc(t('price')), 'price')}</div>` + gradeFields('bg');
+    if (fert.mode === 'tree') {
+      return `<div class="row2">${numIn(esc(t('treeRate')), 'trate')}${numIn(esc(t('apps')), 'tapps')}</div>${numIn(esc(t('trees')), 'ttrees')}`;
+    }
+    return `<div class="row2">${numIn(esc(t('bagWeight')), 'bag')}${numIn(esc(t('price')), 'price')}</div>` + gradeFields('bg') +
+      `<p class="label">${esc(t('organicPresets'))}</p><div class="presets">${ORGANIC_PRESETS.map(o => `<button type="button" data-preset="bg:${o.g.join('-')}">${esc(tr(o.name))}</button>`).join('')}</div>`;
   }
   function fertResult() {
     const a = areaHa();
@@ -468,6 +521,21 @@
           <li>${num(need)} ÷ ${(pctv / 100).toFixed(2)} = ${num(each)} g</li>
           <li>${num(each)} × ${num(n, 0)} = ${num(each * n, 0)} g = ${kg(total)}</li></ol></details>`;
     }
+    if (fert.mode === 'tree') {
+      const rate = Number(fert.trate) || 0, apps = Math.max(0, Math.round(Number(fert.tapps) || 0)), n = Math.max(0, Number(fert.ttrees) || 0);
+      if (rate <= 0 || apps <= 0) return empty;
+      const each = rate / apps, round = each * n, year = rate * n;
+      return `<h2>${esc(t('result'))}</h2>
+        <ul class="res">
+          <li><span>${esc(t('perApp'))}</span><b>${each < 1 ? num(each * 1000, 0) + ' g' : kg(each)}</b></li>
+          <li><span>${esc(t('perRound'))}</span><b>${kg(round)}</b><small>${num(round / 50, 1)} ${esc(t('bags50'))}</small></li>
+          <li><span>${esc(t('perYear'))}</span><b>${kg(year)}</b><small>${num(year / 50, 1)} ${esc(t('bags50'))}</small></li>
+        </ul>
+        <details open><summary>${esc(t('working'))}</summary><ol class="work">
+          <li>${num(rate, 2)} ÷ ${apps} = ${num(each, 3)} kg</li>
+          <li>${num(each, 3)} × ${num(n, 0)} = ${kg(round)}</li>
+          <li>${num(rate, 2)} × ${num(n, 0)} = ${kg(year)}</li></ol></details>`;
+    }
     const w = Number(fert.bag) || 0;
     const g = fert.bg.map(v => Number(v) || 0);
     if (w <= 0) return empty;
@@ -475,13 +543,13 @@
     const sum = amt[0] + amt[1] + amt[2];
     const price = Number(fert.price) || 0;
     return `<h2>${esc(t('contains'))}</h2>
-      <ul class="res">${syms.map((s, i) => `<li><span>${s}</span><b>${kg(amt[i])}</b><small>${num(w)} × ${(g[i] / 100).toFixed(2)}</small></li>`).join('')}</ul>
+      <ul class="res">${syms.map((s, i) => `<li><span>${s}</span><b>${kg(amt[i])}</b><small>${num(w)} × ${num(g[i] / 100, 3)}</small></li>`).join('')}</ul>
       <p><b>${esc(t('elemental'))}:</b> P ${kg(amt[1] * 0.436)} (P₂O₅ × 0.436) · K ${kg(amt[2] * 0.83)} (K₂O × 0.83)</p>
       ${price > 0 && sum > 0 ? `<ul class="res"><li><span>${esc(t('costPerKg'))}</span><b>${num(price / sum, 2)}</b><small>${num(price, 2)} ÷ ${num(sum, 2)} kg. ${esc(t('costNote'))}</small></li></ul>` : ''}`;
   }
   function toolFert() {
     return `<p class="tool-desc">${esc(t('tFertDesc'))}</p>
-      <div class="seg small" role="tablist">${[['straight', 'modeStraight'], ['compound', 'modeCompound'], ['plant', 'modePlant'], ['bag', 'modeBag']].map(m =>
+      <div class="seg small" role="tablist">${[['straight', 'modeStraight'], ['compound', 'modeCompound'], ['plant', 'modePlant'], ['tree', 'modeTree'], ['bag', 'modeBag']].map(m =>
         `<button type="button" role="tab" data-mode="${m[0]}" aria-selected="${fert.mode === m[0]}">${esc(t(m[1]))}</button>`).join('')}</div>
       <form class="fert" id="fert" onsubmit="return false">${fertInputs()}</form>
       <div class="fert-out" id="fertout" aria-live="polite">${fertResult()}</div>`;
@@ -651,6 +719,8 @@
       tex.sand = sand; tex.clay = clay; updateTexture(); return;
     }
     if (el.id === 'r-ph') { ph = Number(el.value); document.getElementById('phout').innerHTML = phResult(); return; }
+    if (el.dataset.slope) { slope[el.dataset.slope] = el.value; document.getElementById('slopeout').innerHTML = slopeResult(); return; }
+    if (el.dataset.phx) { phx[el.dataset.phx] = el.value; document.getElementById('phout').innerHTML = phResult(); return; }
     if (el.id === 'gq') { glossQuery = el.value; document.getElementById('glist').innerHTML = glossaryRows(); return; }
     if (el.dataset.f || el.dataset.g) {
       if (el.dataset.f) fert[el.dataset.f] = el.value;

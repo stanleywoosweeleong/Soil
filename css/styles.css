@@ -293,7 +293,7 @@ h2.sec { margin-top: 2rem; font-size: 1.15rem; color: var(--muted); }
   font: 700 1rem/1.25 var(--display); text-decoration: none;
 }
 .tasks a:hover { background: var(--wash); }
-@media (min-width: 760px) { .tasks { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 760px) { .tasks { grid-template-columns: repeat(4, 1fr); } }
 .chapter { margin-top: 1.75rem; }
 .chapter h3 { font-size: 1.25rem; }
 .chip { min-width: 40px; }
@@ -316,3 +316,4 @@ h2.sec { margin-top: 2rem; font-size: 1.15rem; color: var(--muted); }
 .opt.chosen { border-color: var(--leaf); box-shadow: inset 6px 0 0 var(--leaf); font-weight: 600; }
 .plain-res { margin-top: 12px; }
 .plain-res b { font-size: 1.05rem; }
+.tool p.big { font: 700 clamp(1.6rem, 5vw, 2.2rem) var(--display); margin: 2px 0 6px; }

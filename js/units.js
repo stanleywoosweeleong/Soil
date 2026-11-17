@@ -30,6 +30,8 @@ const TASKS = [
   { href: 'alat/ph', t: ['Fahami bacaan pH', 'Make sense of a pH reading', '看懂 pH 读数'] },
   { href: 'alat/tanda', t: ['Daun kelihatan tidak sihat', 'Leaves look unhealthy', '叶片看起来不健康'] },
   { href: 'nota/4-2', t: ['Tanah dihanyutkan hujan', 'Rain is washing soil away', '雨水把土冲走'] },
+  { href: 'alat/cerun', t: ['Ukur cerun', 'Measure a slope', '测量坡度'] },
+  { href: 'nota/7-1', t: ['Kelapa sawit dan pokok buah', 'Oil palm and fruit trees', '油棕与果树'] },
   { href: 'alat/baja', t: ['Kira kuantiti baja', 'Work out how much fertiliser', '计算肥料用量'] },
 ];
 
