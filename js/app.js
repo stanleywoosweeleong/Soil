@@ -1,6 +1,7 @@
 /* Soil field guide: routing, rendering, tools and quizzes. */
 (function () {
   'use strict';
+  const { classify, shownAs, isExact, eq, massParts, isCount, HA } = SoilCalc;
 
   /* ---------- storage ---------- */
   const store = {
@@ -65,7 +66,7 @@
   function commitRec(mutate) {
     const before = JSON.stringify(rec);
     mutate();
-    if (saveRec()) return true;
+    if (saveRec()) { store.set('lastChange', new Date().toISOString()); return true; }
     rec = JSON.parse(before);
     return false;
   }
@@ -78,7 +79,7 @@
     mode: 'straight', area: 1, unit: 'ha',
     n: 100, p: 40, k: 60, pn: 'urea', pp: 'tsp', pk: 'mop',
     g: [15, 15, 15], basis: 'n', crate: 60,
-    need: 20, pct: 60, plants: 300,
+    need: 20, pct: 60, plants: 300, pnut: 'k',
     bag: 50, bg: [15, 15, 15], price: '',
     trate: 4.5, tapps: 4, ttrees: 100,
   }, store.get('fert', null) || {});
@@ -88,6 +89,7 @@
     if (!['straight', 'compound', 'plant', 'tree', 'bag'].includes(fert.mode)) fert.mode = 'straight';
     if (!['ha', 'm2', 'acre'].includes(fert.unit)) fert.unit = 'ha';
     if (!['n', 'p', 'k'].includes(fert.basis)) fert.basis = 'n';
+    if (!['', 'n', 'p', 'k'].includes(fert.pnut)) fert.pnut = '';
     fert.g = triple(fert.g); fert.bg = triple(fert.bg);
     [['pn', 'n', 'urea'], ['pp', 'p', 'tsp'], ['pk', 'k', 'mop']].forEach(([key, field, fallback]) => {
       if (!PRODUCTS.some(x => x.id === fert[key] && x[field] > 0)) fert[key] = fallback;
@@ -201,6 +203,44 @@
     }
   }
 
+  /* ---------- field readiness ---------- */
+  const offline = { state: 'checking', cached: 0, total: 0, updated: null };
+  const day = iso => { const d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(lang === 'zh' ? 'zh-CN' : lang === 'ms' ? 'ms-MY' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); };
+  function backupStatus() {
+    if (!rec.plots.length && !rec.entries.length) return t('rNoRecords');
+    const last = store.get('lastBackup', null), change = store.get('lastChange', null);
+    if (!last || !day(last)) return t('rNever');
+    return fill(change && change > last ? 'rStale' : 'rBackedUp', { d: day(last) });
+  }
+  function readinessRows() {
+    const off = offline.state === 'ready' ? `<b class="risk riskLow">${esc(t('rReady'))}</b>`
+      : offline.state === 'unsupported' ? esc(t('rUnsupported'))
+      : offline.state === 'checking' ? esc(t('rChecking'))
+      : `<b class="risk riskHigh">${esc(t('rNotReady'))}</b>${offline.total ? ` <span class="plain">${esc(fill('rFiles', { a: offline.cached, b: offline.total }))}</span>` : ''}`;
+    const stale = /^(rStale|rNever)$/.test(!rec.plots.length && !rec.entries.length ? '' : (!store.get('lastBackup', null) ? 'rNever' : (store.get('lastChange', '') > store.get('lastBackup', '') ? 'rStale' : '')));
+    return `<li><span>${esc(t('rOffline'))}</span><div>${off}</div></li>
+      <li><span>${esc(t('rContent'))}</span><div>${offline.updated && day(offline.updated) ? esc(day(offline.updated)) : '—'}</div></li>
+      <li><span>${esc(t('rBackup'))}</span><div>${stale ? `<b class="risk riskSome">${esc(backupStatus())}</b> <a href="#/rekod">${esc(t('navRecords'))}</a>` : esc(backupStatus())}</div></li>`;
+  }
+  /* ask the service worker what it has saved; the answer updates the panel if it is on screen */
+  function checkOffline() {
+    const paint = () => { const el = document.getElementById('ready'); if (el) el.innerHTML = readinessRows(); };
+    if (!('serviceWorker' in navigator)) { offline.state = 'unsupported'; paint(); return; }
+    const sw = navigator.serviceWorker.controller;
+    if (!sw) { offline.state = 'notready'; paint(); return; }
+    const channel = new MessageChannel();
+    const timer = setTimeout(() => { offline.state = 'notready'; paint(); }, 4000);
+    channel.port1.onmessage = e => {
+      clearTimeout(timer);
+      const d = e.data || {};
+      offline.cached = Number(d.cached) || 0; offline.total = Number(d.total) || 0;
+      offline.updated = typeof d.updated === 'string' ? d.updated : null;
+      offline.state = offline.total > 0 && offline.cached === offline.total ? 'ready' : 'notready';
+      paint();
+    };
+    sw.postMessage({ type: 'soil-status' }, [channel.port2]);
+  }
+
   /* ---------- pages ---------- */
   function pageHome() {
     const pct = Math.round((done.length / ALL_LESSONS.length) * 100);
@@ -213,6 +253,10 @@
     <section>
       <h2 class="sec">${esc(t('tasksTitle'))}</h2>
       <ul class="tasks">${TASKS.map(k => `<li><a href="#/${k.href}">${esc(tr(k.t))}</a></li>`).join('')}</ul>
+    </section>
+    <section>
+      <h2 class="sec">${esc(t('readyTitle'))}</h2>
+      <ul class="res plain-res ready" id="ready">${readinessRows()}</ul>
     </section>
     <section>
       <h2 class="sec">${esc(t('unitsTitle'))}</h2>
@@ -313,21 +357,6 @@
   }
 
   /* ----- texture tool ----- */
-  function classify(sand, clay) {
-    const silt = 100 - sand - clay;
-    if (silt + 1.5 * clay < 15) return 'sand';
-    if (silt + 2 * clay < 30) return 'loamySand';
-    if ((clay >= 7 && clay < 20 && sand > 52) || (clay < 7 && silt < 50)) return 'sandyLoam';
-    if (clay >= 7 && clay < 27 && silt >= 28 && silt < 50 && sand <= 52) return 'loam';
-    if ((silt >= 50 && clay >= 12 && clay < 27) || (silt >= 50 && silt < 80 && clay < 12)) return 'siltLoam';
-    if (silt >= 80 && clay < 12) return 'silt';
-    if (clay >= 20 && clay < 35 && silt < 28 && sand > 45) return 'sandyClayLoam';
-    if (clay >= 27 && clay < 40 && sand > 20 && sand <= 45) return 'clayLoam';
-    if (clay >= 27 && clay < 40 && sand <= 20) return 'siltyClayLoam';
-    if (clay >= 35 && sand > 45) return 'sandyClay';
-    if (clay >= 40 && silt >= 40) return 'siltyClay';
-    return 'clay';
-  }
   /* triangle: clay apex on top, sand bottom-left, silt bottom-right */
   const W = 320, H = 277, PAD = 26;
   const pt = (sand, clay) => {
@@ -370,7 +399,7 @@
         <p class="hint">${esc(t('siltAuto'))}</p>
       </div>
       ${saveBar('texture')}
-      <form class="jar" id="jar">
+      <form class="jar" id="jar" novalidate>
         <h2>${esc(t('jarTitle'))}</h2>
         <p>${esc(t('jarDesc'))}</p>
         <div class="row3">
@@ -429,26 +458,18 @@
   }
 
   /* ----- slope tool ----- */
-  /* a rise of 0 is flat ground and is valid; a blank rise is not */
-  function slopeValues() {
-    const rise = Number(slope.rise), run = Number(slope.run);
-    if (String(slope.rise).trim() === '' || !Number.isFinite(rise) || rise < 0 || !Number.isFinite(run) || run <= 0) return null;
-    if (!Number.isFinite(rise / run)) return null;   // numbers too extreme to divide
-    return { rise, run };
-  }
+  const slopeValues = () => SoilCalc.slopeOf(slope.rise, slope.run);
   function slopeResult() {
     const v = slopeValues();
     if (!v) return `<p class="empty">${esc(t('enterSlope'))}</p>`;
-    const { rise, run } = v;
-    const pct = rise / run * 100;
-    const deg = Math.atan(rise / run) * 180 / Math.PI;
+    const { rise, run, pct, deg } = v;
     return `<div class="readout">
         <p class="label">${esc(t('slope'))}</p>
         <p class="big">${num(pct)}% · ${num(deg)}°</p>
       </div>
       <ul class="res plain-res">
-        <li><span>${esc(t('slopeDo'))}</span><b>${esc(tr((SLOPE_DO.find(x => pct < x.max) || SLOPE_DO[SLOPE_DO.length - 1]).text))}</b></li>
-        <li><span>${esc(t('slopePalm'))}</span><b>${esc(tr((SLOPE_PALM.find(x => deg <= x.max) || SLOPE_PALM[SLOPE_PALM.length - 1]).name))}</b></li>
+        <li><span>${esc(t('slopeDo'))}</span><b>${esc(tr(SoilCalc.classOf(SLOPE_DO, pct).text))}</b></li>
+        <li><span>${esc(t('slopePalm'))}</span><b>${esc(tr(SoilCalc.classOf(SLOPE_PALM, deg, true).name))}</b></li>
       </ul>
       <details open><summary>${esc(t('working'))}</summary><p class="work">${num(rise, 2)} ÷ ${num(run, 2)} × 100 = ${num(pct)}%</p></details>
       <p class="hint">${esc(t('slopeNote'))}</p>`;
@@ -479,22 +500,12 @@
   }
 
   /* ----- fertiliser tool ----- */
-  const HA = { ha: 1, m2: 1 / 10000, acre: 0.4047 };
-  const areaHa = () => Math.max(0, Number(fert.area) || 0) * HA[fert.unit];
+  const areaHa = () => SoilCalc.areaHa(fert);
   const prod = id => PRODUCTS.find(p => p.id === id);
-  /* Every quantity on screen goes through fmt(): four significant figures, or the whole number from 1,000 up.
-     shownAs() is the value that text represents, so a line can say "≈" whenever what is printed was rounded. */
-  const shownAs = v => (Math.abs(v) >= 1000 ? Math.round(v) : Number(Number(v).toPrecision(4)));
+  /* every quantity on screen is printed through fmt(); see calc.js for the rounding rule */
   const fmt = v => Number(shownAs(v)).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-GB', { maximumFractionDigits: 10 });
-  const isExact = v => Math.abs(shownAs(v) - v) <= 1e-9 * Math.max(1, Math.abs(v));
-  /* "=" only when the result and every operand are printed exactly */
-  const eq = (result, ...operands) => (isExact(result) && operands.every(isExact) ? '=' : '≈');
-  /* weights are stored in kilograms at full precision; the unit is chosen so small amounts stay readable */
-  const massParts = v => (v > 0 && v < 0.001 ? [v * 1e6, 'mg'] : v > 0 && v < 1 ? [v * 1000, 'g'] : [v, 'kg']);
   const kg = v => { const [n, unit] = massParts(v); return `${fmt(n)} ${unit}`; };
   const massExact = v => isExact(massParts(v)[0]);
-  /* a count typed by the user: a whole number of 1 or more */
-  const isCount = v => String(v).trim() !== '' && Number.isInteger(Number(v)) && Number(v) >= 1;
   const numIn = (label, key, extra = '', whole = false) => `<label>${label}<input type="number" inputmode="${whole ? 'numeric' : 'decimal'}" min="${whole ? 1 : 0}" step="${whole ? 1 : 'any'}" data-f="${key}" value="${esc(fert[key])}" ${extra}></label>`;
   function areaFields() {
     return `<div class="row2">${numIn(esc(t('area')), 'area')}
@@ -522,7 +533,9 @@
       </div>`;
     }
     if (fert.mode === 'plant') {
-      return `<div class="row2">${numIn(esc(t('perPlantNeed')), 'need')}${numIn(esc(t('pct')), 'pct', 'max="100"')}</div>${numIn(esc(t('plants')), 'plants', '', true)}`;
+      return `<div class="row2">${numIn(esc(t('perPlantNeed')), 'need')}${numIn(esc(t('pct')), 'pct', 'max="100"')}</div>
+        <div class="row2"><label>${esc(t('nutrientSel'))}<select data-f="pnut">${[['', '—'], ['n', 'N'], ['p', 'P₂O₅'], ['k', 'K₂O']].map(o => `<option value="${o[0]}" ${fert.pnut === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></label>
+        ${numIn(esc(t('plants')), 'plants', '', true)}</div>`;
     }
     if (fert.mode === 'tree') {
       return `<div class="row2">${numIn(esc(t('treeRate')), 'trate')}${numIn(esc(t('apps')), 'tapps', '', true)}</div>${numIn(esc(t('trees')), 'ttrees', '', true)}`;
@@ -530,18 +543,7 @@
     return `<div class="row2">${numIn(esc(t('bagWeight')), 'bag')}${numIn(esc(t('price')), 'price')}</div>` + gradeFields('bg') +
       `<p class="label">${esc(t('organicPresets'))}</p><div class="presets">${ORGANIC_PRESETS.map(o => `<button type="button" data-preset="bg:${o.g.join('-')}">${esc(tr(o.name))}</button>`).join('')}</div>`;
   }
-  /* percentages typed into the calculator must be real percentages */
-  function fertProblem() {
-    const pctOk = v => Number.isFinite(Number(v)) && Number(v) >= 0 && Number(v) <= 100;
-    const gradeOk = g => g.every(pctOk) && g.reduce((sum, v) => sum + Number(v), 0) <= 100;
-    if (fert.mode === 'compound' && !gradeOk(fert.g)) return 'pctBad';
-    if (fert.mode === 'bag' && !gradeOk(fert.bg)) return 'pctBad';
-    if (fert.mode === 'plant' && String(fert.pct).trim() !== '' && !pctOk(fert.pct)) return 'pctBad';
-    const blank = v => String(v).trim() === '';
-    if (fert.mode === 'plant' && !blank(fert.plants) && !isCount(fert.plants)) return 'countBad';
-    if (fert.mode === 'tree' && ((!blank(fert.tapps) && !isCount(fert.tapps)) || (!blank(fert.ttrees) && !isCount(fert.ttrees)))) return 'countBad';
-    return null;
-  }
+  const fertProblem = () => SoilCalc.fertProblem(fert);
   function fertResult() {
     const a = areaHa();
     const empty = `<p class="empty">${esc(t('enterRate'))}</p>`;
@@ -642,48 +644,45 @@
     const d = e.data || {};
     if (e.kind === 'texture') return `${tr(TEXTURE[classify(d.sand, d.clay)])}: ${t('sand')} ${d.sand}% · ${t('silt')} ${100 - d.sand - d.clay}% · ${t('clay')} ${d.clay}%`;
     if (e.kind === 'ph') return `pH ${Number(d.ph).toFixed(1)} · ${tr(PH_BANDS.find(x => d.ph < x.max).name)}`;
-    if (e.kind === 'slope') return `${num(d.rise / d.run * 100)}% · ${num(Math.atan(d.rise / d.run) * 180 / Math.PI)}°`;
-    if (e.kind === 'fert') return `${d.what}: ${kg(Number(d.kg))}`;
+    if (e.kind === 'slope') { const v = SoilCalc.slopeOf(d.rise, d.run); return v ? `${num(v.pct)}% · ${num(v.deg)}°` : ''; }
+    if (e.kind === 'fert') return `${d.what}: ${kg(Number(d.kg))}` + (d.grade ? ` · ${d.grade.join('-')}` : '') + (d.organic ? ` · ${t('organicTag')}` : '') + (d.cost !== null && d.cost !== undefined ? ` · RM ${fmt(d.cost)}` : '');
     return String(d.text || '');
   }
   const makeEntry = (plot, date, kind, data) => ({ id: newId(), plot, date: /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : today(), kind, data });
   /* returns false if the entries could not be stored */
   const addEntries = list => commitRec(() => { rec.entries.push(...list); });
-  /* the lines the fertiliser calculator would apply right now */
+  /* the lines the fertiliser calculator would apply right now, named in the language on screen */
   function fertLines(material) {
-    if (fertProblem()) return [];
-    const a = areaHa();
-    if (fert.mode === 'straight') {
-      return [['n', 'pn'], ['p', 'pp'], ['k', 'pk']].map(([rk, pk]) => {
-        const rate = Number(fert[rk]) || 0, p = prod(fert[pk]);
-        return rate > 0 && a > 0 ? { what: tr(p.name), kg: rate / (p[rk] / 100) * a } : null;
-      }).filter(Boolean);
+    const fallback = material.trim() || t('product');
+    return SoilCalc.fertLines(fert, PRODUCTS).map(l => ({ what: l.product ? tr(prod(l.product).name) : (l.label || fallback), kg: l.kg, grade: l.grade }));
+  }
+  const gradeInputs = () => `<fieldset class="grade"><legend>${esc(t('gradeOpt'))}</legend><div class="row3">${['N', 'P₂O₅', 'K₂O'].map((sym, i) =>
+    `<label>${sym}<input type="number" inputmode="decimal" min="0" max="100" step="any" name="g${i}"></label>`).join('')}</div></fieldset>`;
+  const costInput = () => `<label>${esc(t('costRM'))}<input type="number" inputmode="decimal" min="0" step="any" name="cost"></label>`;
+  /* reads the optional grade and cost from a form: { grade, cost } or { error: messageKey } */
+  function readGradeCost(f) {
+    const raw = [0, 1, 2].map(i => String(f.get('g' + i) == null ? '' : f.get('g' + i)).trim());
+    let grade = null;
+    if (raw.some(x => x !== '')) {
+      grade = raw.map(x => (x === '' ? 0 : Number(x)));
+      if (!SoilCalc.gradeOk(grade)) return { error: 'pctBad' };
     }
-    if (fert.mode === 'compound') {
-      const g = fert.g.map(v => Number(v) || 0), i = { n: 0, p: 1, k: 2 }[fert.basis], rate = Number(fert.crate) || 0;
-      return rate > 0 && g[i] > 0 && a > 0 ? [{ what: `NPK ${g.join('-')}`, kg: rate / (g[i] / 100) * a }] : [];
-    }
-    const what = material.trim() || t('product');
-    if (fert.mode === 'plant') {
-      const need = Number(fert.need) || 0, pctv = Number(fert.pct) || 0, n = isCount(fert.plants) ? Number(fert.plants) : 0;
-      return need > 0 && pctv > 0 && n > 0 ? [{ what, kg: need / (pctv / 100) * n / 1000 }] : [];
-    }
-    if (fert.mode === 'tree') {
-      const rate = Number(fert.trate) || 0, apps = isCount(fert.tapps) ? Number(fert.tapps) : 0, n = isCount(fert.ttrees) ? Number(fert.ttrees) : 0;
-      return rate > 0 && apps > 0 && n > 0 ? [{ what, kg: rate / apps * n }] : [];
-    }
-    return [];
+    const c = String(f.get('cost') == null ? '' : f.get('cost')).trim();
+    if (c !== '' && !(Number.isFinite(Number(c)) && Number(c) >= 0)) return { error: 'costBad' };
+    return { grade, cost: c === '' ? null : Number(c) };
   }
   function saveBar(kind) {
     if (!rec.plots.length) return `<p class="savebar hint">${esc(t('needPlot'))} <a href="#/rekod">${esc(t('addPlot'))}</a></p>`;
     const last = store.get('lastPlot', '');
     const needsName = kind === 'fert' && (fert.mode === 'plant' || fert.mode === 'tree');
-    return `<form class="savebar" data-save="${kind}">
+    return `<form class="savebar" data-save="${kind}" novalidate>
       <div class="row2">
         <label>${esc(t('plots'))}<select name="plot">${rec.plots.map(p => `<option value="${esc(p.id)}" ${p.id === last ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>
         <label>${esc(t('date'))}<input type="date" name="date" value="${today()}"></label>
       </div>
       ${needsName ? `<label>${esc(t('what'))}<input type="text" name="what" maxlength="60"></label>` : ''}
+      ${kind === 'fert' && (fert.mode === 'tree' || (fert.mode === 'plant' && !fert.pnut)) ? gradeInputs() : ''}
+      ${kind === 'fert' ? costInput() : ''}
       <button class="btn" type="submit">${esc(t('saveToRec'))}</button>
       <p class="savemsg" role="status"></p>
     </form>`;
@@ -698,9 +697,13 @@
     else if (kind === 'ph') list = [makeEntry(plot.id, date, kind, { ph })];
     else if (kind === 'slope') {
       const v = slopeValues();
-      if (v) list = [makeEntry(plot.id, date, kind, v)];
+      if (v) list = [makeEntry(plot.id, date, kind, { rise: v.rise, run: v.run })];
     } else if (kind === 'fert') {
-      list = fertLines(String(f.get('what') || '')).map(l => makeEntry(plot.id, date, 'fert', { what: l.what, kg: l.kg }));
+      const extra = readGradeCost(f);
+      if (extra.error) { msg.className = 'savemsg err'; msg.textContent = t(extra.error); return; }
+      /* the cost is for the whole application, so it is recorded once, on the first line */
+      list = fertLines(String(f.get('what') || '')).map((l, i) => makeEntry(plot.id, date, 'fert',
+        { what: l.what, kg: l.kg, grade: l.grade || extra.grade, cost: i === 0 ? extra.cost : null, organic: false, avail: null }));
     }
     const stored = list.length > 0 && addEntries(list);
     if (stored) store.set('lastPlot', plot.id);
@@ -720,7 +723,7 @@
         const n = entriesOf(p.id).length, phE = latestOf(p.id, 'ph');
         return `<li><a href="#/rekod/${esc(p.id)}"><span class="ltitle"><b>${esc(p.name)}</b><small>${[p.crop, p.area ? `${p.area} ${t(p.unit)}` : '', `${n} ${t('entries')}`, phE ? `pH ${Number(phE.data.ph).toFixed(1)}` : ''].filter(Boolean).map(esc).join(' · ')}</small></span></a></li>`;
       }).join('')}</ul>` : `<p class="empty">${esc(t('noPlots'))}</p>`}
-      <form class="tool recform" id="plotform">
+      <form class="tool recform" id="plotform" novalidate>
         <h2 class="first">${esc(t('addPlot'))}</h2>
         <label>${esc(t('plotName'))}<input type="text" name="name" maxlength="60" required></label>
         <label>${esc(t('crop'))}<input type="text" name="crop" maxlength="60"></label>
@@ -739,6 +742,30 @@
       <p class="savemsg" id="recmsg" role="status"></p>
     </section>`;
   }
+  /* nutrients and cost applied to a plot, year by year */
+  function plotSummary(p, list) {
+    const ferts = list.filter(e => e.kind === 'fert');
+    if (!ferts.length) return '';
+    const areaHaOfPlot = p.area ? Number(p.area) * (HA[p.unit] || 1) : 0;
+    const years = [...new Set(ferts.map(e => e.date.slice(0, 4)))].sort().reverse();
+    const row = (label, vals) => `<tr><th scope="row">${esc(label)}</th>${vals.map(v => `<td>${kg(v)}</td>`).join('')}</tr>`;
+    let anyOrganic = false;
+    const blocks = years.map(y => {
+      const sum = SoilCalc.summarise(ferts.filter(e => e.date.slice(0, 4) === y));
+      if (sum.organicCount) anyOrganic = true;
+      const graded = sum.count - sum.ungraded;
+      return `<h3 class="yr">${esc(y)}</h3>
+        ${graded ? `<div class="tablewrap"><table><thead><tr><th scope="col"></th><th scope="col">N</th><th scope="col">P₂O₅</th><th scope="col">K₂O</th></tr></thead><tbody>
+          ${row(t('sumMineral'), sum.mineral)}
+          ${areaHaOfPlot > 0 ? row(`${t('sumMineral')}, ${t('perHaShort')}`, sum.mineral.map(v => v / areaHaOfPlot)) : ''}
+          ${sum.organicCount ? row(t('sumOrganicTotal'), sum.organicTotal) : ''}
+          ${sum.organicWithAvail ? row(t('sumOrganicAvail'), sum.organicAvail) : ''}
+        </tbody></table></div>` : `<p class="empty">${esc(t('noneGraded'))}</p>`}
+        ${sum.costed ? `<p><b>${esc(t('sumCost'))}:</b> RM ${fmt(sum.cost)}${areaHaOfPlot > 0 ? ` (RM ${fmt(sum.cost / areaHaOfPlot)} ${esc(t('perHaShort'))})` : ''} <span class="plain">${esc(fill('sumCosted', { a: sum.costed, b: sum.count }))}</span></p>` : ''}
+        ${sum.ungraded ? `<p class="hint">${esc(fill('sumUngraded', { n: sum.ungraded }))}</p>` : ''}`;
+    }).join('');
+    return `<h2>${esc(t('summary'))}</h2>${blocks}${anyOrganic ? `<p class="hint">${esc(t('sumOrganicNote'))}</p>` : ''}`;
+  }
   function pagePlot(id) {
     const p = plotById(id);
     if (!p) return pageRecords();
@@ -754,22 +781,27 @@
         <li><span>${esc(t('kPh'))}</span><b>${latest('ph')}</b></li>
         <li><span>${esc(t('kSlope'))}</span><b>${latest('slope')}</b></li>
       </ul>
+      ${plotSummary(p, list)}
       <h2>${esc(t('log'))}</h2>
       ${list.length ? `<ul class="loglist">${list.map(e => `<li>
         <div><small>${esc(e.date)} · ${esc(t(KIND_KEY[e.kind] || 'kNote'))}</small><span>${esc(entryText(e))}</span></div>
         <button type="button" class="delbtn" data-delentry="${esc(e.id)}" aria-label="${esc(t('del'))}: ${esc(entryText(e))}">${esc(t('del'))}</button>
       </li>`).join('')}</ul>` : `<p class="empty">${esc(t('noEntries'))}</p>`}
-      <form class="tool recform" id="appform" data-plot="${esc(p.id)}">
+      <form class="tool recform" id="appform" data-plot="${esc(p.id)}" novalidate>
         <h2 class="first">${esc(t('addApp'))}</h2>
         <label>${esc(t('date'))}<input type="date" name="date" value="${today()}"></label>
         <div class="row2">
           <label>${esc(t('what'))}<input type="text" name="what" maxlength="60"></label>
           <label>${esc(t('amountKg'))}<input type="number" inputmode="decimal" min="0" step="any" name="kg"></label>
         </div>
+        ${gradeInputs()}
+        ${costInput()}
+        <label class="check"><input type="checkbox" name="organic"><span>${esc(t('organicChk'))}</span></label>
+        <label>${esc(t('availPct'))}<input type="number" inputmode="decimal" min="0" max="100" step="any" name="avail"></label>
         <button class="btn" type="submit">${esc(t('save'))}</button>
         <p class="err" role="alert" hidden>${esc(t('appNeeded'))}</p>
       </form>
-      <form class="tool recform" id="noteform" data-plot="${esc(p.id)}">
+      <form class="tool recform" id="noteform" data-plot="${esc(p.id)}" novalidate>
         <h2 class="first">${esc(t('addNote'))}</h2>
         <label>${esc(t('date'))}<input type="date" name="date" value="${today()}"></label>
         <label>${esc(t('note'))}<textarea name="text" rows="3" maxlength="500"></textarea></label>
@@ -792,30 +824,14 @@
   function plotCsv(id) {
     const p = plotById(id);
     const cell = v => { let s = String(v); if (/^[=+\-@]/.test(s)) s = "'" + s; return `"${s.replace(/"/g, '""')}"`; };  // quote, and stop spreadsheet formulas
-    const rows = [[t('date'), t('plotName'), t('csvType'), t('csvDetail')].map(cell).join(',')]
-      .concat(entriesOf(id).reverse().map(e => [e.date, p.name, t(KIND_KEY[e.kind] || 'kNote'), entryText(e)].map(cell).join(',')));
+    const blankIfNull = v => (v === null || v === undefined ? '' : v);
+    const fertCols = e => { const d = e.data; return e.kind === 'fert' ? [d.what, d.kg, ...(d.grade || ['', '', '']), d.organic ? 1 : 0, blankIfNull(d.avail), blankIfNull(d.cost)] : ['', '', '', '', '', '', '', '']; };
+    const rows = [[t('date'), t('plotName'), t('csvType'), t('csvDetail'), t('what'), 'kg', 'N %', 'P2O5 %', 'K2O %', t('organicTag'), t('csvAvail'), 'RM'].map(cell).join(',')]
+      .concat(entriesOf(id).reverse().map(e => [e.date, p.name, t(KIND_KEY[e.kind] || 'kNote'), entryText(e), ...fertCols(e)].map(cell).join(',')));
     download(`${p.name.replace(/[^\w一-鿿-]+/g, '_') || 'plot'}.csv`, '﻿' + rows.join('\r\n'), 'text/csv;charset=utf-8');
   }
-  /* accept only the shape this app writes */
-  function cleanBackup(obj) {
-    if (!obj || !Array.isArray(obj.plots) || !Array.isArray(obj.entries)) return null;
-    const str = (v, n) => String(v == null ? '' : v).slice(0, n);
-    const okId = v => typeof v === 'string' && /^[a-z0-9]{1,40}$/i.test(v);
-    const plots = obj.plots.filter(p => p && okId(p.id) && p.name).map(p => ({ id: p.id, name: str(p.name, 60), crop: str(p.crop, 60), area: Number(p.area) > 0 ? Number(p.area) : '', unit: HA[p.unit] ? p.unit : 'ha', trees: Number(p.trees) > 0 ? Math.round(Number(p.trees)) : '' }));
-    const ids = new Set(plots.map(p => p.id));
-    const fin = v => Number.isFinite(Number(v));
-    const entries = obj.entries.filter(e => e && okId(e.plot) && ids.has(e.plot) && Object.prototype.hasOwnProperty.call(KIND_KEY, e.kind) && e.data && typeof e.data === 'object').map(e => {
-      const d = e.data;
-      let data = null;
-      if (e.kind === 'texture' && fin(d.sand) && fin(d.clay) && d.sand >= 0 && d.clay >= 0 && Number(d.sand) + Number(d.clay) <= 100) data = { sand: Number(d.sand), clay: Number(d.clay) };
-      else if (e.kind === 'ph' && fin(d.ph) && d.ph >= 0 && d.ph <= 14) data = { ph: Number(d.ph) };
-      else if (e.kind === 'slope' && d.rise !== '' && d.rise !== null && fin(d.rise) && Number(d.rise) >= 0 && Number(d.run) > 0) data = { rise: Number(d.rise), run: Number(d.run) };
-      else if (e.kind === 'fert' && Number(d.kg) > 0) data = { what: str(d.what, 60), kg: Number(d.kg) };
-      else if (e.kind === 'note') data = { text: str(d.text, 500) };
-      return data && { id: okId(e.id) ? e.id : newId(), plot: e.plot, date: /^\d{4}-\d{2}-\d{2}$/.test(e.date) ? e.date : today(), kind: e.kind, data };
-    }).filter(Boolean);
-    return { plots, entries };
-  }
+  /* everything read from storage or a backup file is forced into shape first; see store.js */
+  const cleanBackup = obj => SoilStore.cleanRecords(obj, { newId, today });
 
   /* ----- quiz ----- */
   const GENERATED = 3; // calculation questions added to unit 6 with fresh numbers each attempt
@@ -863,8 +879,8 @@
     return out;
   }
   function startQuiz(n) {
-    const qs = QUIZ[n].slice();
-    if (n === 6) qs.push(...generated());
+    const qs = QUIZ[n].map((q, i) => Object.assign({}, q, { l: (QUIZ_LESSON[n] || [])[i] }));
+    if (n === 6) qs.push(...generated().map(q => Object.assign(q, { l: '6-4' })));
     quiz = { n, qs, i: 0, score: 0, picked: null, order: shuffled(4) };
   }
   function pageQuiz(n) {
@@ -898,7 +914,7 @@
         if (answered) cls = oi === q.a ? 'right' : (oi === quiz.picked ? 'wrongpick' : '');
         return `<button type="button" class="opt ${cls}" data-pick="${oi}" ${answered ? 'disabled' : ''}>${esc(tr(q.o[oi]))}</button>`;
       }).join('')}</div>
-      <div aria-live="polite">${answered ? `<p class="fb ${quiz.picked === q.a ? 'ok' : 'no'}"><b>${esc(t(quiz.picked === q.a ? 'correct' : 'wrong'))}.</b> ${esc(tr(q.why))}</p>
+      <div aria-live="polite">${answered ? `<p class="fb ${quiz.picked === q.a ? 'ok' : 'no'}"><b>${esc(t(quiz.picked === q.a ? 'correct' : 'wrong'))}.</b> ${esc(tr(q.why))}${quiz.picked !== q.a && q.l && LESSONS[q.l] ? ` <a href="#/nota/${esc(q.l)}">${esc(fill('reviewLesson', { t: tr(LESSONS[q.l].title) }))}</a>` : ''}</p>
         <button type="button" class="btn" data-nextq>${esc(t(quiz.i + 1 < quiz.qs.length ? 'nextQ' : 'seeResult'))}</button>` : ''}</div>
     </section>`;
   }
@@ -1022,7 +1038,7 @@
   const parse = () => location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
   function render(keepScroll) {
     const r = parse();
-    if (r[0] !== 'kuiz' || (quiz && quiz.n !== Number(r[1]))) quiz = null;
+    if (r[0] === 'kuiz' && quiz && quiz.n !== Number(r[1])) quiz = null;   // an open quiz survives a visit to the lesson
     renderChrome(r);
     main.innerHTML =
       r[0] === 'nota' ? pageLesson(r[1]) :
@@ -1034,6 +1050,7 @@
       r[0] === 'buku' ? pageBook() :
       r[0] === 'sumber' ? pageSources() : pageHome();
     if (!keepScroll) window.scrollTo(0, 0);
+    if (!r[0]) checkOffline();
     if (!keepScroll && r[0] === 'nota' && /^s\d+$/.test(r[2] || '')) {
       const target = document.getElementById(r[2]);
       if (target) { target.scrollIntoView(); target.focus({ preventScroll: true }); }
@@ -1070,7 +1087,12 @@
       return;
     }
     if (d.csv) { plotCsv(d.csv); return; }
-    if (d.backup !== undefined) { download('soil-records.json', JSON.stringify(rec, null, 1), 'application/json'); return; }
+    if (d.backup !== undefined) {
+      download('soil-records.json', JSON.stringify(rec, null, 1), 'application/json');
+      store.set('lastBackup', new Date().toISOString());
+      const m = document.getElementById('recmsg'); if (m) { m.className = 'savemsg ok'; m.textContent = backupStatus(); }
+      return;
+    }
     if (d.defwhere) { def.where = d.defwhere; def.pick = null; redrawTool(toolDef); return; }
     if (d.defpick) { def.pick = d.defpick; redrawTool(toolDef); return; }
     if (d.mode) { fert.mode = d.mode; store.set('fert', fert); redrawTool(toolFert); return; }
@@ -1132,8 +1154,12 @@
         stored = commitRec(() => { rec.plots.push({ id, name: text('name').slice(0, 60), crop: text('crop').slice(0, 60), area: Number(f.get('area')) > 0 ? Number(f.get('area')) : '', unit: HA[f.get('unit')] ? f.get('unit') : 'ha', trees: isCount(text('trees')) ? Number(text('trees')) : '' }); });
         if (stored) store.set('lastPlot', id);
       } else if (form.id === 'appform' && plotById(form.dataset.plot) && text('what') && Number(f.get('kg')) > 0) {
+        const extra = readGradeCost(f), organic = f.get('organic') !== null, av = text('avail');
+        const problem = extra.error || (av !== '' && !SoilCalc.pctOk(av) ? 'pctBad' : null);
+        if (problem) { err.textContent = t(problem); err.hidden = false; return; }
         valid = true;
-        stored = addEntries([makeEntry(form.dataset.plot, f.get('date'), 'fert', { what: text('what').slice(0, 60), kg: Number(f.get('kg')) })]);
+        stored = addEntries([makeEntry(form.dataset.plot, f.get('date'), 'fert',
+          { what: text('what').slice(0, 60), kg: Number(f.get('kg')), grade: extra.grade, cost: extra.cost, organic, avail: organic && av !== '' ? Number(av) : null })]);
       } else if (form.id === 'noteform' && plotById(form.dataset.plot) && text('text')) {
         valid = true;
         stored = addEntries([makeEntry(form.dataset.plot, f.get('date'), 'note', { text: text('text').slice(0, 500) })]);
@@ -1176,7 +1202,8 @@
   rec = cleanBackup(rec) || { plots: [], entries: [] };
   store.set('probe', 1);
   render(false);
-  if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('sw.js').then(() => navigator.serviceWorker.ready).then(() => setTimeout(checkOffline, 800)).catch(() => {});
+    navigator.serviceWorker.addEventListener('controllerchange', () => setTimeout(checkOffline, 800));
   }
 })();

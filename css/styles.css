@@ -364,3 +364,14 @@ input[type="text"], input[type="date"], textarea {
 mark { background: color-mix(in srgb, var(--ochre) 35%, transparent); color: inherit; border-radius: 3px; padding: 0 1px; }
 h2[id]:focus { outline: none; }
 h2[id] { scroll-margin-top: 76px; }
+
+/* ----- readiness panel, summaries, record form extras ----- */
+.ready { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 0 16px; margin-top: 12px; }
+.ready li { grid-template-columns: 9.5em 1fr; align-items: start; }
+.ready li:last-child { border-bottom: 0; }
+.ready span { color: var(--muted); }
+.ready div { overflow-wrap: anywhere; }
+h3.yr { margin-top: 1.25rem; }
+label.check { display: flex; gap: 12px; align-items: flex-start; font-weight: 400; cursor: pointer; }
+label.check input { width: 22px; height: 22px; flex: none; accent-color: var(--leaf); margin-top: 2px; }
+.fb a { font-weight: 600; white-space: nowrap; }
