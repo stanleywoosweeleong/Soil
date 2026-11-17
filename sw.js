@@ -1,6 +1,6 @@
 /* Network first, falling back to this version's cache, so updates arrive as soon as the device is online. */
 const PREFIX = 'soil-';
-const CACHE = PREFIX + 'v11';
+const CACHE = PREFIX + 'v12';
 const FILES = ['./', 'index.html', 'css/styles.css', 'js/content.js', 'js/units.js', 'js/crops.js', 'js/records.js', 'js/calc.js', 'js/store.js', 'js/app.js', 'icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png', 'manifest.webmanifest'];
 
 self.addEventListener('install', e => {
