@@ -281,16 +281,41 @@ test('long text is cut to its limit', () => {
 const app = read('js/app.js'), sw = read('sw.js'), html = read('index.html');
 
 test('the service worker saves every file the page loads', () => {
-  const files = JSON.parse(sw.match(/const FILES = (\[[^\]]+\])/)[1].replace(/'/g, '"'));
-  const loaded = [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1]).concat([...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map(m => m[1]));
+  const files = [...sw.match(/const SHELL = \[([^\]]+)\]/)[1].matchAll(/'\.\/([^']+)'/g)].map(m => m[1]);
+  assert.ok(/const INDEX = '\.\/index\.html';/.test(sw) && files.length >= 10, 'shell list');
+  const loaded = [...html.matchAll(/<script src="([^"]+)"/g)].map(m => m[1])
+    .concat([...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map(m => m[1]))
+    .concat([...html.matchAll(/<img src="([^"]+)"/g)].map(m => m[1]));
   for (const f of loaded) assert.ok(files.includes(f), `${f} is not in the offline file list`);
-  for (const f of files.filter(f => f !== './')) assert.ok(fs.existsSync(path.join(root, f)), `${f} is listed but missing`);
+  for (const f of files) assert.ok(fs.existsSync(path.join(root, f)), `${f} is listed but missing`);
+  for (const icon of JSON.parse(read('manifest.webmanifest')).icons) assert.ok(fs.existsSync(path.join(root, icon.src)), icon.src);
 });
 
-test('the service worker clears only this app\'s old caches and falls back only to the current one', () => {
-  assert.ok(/names\.filter\(n => n\.startsWith\(PREFIX\) && n !== CACHE\)/.test(sw), 'old caches are filtered by prefix');
+test('the service worker has one fixed cache and needs no version bump', () => {
+  assert.ok(/const CACHE = 'soil-shell';/.test(sw) && /const CACHE_PREFIX = 'soil-';/.test(sw));
+  assert.ok(!/soil-v\d/.test(sw), 'no versioned cache name');
+});
+
+test('the service worker clears only this app\'s old caches and reads only its own', () => {
+  assert.ok(/k\.indexOf\(CACHE_PREFIX\) === 0 && k !== CACHE \? caches\.delete\(k\)/.test(sw), 'old caches are filtered by prefix');
   assert.ok(!/caches\.match\(/.test(sw), 'no lookup across every cache');
-  assert.ok(/caches\.open\(CACHE\)\s*\.then\(c => c\.match\(e\.request/.test(sw), 'fallback reads the current cache');
+  assert.ok(/if \(!res \|\| !res\.ok\) return false;/.test(sw), 'an error response never replaces a saved file');
+  assert.ok(/cache: 'no-cache'/.test(sw), 'update checks go past the HTTP cache');
+});
+
+test('the page offers the new version and asks for a language on first launch', () => {
+  for (const id of ['toast', 'toastgo', 'toastx', 'langpick']) assert.ok(html.includes(`id="${id}"`), id);
+  assert.deepStrictEqual([...html.matchAll(/data-langpick="(\w+)"/g)].map(m => m[1]), ['ms', 'en', 'zh']);
+  assert.ok(/postMessage\('check'\)/.test(app) && /e\.data === 'updated'/.test(app));
+  const css = read('css/styles.css');
+  assert.ok(css.includes('.toast[hidden] { display: none; }') && css.includes('#langpick[hidden] { display: none; }'), 'hidden wins over display:flex');
+});
+
+test('no click attribute is used for two different things', () => {
+  /* the click handler dispatches on data- attributes; a name shared by two features sends one feature's clicks to the other */
+  const inShell = new Set([...html.matchAll(/ data-([a-z]+)=/g)].map(m => m[1]));
+  const inPages = new Set([...app.matchAll(/ data-([a-z]+)="/g)].map(m => m[1]));
+  for (const name of inShell) assert.ok(!inPages.has(name), `data-${name} is used in both index.html and app.js`);
 });
 
 test('stored IDs are escaped wherever they are placed in markup', () => {

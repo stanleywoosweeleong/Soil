@@ -23,15 +23,18 @@
   };
 
   /* ---------- language ---------- */
-  function detectLang() {
-    const saved = store.get('lang', null);
-    if (LANGS.some(l => l.code === saved)) return saved;
-    const nav = (navigator.language || 'ms').toLowerCase();
-    if (nav.startsWith('zh')) return 'zh';
-    if (nav.startsWith('en')) return 'en';
-    return 'ms';
+  /* The language is whatever the user last chose. With nothing valid saved this is a first launch:
+     the picker is shown and Malay renders behind it. */
+  const isLang = code => LANGS.some(l => l.code === code);
+  const FIRST_LAUNCH = !isLang(store.get('lang', null));
+  let lang = FIRST_LAUNCH ? 'ms' : store.get('lang', null);
+  /* the one place a language is set; it is saved even when it equals the current one */
+  function setLang(code) {
+    if (!isLang(code)) return false;
+    lang = code;
+    store.set('lang', lang);
+    return true;
   }
-  let lang = detectLang();
   /* light unless the user has chosen dark; the choice does not follow the device setting */
   let theme = store.get('theme', 'light') === 'dark' ? 'dark' : 'light';
   const EN = LANGS.findIndex(l => l.code === 'en');
@@ -125,6 +128,9 @@
     lg.innerHTML = LANGS.map(l =>
       `<button type="button" data-lang="${l.code}" lang="${l.html}" aria-pressed="${l.code === lang}" title="${esc(l.name)}">${esc(l.label)}</button>`).join('');
     document.getElementById('foot').textContent = t('disclaimer');
+    document.getElementById('toastmsg').textContent = t('toastMsg');
+    document.getElementById('toastgo').textContent = t('toastGo');
+    document.getElementById('toastx').setAttribute('aria-label', t('toastClose'));
     if (theme === 'dark') document.documentElement.dataset.theme = 'dark'; else delete document.documentElement.dataset.theme;
     document.getElementById('themecolor').setAttribute('content', theme === 'dark' ? '#121a15' : '#edf1ec');
     const tb = document.getElementById('theme'), next = theme === 'dark' ? 'themeLight' : 'themeDark';
@@ -1072,7 +1078,8 @@
     const el = e.target.closest('button, a');
     if (!el) return;
     const d = el.dataset;
-    if (d.lang) { lang = d.lang; store.set('lang', lang); render(true); return; }
+    if (d.langpick) { if (setLang(d.langpick)) { showLangPick(false); render(false); } return; }
+    if (d.lang) { if (setLang(d.lang)) render(true); return; }
     if (el.id === 'theme') { theme = d.theme === 'dark' ? 'dark' : 'light'; store.set('theme', theme); render(true); return; }
     if (d.hz) {
       horizon = d.hz;
@@ -1211,8 +1218,28 @@
   rec = cleanBackup(rec) || { plots: [], entries: [] };
   store.set('probe', 1);
   render(false);
-  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-    navigator.serviceWorker.register('sw.js').then(() => navigator.serviceWorker.ready).then(() => setTimeout(checkOffline, 800)).catch(() => {});
+  /* first launch: choose a language before anything else is usable */
+  function showLangPick(on) {
+    document.getElementById('langpick').hidden = !on;
+    document.body.classList.toggle('picking', on);
+    for (const n of [document.querySelector('header'), main, document.getElementById('foot')]) n.inert = on;
+  }
+  if (FIRST_LAUNCH) { showLangPick(true); document.getElementById('langpick').focus(); }
+
+  /* a new version: the service worker saves it in the background and says so; one tap applies it */
+  const toast = document.getElementById('toast');
+  document.getElementById('toastgo').onclick = () => location.reload();
+  document.getElementById('toastx').onclick = () => { toast.hidden = true; };
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    const askForUpdate = () => {
+      if (navigator.onLine === false) return;
+      navigator.serviceWorker.ready.then(reg => { if (reg.active) reg.active.postMessage('check'); }).catch(() => {});
+    };
+    navigator.serviceWorker.addEventListener('message', e => { if (e.data === 'updated') { toast.hidden = false; checkOffline(); } });
     navigator.serviceWorker.addEventListener('controllerchange', () => setTimeout(checkOffline, 800));
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').then(askForUpdate).then(() => setTimeout(checkOffline, 800)).catch(() => {});
+    });
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') askForUpdate(); });
   }
 })();

@@ -24,3 +24,9 @@ Content lives in `js/content.js` (interface text, tool data, sources) `js/units.
 Numbers in the lessons are teaching examples. Each carries a source line saying where it came from and where it applies; crop fertiliser tables are published examples, not field recommendations.
 
 The app opens in light mode and has a switch for dark mode in the header; the choice is remembered and does not follow the device setting. Icons are in `icons/`, drawn from `icon.svg` and `icons/icon-maskable.svg`.
+
+## Publishing
+
+Push to `main`; GitHub Pages publishes in a minute or two. There is no cache version to bump. Installed copies open from the saved version, check for changes in the background, and show a "new version is ready" bar with a Refresh button when any app file has changed.
+
+On first launch the app asks for a language (Bahasa Melayu, English or 中文) and remembers the choice until it is changed from the header.
