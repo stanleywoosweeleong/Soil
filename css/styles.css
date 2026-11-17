@@ -281,3 +281,37 @@ summary { cursor: pointer; font-weight: 600; min-height: 36px; }
 .srcs li { padding: 8px 0; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+/* ----- field guide additions ----- */
+.hero { display: block; margin-bottom: 4px; }
+h2.sec { margin-top: 2rem; font-size: 1.15rem; color: var(--muted); }
+.tasks { list-style: none; margin: 12px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tasks a {
+  display: flex; align-items: center; min-height: 72px; padding: 12px 14px;
+  background: var(--ink); color: var(--bg); border-radius: var(--r);
+  font: 700 1rem/1.25 var(--display); text-decoration: none;
+}
+.tasks li:nth-child(4n+2) a, .tasks li:nth-child(4n+3) a { background: var(--leaf); color: var(--leaf-ink); }
+@media (min-width: 760px) { .tasks { grid-template-columns: repeat(3, 1fr); } .tasks li:nth-child(n) a { background: var(--ink); color: var(--bg); } .tasks li:nth-child(even) a { background: var(--leaf); color: var(--leaf-ink); } }
+.chapter { margin-top: 1.75rem; }
+.chapter h3 { font-size: 1.25rem; }
+.chip { min-width: 40px; }
+.lessonlist .extra { background: var(--wash); }
+.tag { flex: none; font-size: 0.8rem; font-weight: 600; color: var(--leaf); min-width: 4.2em; }
+.booklink { margin-top: 1.5rem; font-weight: 600; }
+.lesson-head .label { margin-bottom: 2px; }
+.bookref { margin-top: -10px; }
+.plain { font-weight: 400; color: var(--muted); }
+.searchbox input { display: block; width: 100%; min-height: 48px; margin-top: 6px; padding: 8px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; font-size: 1rem; }
+.gloss { margin: 16px 0 0; }
+.gloss > div { padding: 12px 0; border-bottom: 1px solid var(--line); }
+.gloss dt { font: 700 1.05rem var(--display); }
+.gloss dd { margin: 2px 0 0; }
+.gloss .others { color: var(--muted); font-size: 0.95rem; }
+.gloss .others span + span::before { content: " / "; }
+.gloss .others span:empty { display: none; }
+.tool h2.first { margin-top: 0.5rem; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.opt.chosen { border-color: var(--leaf); box-shadow: inset 6px 0 0 var(--leaf); font-weight: 600; }
+.plain-res { margin-top: 12px; }
+.plain-res b { font-size: 1.05rem; }

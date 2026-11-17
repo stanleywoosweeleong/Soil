@@ -1,4 +1,4 @@
-/* Soil science app: routing, rendering and the three tools. */
+/* Soil field guide: routing, rendering, tools and quizzes. */
 (function () {
   'use strict';
 
@@ -31,6 +31,7 @@
     return v === undefined ? x[EN] : v;
   }
   const t = key => tr(UI[key]);
+  const fill = (key, vars) => t(key).replace(/\{(\w+)\}/g, (m, k) => vars[k]);
 
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   /* escape, then turn **bold** into <strong> */
@@ -38,40 +39,42 @@
   const num = (v, d = 1) => Number(v).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-GB', { maximumFractionDigits: d, minimumFractionDigits: 0 });
 
   /* ---------- state ---------- */
-  let done = store.get('done', []);
-  let best = store.get('best', {});
-  let reflect = store.get('reflect', {});
+  const ALL_LESSONS = UNITS.flatMap(u => u.lessons);
+  let done = store.get('done', []).filter(id => ALL_LESSONS.includes(id));
+  let best = store.get('best2', {});
   let horizon = 'A';
-  let quiz = null; // { id, i, score, picked }
+  let quiz = null; // { n, qs, i, score, picked, order }
+  let glossQuery = '';
+  const def = { where: null, pick: null };
   const tex = { sand: 40, clay: 20 };
   let ph = 5.0;
-  const fert = store.get('fert', null) || {
+  const fert = Object.assign({
     mode: 'straight', area: 1, unit: 'ha',
     n: 100, p: 40, k: 60, pn: 'urea', pp: 'tsp', pk: 'mop',
-    g: [15, 15, 15], basis: 'n', crate: 60, bag: 50, bg: [15, 15, 15],
-  };
+    g: [15, 15, 15], basis: 'n', crate: 60,
+    need: 20, pct: 60, plants: 300,
+    bag: 50, bg: [15, 15, 15], price: '',
+  }, store.get('fert', null) || {});
 
-  const ALL_LESSONS = CHAPTERS.flatMap(c => c.lessons);
-  const chapterOf = id => CHAPTERS.find(c => c.lessons.includes(id));
+  const unitOf = id => UNITS.find(u => u.lessons.includes(id));
   const main = document.getElementById('main');
 
   /* ---------- chrome ---------- */
   const ICONS = {
-    notes: '<path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/>',
+    guide: '<path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/>',
     tools: '<path d="M12 3l9 16H3z"/><path d="M12 10v4"/>',
-    quiz: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 1-1 1.7"/><path d="M12 17h.01"/>',
-    sources: '<path d="M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4z"/><path d="M20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z"/>',
+    glossary: '<path d="M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4z"/><path d="M20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z"/>',
+    sources: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>',
   };
   const icon = n => `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
 
   function renderChrome(route) {
-    const html = LANGS.find(l => l.code === lang).html;
-    document.documentElement.lang = html;
+    document.documentElement.lang = LANGS.find(l => l.code === lang).html;
     document.title = t('appName');
     document.getElementById('brand').innerHTML =
       `<span class="mark" aria-hidden="true">${HORIZONS.slice(0, 4).map(h => `<i style="background:${h.color}"></i>`).join('')}</span><span>${esc(t('appName'))}</span>`;
-    const tabs = [['', 'navHome', 'notes'], ['alat', 'navTools', 'tools'], ['kuiz', 'navQuiz', 'quiz'], ['sumber', 'navSources', 'sources']];
-    const top = route[0] === 'nota' ? '' : (route[0] || '');
+    const tabs = [['', 'navHome', 'guide'], ['alat', 'navTools', 'tools'], ['istilah', 'navGlossary', 'glossary'], ['sumber', 'navSources', 'sources']];
+    const top = ['alat', 'istilah', 'sumber'].includes(route[0]) ? route[0] : '';
     document.getElementById('tabs').innerHTML = tabs.map(([r, key, ic]) =>
       `<a href="#/${r}" ${top === r ? 'aria-current="page"' : ''}>${icon(ic)}<span>${esc(t(key))}</span></a>`).join('');
     const lg = document.getElementById('lang');
@@ -125,18 +128,18 @@
   }
 
   const PH_GRADIENT = 'linear-gradient(90deg,#c0392b 0%,#e08a2c 22%,#e5c53a 40%,#5d9e4a 57%,#2f7f86 75%,#3d4f9f 100%)';
+  const phTicks = () => `<span class="ph-ticks">${[3, 4, 5, 6, 7, 8, 9].map(v => `<span style="left:${((v - 3) / 6) * 100}%">${v}</span>`).join('')}</span>`;
   function figPhScale() {
-    const marks = [[3, ['Tanah gambut', 'Peat soil', '泥炭土']], [5, ['Kebanyakan tanah tanah tinggi Malaysia', 'Most Malaysian upland soils', '马来西亚多数高地土壤']], [7, ['Neutral', 'Neutral', '中性']]];
-    const pos = v => ((v - 3) / 6) * 100;
+    const marks = [['3.0–4.5', ['Tanah gambut', 'Peat soil', '泥炭土']], ['5', ['Kebanyakan tanah tanah tinggi Malaysia', 'Most Malaysian upland soils', '马来西亚多数高地土壤']], ['7', ['Neutral', 'Neutral', '中性']]];
     return `<figure class="phfig">
-      <div class="ph-track" style="background:${PH_GRADIENT}"></div>
-      <div class="ph-ticks">${[3, 4, 5, 6, 7, 8, 9].map(v => `<span style="left:${pos(v)}%">${v}</span>`).join('')}</div>
-      <ul class="ph-marks">${marks.map(m => `<li><b>pH ${m[0] === 3 ? '3.0–4.5' : m[0]}</b> ${esc(tr(m[1]))}</li>`).join('')}</ul>
+      <div class="ph-track" style="background:${PH_GRADIENT}"></div>${phTicks()}
+      <ul class="ph-marks">${marks.map(m => `<li><b>pH ${m[0]}</b> ${esc(tr(m[1]))}</li>`).join('')}</ul>
     </figure>`;
   }
 
   const FIGS = { profile: figProfile, composition: figComposition, structure: figStructure, phscale: figPhScale };
-  const TOOL_KEYS = { tekstur: 'tTexture', ph: 'tPh', baja: 'tFert' };
+  const TOOLS = ['tekstur', 'ph', 'tanda', 'baja'];
+  const TOOL_KEYS = { tekstur: 'tTexture', ph: 'tPh', tanda: 'tDef', baja: 'tFert' };
 
   /* ---------- lesson blocks ---------- */
   function block(b) {
@@ -161,56 +164,108 @@
   function pageHome() {
     const pct = Math.round((done.length / ALL_LESSONS.length) * 100);
     return `<section class="hero">
-      <div class="hero-text">
-        <h1>${esc(t('appName'))}</h1>
-        <p class="lede">${esc(t('tagline'))}</p>
-        <div class="meter" role="img" aria-label="${esc(t('progress'))} ${pct}%">
-          <div class="meter-bar"><i style="width:${pct}%"></i></div>
-          <span>${esc(t('progress'))}: ${done.length}/${ALL_LESSONS.length}</span>
-        </div>
-      </div>
-      ${figProfile()}
+      <h1>${esc(t('appName'))}</h1>
+      <p class="lede">${esc(t('tagline'))}</p>
     </section>
-    ${CHAPTERS.map(c => `<section class="chapter">
-      <header><span class="chip" style="background:${c.chip}">${c.id}</span>
-        <div><h2>${esc(tr(c.title))}</h2><p>${esc(tr(c.blurb))}</p></div></header>
-      <ul class="lessonlist">
-        ${c.lessons.map(id => `<li><a href="#/nota/${id}"><span class="lnum">${id}</span><span class="ltitle">${esc(tr(LESSONS[id].title))}</span>${done.includes(id) ? `<span class="tick" aria-label="${esc(t('done'))}">✓</span>` : ''}</a></li>`).join('')}
-        <li><a class="quizlink" href="#/kuiz/${c.id}"><span class="lnum">?</span><span class="ltitle">${esc(t('reflection'))} + Jana Minda</span>${best[c.id] !== undefined ? `<span class="tick">${best[c.id]}/${QUIZ[c.id].length}</span>` : ''}</a></li>
-      </ul>
-    </section>`).join('')}`;
+    <section>
+      <h2 class="sec">${esc(t('tasksTitle'))}</h2>
+      <ul class="tasks">${TASKS.map(k => `<li><a href="#/${k.href}">${esc(tr(k.t))}</a></li>`).join('')}</ul>
+    </section>
+    <section>
+      <h2 class="sec">${esc(t('unitsTitle'))}</h2>
+      <div class="meter" role="img" aria-label="${esc(t('progress'))} ${pct}%">
+        <div class="meter-bar"><i style="width:${pct}%"></i></div>
+        <span>${esc(t('progress'))}: ${done.length}/${ALL_LESSONS.length}</span>
+      </div>
+      ${UNITS.map(u => `<div class="chapter">
+        <header><span class="chip" style="background:${u.chip}">${u.n}</span>
+          <div><h3>${esc(tr(u.title))}</h3><p>${esc(tr(u.blurb))}</p></div></header>
+        <ul class="lessonlist">
+          ${u.lessons.map(id => `<li><a href="#/nota/${id}"><span class="ltitle">${esc(tr(LESSONS[id].title))}</span>${done.includes(id) ? `<span class="tick" aria-label="${esc(t('done'))}">✓</span>` : ''}</a></li>`).join('')}
+          <li><a class="extra" href="#/amali/${u.n}"><span class="tag">${esc(t('activity'))}</span><span class="ltitle">${esc(tr(ACTIVITIES[u.n].title))}</span></a></li>
+          <li><a class="extra" href="#/kuiz/${u.n}"><span class="tag">${esc(t('quiz'))}</span><span class="ltitle">${quizSize(u.n)} ${esc(t('questions'))}</span>${best[u.n] !== undefined ? `<span class="tick">${esc(t('best'))} ${best[u.n]}/${quizSize(u.n)}</span>` : ''}</a></li>
+        </ul>
+      </div>`).join('')}
+      <p class="booklink"><a href="#/buku">${esc(t('bookIndex'))}</a></p>
+    </section>`;
   }
+
+  const unitHead = (u, title) => `<a class="back" href="#/">‹ ${esc(t('backToNotes'))}</a>
+    <header class="lesson-head"><span class="chip" style="background:${u.chip}">${u.n}</span>
+      <div><p class="label">${esc(t('unit'))} ${u.n}: ${esc(tr(u.title))}</p><h1>${esc(title)}</h1></div></header>`;
 
   function pageLesson(id) {
     const L = LESSONS[id];
     if (!L) return pageHome();
-    const c = chapterOf(id);
+    const u = unitOf(id);
     const i = ALL_LESSONS.indexOf(id);
     const prev = ALL_LESSONS[i - 1], next = ALL_LESSONS[i + 1];
     const isDone = done.includes(id);
     return `<article class="lesson">
-      <a class="back" href="#/">‹ ${esc(t('backToNotes'))}</a>
-      <header class="lesson-head"><span class="chip" style="background:${c.chip}">${id}</span><h1>${esc(tr(L.title))}</h1></header>
+      ${unitHead(u, tr(L.title))}
+      ${L.book ? `<p class="hint bookref">${esc(t('bookRef'))} ${L.book}</p>` : ''}
       ${L.body.map(block).join('')}
       <div class="lesson-end">
         <button type="button" class="btn ${isDone ? 'is-done' : ''}" data-done="${id}" aria-pressed="${isDone}">${isDone ? '✓ ' + esc(t('markedDone')) : esc(t('markDone'))}</button>
-        <a class="btn ghost" href="#/kuiz/${c.id}">${esc(t('takeQuiz'))}</a>
+        <a class="btn ghost" href="#/kuiz/${u.n}">${esc(t('takeQuiz'))}</a>
       </div>
       <nav class="pager" aria-label="${esc(t('navHome'))}">
-        ${prev ? `<a href="#/nota/${prev}"><small>${esc(t('prev'))}</small>${prev} ${esc(tr(LESSONS[prev].title))}</a>` : '<span></span>'}
-        ${next ? `<a class="nx" href="#/nota/${next}"><small>${esc(t('next'))}</small>${next} ${esc(tr(LESSONS[next].title))}</a>` : '<span></span>'}
+        ${prev ? `<a href="#/nota/${prev}"><small>${esc(t('prev'))}</small>${esc(tr(LESSONS[prev].title))}</a>` : '<span></span>'}
+        ${next ? `<a class="nx" href="#/nota/${next}"><small>${esc(t('next'))}</small>${esc(tr(LESSONS[next].title))}</a>` : '<span></span>'}
       </nav>
     </article>`;
   }
 
+  function pageActivity(n) {
+    const u = UNITS.find(x => x.n === Number(n));
+    if (!u) return pageHome();
+    const a = ACTIVITIES[u.n];
+    return `<article class="lesson">
+      ${unitHead(u, tr(a.title))}
+      <p class="note"><b>${esc(t('youNeed'))}:</b> ${esc(tr(a.need))}</p>
+      <ol class="steps">${a.steps.map(s => `<li>${rich(s)}</li>`).join('')}</ol>
+      <div class="lesson-end"><a class="btn ghost" href="#/kuiz/${u.n}">${esc(t('takeQuiz'))}</a></div>
+    </article>`;
+  }
+
+  function pageBook() {
+    return `<section class="page">
+      <a class="back" href="#/">‹ ${esc(t('backToNotes'))}</a>
+      <h1>${esc(t('bookIndex'))}</h1>
+      <p class="lede">${esc(t('bookIntro'))}</p>
+      <div class="tablewrap"><table><tbody>${BOOK.map(b => `<tr><th scope="row">${b.n}<br><span class="plain">${esc(tr(b.t))}</span></th>
+        <td>${b.to.map(id => `<a href="#/nota/${id}">${esc(tr(LESSONS[id].title))}</a>`).join('<br>')}</td></tr>`).join('')}</tbody></table></div>
+    </section>`;
+  }
+
+  function glossaryRows() {
+    const q = glossQuery.trim().toLowerCase();
+    const idx = li();
+    const rows = GLOSSARY
+      .filter(g => !q || g[0].some(x => x.toLowerCase().includes(q)))
+      .sort((a, b) => tr(a[0]).localeCompare(tr(b[0]), LANGS[idx].html));
+    if (!rows.length) return `<p class="empty">${esc(t('noMatch'))}</p>`;
+    return `<dl class="gloss">${rows.map(g => `<div><dt>${esc(tr(g[0]))}</dt>
+      <dd class="others">${g[0].map((x, i) => i === idx ? '' : `<span lang="${LANGS[i].html}">${esc(x)}</span>`).join('')}</dd>
+      <dd>${esc(tr(g[1]))}</dd></div>`).join('')}</dl>`;
+  }
+  function pageGlossary() {
+    return `<section class="page">
+      <h1>${esc(t('navGlossary'))}</h1>
+      <p class="lede">${esc(t('glossaryIntro'))}</p>
+      <label class="searchbox">${esc(t('search'))}<input type="search" id="gq" value="${esc(glossQuery)}" autocomplete="off"></label>
+      <div id="glist" aria-live="polite">${glossaryRows()}</div>
+    </section>`;
+  }
+
   function pageTools(which) {
-    const order = ['tekstur', 'ph', 'baja'];
-    const cur = order.includes(which) ? which : 'tekstur';
+    const cur = TOOLS.includes(which) ? which : 'tekstur';
+    const body = { tekstur: toolTexture, ph: toolPh, tanda: toolDef, baja: toolFert }[cur]();
     return `<section class="page">
       <h1>${esc(t('navTools'))}</h1>
       <p class="lede">${esc(t('toolsIntro'))}</p>
-      <div class="seg" role="tablist">${order.map(k => `<a role="tab" href="#/alat/${k}" aria-selected="${k === cur}">${esc(t(TOOL_KEYS[k]))}</a>`).join('')}</div>
-      <div class="tool" id="tool">${cur === 'tekstur' ? toolTexture() : cur === 'ph' ? toolPh() : toolFert()}</div>
+      <div class="seg" role="tablist">${TOOLS.map(k => `<a role="tab" href="#/alat/${k}" aria-selected="${k === cur}">${esc(t(TOOL_KEYS[k]))}</a>`).join('')}</div>
+      <div class="tool" id="tool">${body}</div>
     </section>`;
   }
 
@@ -292,36 +347,44 @@
   }
 
   /* ----- pH tool ----- */
-  function avail(c, v) {
-    if (v <= c[0] || v >= c[3]) return 0;
-    if (v < c[1]) return (v - c[0]) / (c[1] - c[0]);
-    if (v > c[2]) return (c[3] - v) / (c[3] - c[2]);
-    return 1;
-  }
   function phResult() {
-    const cls = PH_CLASSES.find(c => ph < c.max);
-    const adv = PH_ADVICE.find(a => ph < a.max);
-    const risk = ph < 5.0 ? 'riskHigh' : ph < 5.5 ? 'riskSome' : 'riskLow';
+    const b = PH_BANDS.find(x => ph < x.max);
     return `<div class="readout">
         <p class="label">pH ${ph.toFixed(1)}</p>
-        <p class="big">${esc(tr(cls.name))}</p>
-        <p><b>${esc(t('alRisk'))}:</b> <span class="risk ${risk}">${esc(t(risk))}</span></p>
-        <p><b>${esc(t('whatToDo'))}:</b> ${esc(tr(adv.text))}</p>
+        <p class="big">${esc(tr(b.name))}</p>
+        <p><b>${esc(t('whatToDo'))}:</b> ${esc(tr(b.text))}</p>
       </div>
-      <h2>${esc(t('availability'))}</h2>
-      <ul class="bars">${PH_NUTRIENTS.map(n => {
-        const a = Math.round(avail(n.c, ph) * 100);
-        return `<li><span class="sym">${n.s}</span><span class="nm">${esc(tr(n.name))}</span><span class="bar" role="img" aria-label="${a}%"><i style="width:${Math.max(a, 2)}%"></i></span></li>`;
-      }).join('')}</ul>
+      <ul class="res plain-res">
+        <li><span>${esc(t('alRisk'))}</span><b class="risk ${b.risk}">${esc(t(b.risk))}</b></li>
+        <li><span>${esc(t('phLimited'))}</span><b>${b.limited || esc(t('phNone'))}</b></li>
+        <li><span>${esc(t('phExcess'))}</span><b>${b.excess || esc(t('phNone'))}</b></li>
+      </ul>
       <p class="hint">${esc(t('availNote'))}</p>`;
   }
   function toolPh() {
     return `<p class="tool-desc">${esc(t('tPhDesc'))}</p>
       <label class="phslider">${esc(t('phValue'))}
         <input type="range" id="r-ph" min="3" max="9" step="0.1" value="${ph}" style="--track:${PH_GRADIENT}">
-        <span class="ph-ticks">${[3, 4, 5, 6, 7, 8, 9].map(v => `<span style="left:${((v - 3) / 6) * 100}%">${v}</span>`).join('')}</span>
+        ${phTicks()}
       </label>
       <div id="phout" aria-live="polite">${phResult()}</div>`;
+  }
+
+  /* ----- deficiency key ----- */
+  function toolDef() {
+    const list = def.where ? DEFICIENCY[def.where] : [];
+    const hit = list.find(d => d.s === def.pick);
+    return `<p class="tool-desc">${esc(t('tDefDesc'))}</p>
+      <h2 class="first">${esc(t('defWhere'))}</h2>
+      <div class="seg small">${[['old', 'defOld'], ['young', 'defYoung']].map(w =>
+        `<button type="button" data-defwhere="${w[0]}" aria-pressed="${def.where === w[0]}">${esc(t(w[1]))}</button>`).join('')}</div>
+      ${def.where ? `<h2>${esc(t('defPick'))}</h2>
+        <div class="opts">${list.map(d => `<button type="button" class="opt ${def.pick === d.s ? 'chosen' : ''}" data-defpick="${d.s}" aria-pressed="${def.pick === d.s}">${esc(tr(d.sign))}</button>`).join('')}</div>` : ''}
+      <div aria-live="polite">${hit ? `<div class="readout">
+        <p class="label">${esc(t('defLikely'))}</p>
+        <p class="big">${esc(tr(hit.name))} (${hit.s})</p>
+        <p><b>${esc(t('whatToDo'))}:</b> ${esc(tr(hit.fix))}</p>
+        <p class="note">${esc(t('defCaveat'))}</p></div>` : ''}</div>`;
   }
 
   /* ----- fertiliser tool ----- */
@@ -329,9 +392,9 @@
   const areaHa = () => Math.max(0, Number(fert.area) || 0) * HA[fert.unit];
   const prod = id => PRODUCTS.find(p => p.id === id);
   const kg = v => `${num(v, v < 10 ? 2 : 1)} kg`;
+  const numIn = (label, key, extra = '') => `<label>${label}<input type="number" inputmode="decimal" min="0" step="any" data-f="${key}" value="${esc(fert[key])}" ${extra}></label>`;
   function areaFields() {
-    return `<div class="row2">
-      <label>${esc(t('area'))}<input type="number" inputmode="decimal" min="0" step="any" data-f="area" value="${fert.area}"></label>
+    return `<div class="row2">${numIn(esc(t('area')), 'area')}
       <label><span class="vh">${esc(t('area'))}</span><select data-f="unit">${['ha', 'm2', 'acre'].map(u => `<option value="${u}" ${fert.unit === u ? 'selected' : ''}>${esc(t(u))}</option>`).join('')}</select></label>
     </div>`;
   }
@@ -344,7 +407,7 @@
   function fertInputs() {
     if (fert.mode === 'straight') {
       const row = (sym, rateKey, prodKey, field) => `<div class="row2">
-        <label>${sym} · ${esc(t('rate'))}<input type="number" inputmode="decimal" min="0" step="any" data-f="${rateKey}" value="${fert[rateKey]}"></label>
+        ${numIn(`${sym} · ${esc(t('rate'))}`, rateKey)}
         <label>${esc(t('product'))}<select data-f="${prodKey}">${PRODUCTS.filter(p => p[field] > 0).map(p => `<option value="${p.id}" ${fert[prodKey] === p.id ? 'selected' : ''}>${esc(tr(p.name))} (${p[field]}%)</option>`).join('')}</select></label>
       </div>`;
       return areaFields() + row('N', 'n', 'pn', 'n') + row('P₂O₅', 'p', 'pp', 'p') + row('K₂O', 'k', 'pk', 'k') + `<p class="hint">${esc(t('typical'))}</p>`;
@@ -352,36 +415,39 @@
     if (fert.mode === 'compound') {
       return areaFields() + gradeFields('g') + `<div class="row2">
         <label>${esc(t('basis'))}<select data-f="basis">${[['n', 'N'], ['p', 'P₂O₅'], ['k', 'K₂O']].map(b => `<option value="${b[0]}" ${fert.basis === b[0] ? 'selected' : ''}>${b[1]}</option>`).join('')}</select></label>
-        <label>${esc(t('rate'))}<input type="number" inputmode="decimal" min="0" step="any" data-f="crate" value="${fert.crate}"></label>
+        ${numIn(esc(t('rate')), 'crate')}
       </div>`;
     }
-    return `<label>${esc(t('bagWeight'))}<input type="number" inputmode="decimal" min="0" step="any" data-f="bag" value="${fert.bag}"></label>` + gradeFields('bg');
+    if (fert.mode === 'plant') {
+      return `<div class="row2">${numIn(esc(t('perPlantNeed')), 'need')}${numIn(esc(t('pct')), 'pct', 'max="100"')}</div>${numIn(esc(t('plants')), 'plants')}`;
+    }
+    return `<div class="row2">${numIn(esc(t('bagWeight')), 'bag')}${numIn(esc(t('price')), 'price')}</div>` + gradeFields('bg');
   }
   function fertResult() {
     const a = areaHa();
+    const empty = `<p class="empty">${esc(t('enterRate'))}</p>`;
     if (fert.mode === 'straight') {
       const lines = [['N', 'n', 'pn'], ['P₂O₅', 'p', 'pp'], ['K₂O', 'k', 'pk']].map(([sym, rk, pk]) => {
         const rate = Number(fert[rk]) || 0;
         if (rate <= 0) return null;
         const p = prod(fert[pk]);
-        const pctv = p[rk];
-        const perHa = rate / (pctv / 100);
-        return { sym, rate, p, pctv, perHa, total: perHa * a };
+        const perHa = rate / (p[rk] / 100);
+        return { sym, rate, p, pctv: p[rk], perHa, total: perHa * a };
       }).filter(Boolean);
-      if (!lines.length) return `<p class="empty">${esc(t('enterRate'))}</p>`;
+      if (!lines.length) return empty;
       return `<h2>${esc(t('result'))}</h2>
         <ul class="res">${lines.map(l => `<li><span>${esc(tr(l.p.name))}</span><b>${kg(l.total)}</b><small>${num(l.perHa)} ${esc(t('perHa'))} · ${num(l.total / 50, 1)} ${esc(t('bags50'))}</small></li>`).join('')}</ul>
         <details open><summary>${esc(t('working'))}</summary><ol class="work">${lines.map(l =>
           `<li>${l.sym}: ${num(l.rate)} ÷ ${(l.pctv / 100).toFixed(2)} = ${num(l.perHa)} ${esc(t('perHa'))}; × ${num(a, 4)} ha = ${kg(l.total)}</li>`).join('')}</ol></details>`;
     }
+    const syms = ['N', 'P₂O₅', 'K₂O'];
     if (fert.mode === 'compound') {
       const idx = { n: 0, p: 1, k: 2 }[fert.basis];
       const g = fert.g.map(v => Number(v) || 0);
       const rate = Number(fert.crate) || 0;
-      if (rate <= 0) return `<p class="empty">${esc(t('enterRate'))}</p>`;
+      if (rate <= 0) return empty;
       if (g[idx] <= 0) return `<p class="empty">${esc(t('gradeZero'))}</p>`;
       const perHa = rate / (g[idx] / 100), total = perHa * a;
-      const syms = ['N', 'P₂O₅', 'K₂O'];
       return `<h2>${esc(t('result'))}</h2>
         <ul class="res"><li><span>NPK ${g.join('-')}</span><b>${kg(total)}</b><small>${num(perHa)} ${esc(t('perHa'))} · ${num(total / 50, 1)} ${esc(t('bags50'))}</small></li></ul>
         <p><b>${esc(t('alsoSupplies'))}</b> (${esc(t('perHa'))}): ${syms.map((s, i) => `${s} ${num(perHa * g[i] / 100)}`).join(' · ')}</p>
@@ -389,72 +455,113 @@
           <li>${syms[idx]}: ${num(rate)} ÷ ${(g[idx] / 100).toFixed(2)} = ${num(perHa)} ${esc(t('perHa'))}</li>
           <li>${num(perHa)} × ${num(a, 4)} ha = ${kg(total)}</li></ol></details>`;
     }
+    if (fert.mode === 'plant') {
+      const need = Number(fert.need) || 0, pctv = Number(fert.pct) || 0, n = Math.max(0, Number(fert.plants) || 0);
+      if (need <= 0 || pctv <= 0) return empty;
+      const each = need / (pctv / 100), total = each * n / 1000;
+      return `<h2>${esc(t('result'))}</h2>
+        <ul class="res">
+          <li><span>${esc(t('perPlant'))}</span><b>${num(each)} g</b></li>
+          <li><span>${esc(t('total'))}</span><b>${kg(total)}</b><small>${num(total / 50, 1)} ${esc(t('bags50'))}</small></li>
+        </ul>
+        <details open><summary>${esc(t('working'))}</summary><ol class="work">
+          <li>${num(need)} ÷ ${(pctv / 100).toFixed(2)} = ${num(each)} g</li>
+          <li>${num(each)} × ${num(n, 0)} = ${num(each * n, 0)} g = ${kg(total)}</li></ol></details>`;
+    }
     const w = Number(fert.bag) || 0;
     const g = fert.bg.map(v => Number(v) || 0);
-    if (w <= 0) return `<p class="empty">${esc(t('enterRate'))}</p>`;
-    const n = w * g[0] / 100, p = w * g[1] / 100, k = w * g[2] / 100;
+    if (w <= 0) return empty;
+    const amt = g.map(x => w * x / 100);
+    const sum = amt[0] + amt[1] + amt[2];
+    const price = Number(fert.price) || 0;
     return `<h2>${esc(t('contains'))}</h2>
-      <ul class="res">
-        <li><span>N</span><b>${kg(n)}</b><small>${num(w)} × ${(g[0] / 100).toFixed(2)}</small></li>
-        <li><span>P₂O₅</span><b>${kg(p)}</b><small>${num(w)} × ${(g[1] / 100).toFixed(2)}</small></li>
-        <li><span>K₂O</span><b>${kg(k)}</b><small>${num(w)} × ${(g[2] / 100).toFixed(2)}</small></li>
-      </ul>
-      <p><b>${esc(t('elemental'))}:</b> P ${kg(p * 0.436)} (P₂O₅ × 0.436) · K ${kg(k * 0.83)} (K₂O × 0.83)</p>`;
+      <ul class="res">${syms.map((s, i) => `<li><span>${s}</span><b>${kg(amt[i])}</b><small>${num(w)} × ${(g[i] / 100).toFixed(2)}</small></li>`).join('')}</ul>
+      <p><b>${esc(t('elemental'))}:</b> P ${kg(amt[1] * 0.436)} (P₂O₅ × 0.436) · K ${kg(amt[2] * 0.83)} (K₂O × 0.83)</p>
+      ${price > 0 && sum > 0 ? `<ul class="res"><li><span>${esc(t('costPerKg'))}</span><b>${num(price / sum, 2)}</b><small>${num(price, 2)} ÷ ${num(sum, 2)} kg. ${esc(t('costNote'))}</small></li></ul>` : ''}`;
   }
   function toolFert() {
     return `<p class="tool-desc">${esc(t('tFertDesc'))}</p>
-      <div class="seg small" role="tablist">${[['straight', 'modeStraight'], ['compound', 'modeCompound'], ['bag', 'modeBag']].map(m =>
+      <div class="seg small" role="tablist">${[['straight', 'modeStraight'], ['compound', 'modeCompound'], ['plant', 'modePlant'], ['bag', 'modeBag']].map(m =>
         `<button type="button" role="tab" data-mode="${m[0]}" aria-selected="${fert.mode === m[0]}">${esc(t(m[1]))}</button>`).join('')}</div>
       <form class="fert" id="fert" onsubmit="return false">${fertInputs()}</form>
       <div class="fert-out" id="fertout" aria-live="polite">${fertResult()}</div>`;
   }
 
   /* ----- quiz ----- */
-  function pageQuizList() {
-    return `<section class="page">
-      <h1>${esc(t('navQuiz'))}</h1>
-      <p class="lede">${esc(t('quizIntro'))}</p>
-      <ul class="quizlist">${CHAPTERS.map(c => `<li><a href="#/kuiz/${c.id}">
-        <span class="chip" style="background:${c.chip}">${c.id}</span>
-        <span class="ltitle"><b>${esc(tr(c.title))}</b><small>${QUIZ[c.id].length} ${esc(t('questions'))}${best[c.id] !== undefined ? ` · ${esc(t('best'))} ${best[c.id]}/${QUIZ[c.id].length}` : ''}</small></span>
-      </a></li>`).join('')}</ul>
-    </section>`;
-  }
+  const GENERATED = 3; // calculation questions added to unit 6 with fresh numbers each attempt
+  const quizSize = n => QUIZ[n].length + (n === 6 ? GENERATED : 0);
+  const pick = a => a[Math.floor(Math.random() * a.length)];
   function shuffled(n) {
     const a = [...Array(n).keys()];
     for (let i = n - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
     return a;
   }
-  function pageQuiz(id) {
-    const c = CHAPTERS.find(x => x.id === id);
-    if (!c) return pageQuizList();
-    const qs = QUIZ[id];
-    const head = `<a class="back" href="#/kuiz">‹ ${esc(t('allQuizzes'))}</a>
-      <header class="lesson-head"><span class="chip" style="background:${c.chip}">${id}</span><h1>${esc(tr(c.title))}</h1></header>`;
-    if (!quiz || quiz.id !== id) {
-      const ticks = reflect[id] || [];
+  /* build a numeric question: the correct answer plus three distinct wrong ones */
+  function numericQ(q, right, wrongs, unit, why) {
+    const seen = new Set([right]);
+    const opts = [right];
+    for (const w of wrongs.concat([right * 2, right / 2, right + 10, right * 3])) {
+      const v = Math.round(w * 10) / 10;
+      if (v > 0 && !seen.has(v) && opts.length < 4) { seen.add(v); opts.push(v); }
+    }
+    return { q, o: opts.map(v => `${num(v)} ${unit}`), a: 0, why };
+  }
+  function generated() {
+    const straight = [['urea', 'N', 46], ['as', 'N', 21], ['tsp', 'P₂O₅', 46], ['mop', 'K₂O', 60]];
+    const out = [];
+    { // amount of a straight fertiliser for a nutrient target
+      const [id, s, g] = pick(straight);
+      const ans = pick([100, 150, 200, 250, 300, 400]);
+      const x = ans * g / 100;
+      out.push(numericQ(fill('gq1', { p: tr(prod(id).name), g, s, x: num(x) }), ans, [x * g / 100, x, ans + 50], 'kg', `${num(x)} ÷ ${(g / 100).toFixed(2)} = ${num(ans)} kg`));
+    }
+    { // nutrient in a weight of compound fertiliser
+      const g = pick([[15, 15, 15], [12, 12, 17], [10, 10, 10], [18, 46, 0]]);
+      const i = pick(g[2] === 0 ? [0, 1] : [0, 1, 2]);
+      const w = pick([100, 200, 250, 300, 500]);
+      const ans = w * g[i] / 100;
+      out.push(numericQ(fill('gq2', { w, g: g.join('-'), s: ['N', 'P₂O₅', 'K₂O'][i] }), ans, [w / g[i] * 10, g[i], w - ans], 'kg', `${w} × ${(g[i] / 100).toFixed(2)} = ${num(ans)} kg`));
+    }
+    { // per-plant amount scaled to a number of plants
+      const [id, s, g] = pick(straight);
+      const each = pick([25, 50, 100]);           // grams of fertiliser per plant
+      const n = pick([100, 200, 400]);
+      const x = each * g / 100;
+      const ans = each * n / 1000;
+      out.push(numericQ(fill('gq3', { p: tr(prod(id).name), g, s, x: num(x), n }), ans, [x * n / 1000, ans * 10, x * g / 100 * n / 1000], 'kg', `${num(x)} ÷ ${(g / 100).toFixed(2)} = ${num(each)} g; ${num(each)} × ${n} = ${num(ans)} kg`));
+    }
+    return out;
+  }
+  function startQuiz(n) {
+    const qs = QUIZ[n].slice();
+    if (n === 6) qs.push(...generated());
+    quiz = { n, qs, i: 0, score: 0, picked: null, order: shuffled(4) };
+  }
+  function pageQuiz(n) {
+    const u = UNITS.find(x => x.n === Number(n));
+    if (!u) return pageHome();
+    const head = unitHead(u, t('quiz'));
+    const size = quizSize(u.n);
+    if (!quiz || quiz.n !== u.n) {
       return `<section class="page quiz">${head}
-        <h2>${esc(t('reflection'))}</h2><p class="hint">${esc(t('reflectionHint'))}</p>
-        <ul class="checks">${REFLECT[id].map((r, i) => `<li><label><input type="checkbox" data-reflect="${id}:${i}" ${ticks.includes(i) ? 'checked' : ''}><span>${esc(tr(r))}</span></label></li>`).join('')}</ul>
-        <h2>Jana Minda</h2>
-        <p>${qs.length} ${esc(t('questions'))}${best[id] !== undefined ? ` · ${esc(t('best'))} ${best[id]}/${qs.length}` : ''}</p>
-        <button type="button" class="btn" data-start="${id}">${esc(t('start'))}</button>
+        <p>${size} ${esc(t('questions'))}${best[u.n] !== undefined ? ` · ${esc(t('best'))} ${best[u.n]}/${size}` : ''}</p>
+        <button type="button" class="btn" data-start="${u.n}">${esc(t('start'))}</button>
       </section>`;
     }
-    if (quiz.i >= qs.length) {
+    if (quiz.i >= quiz.qs.length) {
       return `<section class="page quiz">${head}
         <p class="label">${esc(t('score'))}</p>
-        <p class="score">${quiz.score}<span>/${qs.length}</span></p>
+        <p class="score">${quiz.score}<span>/${size}</span></p>
         <div class="lesson-end">
-          <button type="button" class="btn" data-start="${id}">${esc(t('retry'))}</button>
-          <a class="btn ghost" href="#/nota/${c.lessons[0]}">${esc(t('reviewNotes'))}</a>
+          <button type="button" class="btn" data-start="${u.n}">${esc(t('retry'))}</button>
+          <a class="btn ghost" href="#/nota/${u.lessons[0]}">${esc(t('reviewNotes'))}</a>
         </div>
       </section>`;
     }
-    const q = qs[quiz.i];
+    const q = quiz.qs[quiz.i];
     const answered = quiz.picked !== null;
     return `<section class="page quiz">${head}
-      <p class="label">${esc(t('question'))} ${quiz.i + 1}${esc(t('questionSuffix'))} ${esc(t('of'))} ${qs.length}</p>
+      <p class="label">${esc(t('question'))} ${quiz.i + 1}${esc(t('questionSuffix'))} ${esc(t('of'))} ${size}</p>
       <h2 class="qtext">${esc(tr(q.q))}</h2>
       <div class="opts">${quiz.order.map(oi => {
         let cls = '';
@@ -462,7 +569,7 @@
         return `<button type="button" class="opt ${cls}" data-pick="${oi}" ${answered ? 'disabled' : ''}>${esc(tr(q.o[oi]))}</button>`;
       }).join('')}</div>
       <div aria-live="polite">${answered ? `<p class="fb ${quiz.picked === q.a ? 'ok' : 'no'}"><b>${esc(t(quiz.picked === q.a ? 'correct' : 'wrong'))}.</b> ${esc(tr(q.why))}</p>
-        <button type="button" class="btn" data-nextq>${esc(t(quiz.i + 1 < qs.length ? 'nextQ' : 'seeResult'))}</button>` : ''}</div>
+        <button type="button" class="btn" data-nextq>${esc(t(quiz.i + 1 < quiz.qs.length ? 'nextQ' : 'seeResult'))}</button>` : ''}</div>
     </section>`;
   }
 
@@ -478,18 +585,22 @@
   const parse = () => location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
   function render(keepScroll) {
     const r = parse();
-    if (r[0] !== 'kuiz' || (quiz && quiz.id !== r[1])) quiz = null;
+    if (r[0] !== 'kuiz' || (quiz && quiz.n !== Number(r[1]))) quiz = null;
     renderChrome(r);
     main.innerHTML =
       r[0] === 'nota' ? pageLesson(r[1]) :
+      r[0] === 'amali' ? pageActivity(r[1]) :
+      r[0] === 'kuiz' ? pageQuiz(r[1]) :
       r[0] === 'alat' ? pageTools(r[1]) :
-      r[0] === 'kuiz' ? (r[1] ? pageQuiz(r[1]) : pageQuizList()) :
+      r[0] === 'istilah' ? pageGlossary() :
+      r[0] === 'buku' ? pageBook() :
       r[0] === 'sumber' ? pageSources() : pageHome();
     if (!keepScroll) window.scrollTo(0, 0);
   }
   window.addEventListener('hashchange', () => render(false));
 
   /* ---------- events ---------- */
+  const redrawTool = fn => { document.getElementById('tool').innerHTML = fn(); };
   document.addEventListener('click', e => {
     const el = e.target.closest('button, a');
     if (!el) return;
@@ -506,24 +617,26 @@
       done = done.includes(d.done) ? done.filter(x => x !== d.done) : done.concat(d.done);
       store.set('done', done); render(true); return;
     }
-    if (d.mode) { fert.mode = d.mode; store.set('fert', fert); document.getElementById('tool').innerHTML = toolFert(); return; }
+    if (d.defwhere) { def.where = d.defwhere; def.pick = null; redrawTool(toolDef); return; }
+    if (d.defpick) { def.pick = d.defpick; redrawTool(toolDef); return; }
+    if (d.mode) { fert.mode = d.mode; store.set('fert', fert); redrawTool(toolFert); return; }
     if (d.preset) {
       const [key, g] = d.preset.split(':');
       fert[key] = g.split('-').map(Number); store.set('fert', fert);
-      document.getElementById('tool').innerHTML = toolFert(); return;
+      redrawTool(toolFert); return;
     }
-    if (d.start) { quiz = { id: d.start, i: 0, score: 0, picked: null, order: shuffled(4) }; render(false); return; }
+    if (d.start) { startQuiz(Number(d.start)); render(false); return; }
     if (d.pick !== undefined && quiz && quiz.picked === null) {
       quiz.picked = Number(d.pick);
-      if (quiz.picked === QUIZ[quiz.id][quiz.i].a) quiz.score++;
+      if (quiz.picked === quiz.qs[quiz.i].a) quiz.score++;
       render(true);
       const nx = document.querySelector('[data-nextq]'); if (nx) nx.focus();
       return;
     }
     if (d.nextq !== undefined && quiz) {
       quiz.i++; quiz.picked = null; quiz.order = shuffled(4);
-      if (quiz.i >= QUIZ[quiz.id].length && (best[quiz.id] === undefined || quiz.score > best[quiz.id])) {
-        best[quiz.id] = quiz.score; store.set('best', best);
+      if (quiz.i >= quiz.qs.length && (best[quiz.n] === undefined || quiz.score > best[quiz.n])) {
+        best[quiz.n] = quiz.score; store.set('best2', best);
       }
       render(false);
     }
@@ -538,20 +651,12 @@
       tex.sand = sand; tex.clay = clay; updateTexture(); return;
     }
     if (el.id === 'r-ph') { ph = Number(el.value); document.getElementById('phout').innerHTML = phResult(); return; }
+    if (el.id === 'gq') { glossQuery = el.value; document.getElementById('glist').innerHTML = glossaryRows(); return; }
     if (el.dataset.f || el.dataset.g) {
-      if (el.dataset.f) fert[el.dataset.f] = el.type === 'number' ? el.value : el.value;
+      if (el.dataset.f) fert[el.dataset.f] = el.value;
       else fert[el.dataset.g][Number(el.dataset.i)] = el.value;
       store.set('fert', fert);
       document.getElementById('fertout').innerHTML = fertResult();
-    }
-  });
-  document.addEventListener('change', e => {
-    const el = e.target;
-    if (el.dataset.reflect) {
-      const [id, i] = el.dataset.reflect.split(':');
-      const set = new Set(reflect[id] || []);
-      if (el.checked) set.add(Number(i)); else set.delete(Number(i));
-      reflect[id] = [...set]; store.set('reflect', reflect);
     }
   });
   document.addEventListener('submit', e => {
