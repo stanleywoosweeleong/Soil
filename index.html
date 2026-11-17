@@ -5,9 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Sains Tanah</title>
   <meta name="description" content="Panduan lapangan sains tanah dalam Bahasa Melayu, English dan 中文.">
-  <meta name="theme-color" content="#17231b">
+  <meta name="theme-color" content="#edf1ec" id="themecolor">
+  <meta name="color-scheme" content="light dark">
+  <script>try { if (localStorage.getItem('soil.theme') === '"dark"') document.documentElement.dataset.theme = 'dark'; } catch (e) {}</script>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/favicon-48.png" sizes="48x48" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
@@ -18,7 +22,10 @@
   <header class="bar">
     <a class="brand" href="#/" id="brand"></a>
     <nav class="tabs" id="tabs" aria-label="Main"></nav>
-    <div class="lang" id="lang" role="group"></div>
+    <div class="bar-end">
+      <div class="lang" id="lang" role="group"></div>
+      <button type="button" class="themebtn" id="theme"></button>
+    </div>
   </header>
   <p class="storewarn" id="storewarn" role="alert" hidden></p>
   <main id="main" tabindex="-1"></main>

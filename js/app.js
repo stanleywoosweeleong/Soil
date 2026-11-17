@@ -32,6 +32,8 @@
     return 'ms';
   }
   let lang = detectLang();
+  /* light unless the user has chosen dark; the choice does not follow the device setting */
+  let theme = store.get('theme', 'light') === 'dark' ? 'dark' : 'light';
   const EN = LANGS.findIndex(l => l.code === 'en');
   const li = () => LANGS.findIndex(l => l.code === lang);
   /* translate a tuple; plain strings are language-neutral */
@@ -113,7 +115,7 @@
     document.documentElement.lang = LANGS.find(l => l.code === lang).html;
     document.title = t('appName');
     document.getElementById('brand').innerHTML =
-      `<span class="mark" aria-hidden="true">${HORIZONS.slice(0, 4).map(h => `<i style="background:${h.color}"></i>`).join('')}</span><span>${esc(t('appName'))}</span>`;
+      `<img src="icon.svg" width="28" height="28" alt=""><span>${esc(t('appName'))}</span>`;
     const tabs = [['', 'navHome', 'guide'], ['alat', 'navTools', 'tools'], ['rekod', 'navRecords', 'records'], ['istilah', 'navGlossary', 'glossary'], ['sumber', 'navSources', 'sources']];
     const top = ['alat', 'rekod', 'istilah', 'sumber'].includes(route[0]) ? route[0] : '';
     document.getElementById('tabs').innerHTML = tabs.map(([r, key, ic]) =>
@@ -123,6 +125,12 @@
     lg.innerHTML = LANGS.map(l =>
       `<button type="button" data-lang="${l.code}" lang="${l.html}" aria-pressed="${l.code === lang}" title="${esc(l.name)}">${esc(l.label)}</button>`).join('');
     document.getElementById('foot').textContent = t('disclaimer');
+    if (theme === 'dark') document.documentElement.dataset.theme = 'dark'; else delete document.documentElement.dataset.theme;
+    document.getElementById('themecolor').setAttribute('content', theme === 'dark' ? '#121a15' : '#edf1ec');
+    const tb = document.getElementById('theme'), next = theme === 'dark' ? 'themeLight' : 'themeDark';
+    tb.setAttribute('aria-label', t(next)); tb.title = t(next); tb.dataset.theme = theme === 'dark' ? 'light' : 'dark';
+    tb.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${
+      theme === 'dark' ? '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>' : '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/>'}</svg>`;
   }
 
   /* ---------- figures ---------- */
@@ -1065,6 +1073,7 @@
     if (!el) return;
     const d = el.dataset;
     if (d.lang) { lang = d.lang; store.set('lang', lang); render(true); return; }
+    if (el.id === 'theme') { theme = d.theme === 'dark' ? 'dark' : 'light'; store.set('theme', theme); render(true); return; }
     if (d.hz) {
       horizon = d.hz;
       document.querySelectorAll('.profile').forEach(p => { p.outerHTML = figProfile(); });

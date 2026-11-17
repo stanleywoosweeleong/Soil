@@ -22,3 +22,5 @@ They cover the calculations, record validation, the bugs found in review, and co
 Content lives in `js/content.js` (interface text, tool data, sources) `js/units.js` (units, lessons, activities, quizzes, glossary) and `js/crops.js` (the crop unit and its tool data). Each text is a tuple `[ms, en, zh]`; to add a language, add it to `LANGS` and append one entry to each tuple (missing entries fall back to English). References are listed on the Sources page of the app.
 
 Numbers in the lessons are teaching examples. Each carries a source line saying where it came from and where it applies; crop fertiliser tables are published examples, not field recommendations.
+
+The app opens in light mode and has a switch for dark mode in the header; the choice is remembered and does not follow the device setting. Icons are in `icons/`, drawn from `icon.svg` and `icons/icon-maskable.svg`.

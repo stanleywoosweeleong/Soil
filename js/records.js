@@ -42,6 +42,8 @@ Object.assign(UI, {
   saveFailed: ['Tidak disimpan. Storan pelayar disekat atau penuh.', 'Not saved. Browser storage is blocked or full.', '未保存。浏览器存储被阻止或已满。'],
   pctBad: ['Peratus nutrien mesti antara 0 dan 100, dan jumlah gred tidak boleh melebihi 100.', 'Nutrient percentages must be between 0 and 100, and a grade cannot total more than 100.', '养分百分比须在 0 至 100 之间，且配比合计不得超过 100。'],
   countBad: ['Bilangan pemberian dan bilangan pokok mestilah nombor bulat, 1 atau lebih.', 'Applications and plant counts must be whole numbers of 1 or more.', '施肥次数和株数必须是 1 或以上的整数。'],
+  themeLight: ['Tukar ke mod cerah', 'Switch to light mode', '切换到浅色模式'],
+  themeDark: ['Tukar ke mod gelap', 'Switch to dark mode', '切换到深色模式'],
   csvType: ['Jenis', 'Type', '类型'],
   csvDetail: ['Butiran', 'Detail', '详情'],
   kTexture: ['Tekstur', 'Texture', '质地'],
