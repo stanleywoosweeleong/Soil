@@ -1,6 +1,6 @@
 /* Network first, falling back to the cache, so updates arrive without a manual version bump. */
-const CACHE = 'soil-v3';
-const FILES = ['./', 'index.html', 'css/styles.css', 'js/content.js', 'js/units.js', 'js/crops.js', 'js/app.js', 'icon.svg', 'manifest.webmanifest'];
+const CACHE = 'soil-v4';
+const FILES = ['./', 'index.html', 'css/styles.css', 'js/content.js', 'js/units.js', 'js/crops.js', 'js/records.js', 'js/app.js', 'icon.svg', 'manifest.webmanifest'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', e => {

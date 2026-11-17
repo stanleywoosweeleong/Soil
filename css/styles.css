@@ -317,3 +317,27 @@ h2.sec { margin-top: 2rem; font-size: 1.15rem; color: var(--muted); }
 .plain-res { margin-top: 12px; }
 .plain-res b { font-size: 1.05rem; }
 .tool p.big { font: 700 clamp(1.6rem, 5vw, 2.2rem) var(--display); margin: 2px 0 6px; }
+
+/* ----- field records ----- */
+.savebar { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 6px; }
+p.savebar { padding-top: 14px; }
+.savemsg { min-height: 1.4em; margin: 8px 0 0; font-weight: 600; }
+.savemsg.ok { color: var(--ok); }
+.savemsg.err { color: var(--bad); }
+input[type="text"], input[type="date"], textarea {
+  display: block; width: 100%; min-height: 46px; margin-top: 6px; padding: 8px 12px;
+  background: var(--bg); border: 1px solid var(--line); border-radius: 8px; font: inherit; color: inherit;
+}
+.recform { margin-top: 20px; }
+.plot-title { font-size: clamp(1.6rem, 5vw, 2.4rem); overflow-wrap: anywhere; }
+.loglist { list-style: none; margin: 0; padding: 0; }
+.loglist li { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.loglist div { min-width: 0; overflow-wrap: anywhere; }
+.loglist small { display: block; color: var(--muted); }
+.delbtn { flex: none; min-height: 40px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--bad); cursor: pointer; font-weight: 600; font-size: 0.9rem; }
+.btn.danger { border-color: var(--bad); color: var(--bad); }
+.filebtn { cursor: pointer; margin: 0; font-size: 1rem; }
+.filebtn:focus-within { outline: 3px solid var(--ochre); outline-offset: 2px; }
+.latest b { font-size: 1rem; text-align: right; overflow-wrap: anywhere; }
+.latest small { display: block; font-weight: 400; color: var(--muted); }
+.tabs a { min-width: 0; }

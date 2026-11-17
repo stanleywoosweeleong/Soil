@@ -45,6 +45,8 @@
   let horizon = 'A';
   let quiz = null; // { n, qs, i, score, picked, order }
   let glossQuery = '';
+  let rec = store.get('rec', null) || { plots: [], entries: [] };
+  const saveRec = () => store.set('rec', rec);
   const def = { where: null, pick: null };
   const tex = { sand: 40, clay: 20 };
   let ph = 5.0;
@@ -66,6 +68,7 @@
   const ICONS = {
     guide: '<path d="M5 4h11l3 3v13H5z"/><path d="M8 10h8M8 14h8M8 18h5"/>',
     tools: '<path d="M12 3l9 16H3z"/><path d="M12 10v4"/>',
+    records: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/>',
     glossary: '<path d="M4 5h6a2 2 0 0 1 2 2v12a2 2 0 0 0-2-2H4z"/><path d="M20 5h-6a2 2 0 0 0-2 2v12a2 2 0 0 1 2-2h6z"/>',
     sources: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/>',
   };
@@ -76,8 +79,8 @@
     document.title = t('appName');
     document.getElementById('brand').innerHTML =
       `<span class="mark" aria-hidden="true">${HORIZONS.slice(0, 4).map(h => `<i style="background:${h.color}"></i>`).join('')}</span><span>${esc(t('appName'))}</span>`;
-    const tabs = [['', 'navHome', 'guide'], ['alat', 'navTools', 'tools'], ['istilah', 'navGlossary', 'glossary'], ['sumber', 'navSources', 'sources']];
-    const top = ['alat', 'istilah', 'sumber'].includes(route[0]) ? route[0] : '';
+    const tabs = [['', 'navHome', 'guide'], ['alat', 'navTools', 'tools'], ['rekod', 'navRecords', 'records'], ['istilah', 'navGlossary', 'glossary'], ['sumber', 'navSources', 'sources']];
+    const top = ['alat', 'rekod', 'istilah', 'sumber'].includes(route[0]) ? route[0] : '';
     document.getElementById('tabs').innerHTML = tabs.map(([r, key, ic]) =>
       `<a href="#/${r}" ${top === r ? 'aria-current="page"' : ''}>${icon(ic)}<span>${esc(t(key))}</span></a>`).join('');
     const lg = document.getElementById('lang');
@@ -329,6 +332,7 @@
         <label>${esc(t('clay'))} <output id="o-clay">${tex.clay}%</output><input type="range" id="r-clay" min="0" max="100" value="${tex.clay}"></label>
         <p class="hint">${esc(t('siltAuto'))}</p>
       </div>
+      ${saveBar('texture')}
       <form class="jar" id="jar">
         <h2>${esc(t('jarTitle'))}</h2>
         <p>${esc(t('jarDesc'))}</p>
@@ -392,7 +396,8 @@
         <label>${esc(t('crop'))}<select data-phx="crop">${CROP_PH.map(c => `<option value="${c.id}" ${phx.crop === c.id ? 'selected' : ''}>${esc(tr(c.name))}</option>`).join('')}</select></label>
         <label>${esc(t('soilTex'))}<select data-phx="tex">${LIME_TEX.map(c => `<option value="${c.id}" ${phx.tex === c.id ? 'selected' : ''}>${esc(tr(c.name))}</option>`).join('')}</select></label>
       </div>
-      <div id="phout" aria-live="polite">${phResult()}</div>`;
+      <div id="phout" aria-live="polite">${phResult()}</div>
+      ${saveBar('ph')}`;
   }
 
   /* ----- slope tool ----- */
@@ -416,7 +421,8 @@
     const f = (key) => `<label>${esc(t(key))}<input type="number" inputmode="decimal" min="0" step="any" data-slope="${key}" value="${esc(slope[key])}"></label>`;
     return `<p class="tool-desc">${esc(t('tSlopeDesc'))}</p>
       <div class="row2">${f('rise')}${f('run')}</div>
-      <div id="slopeout" aria-live="polite">${slopeResult()}</div>`;
+      <div id="slopeout" aria-live="polite">${slopeResult()}</div>
+      ${saveBar('slope')}`;
   }
 
   /* ----- deficiency key ----- */
@@ -552,7 +558,193 @@
       <div class="seg small" role="tablist">${[['straight', 'modeStraight'], ['compound', 'modeCompound'], ['plant', 'modePlant'], ['tree', 'modeTree'], ['bag', 'modeBag']].map(m =>
         `<button type="button" role="tab" data-mode="${m[0]}" aria-selected="${fert.mode === m[0]}">${esc(t(m[1]))}</button>`).join('')}</div>
       <form class="fert" id="fert" onsubmit="return false">${fertInputs()}</form>
-      <div class="fert-out" id="fertout" aria-live="polite">${fertResult()}</div>`;
+      <div class="fert-out" id="fertout" aria-live="polite">${fertResult()}</div>
+      ${fert.mode === 'bag' ? '' : saveBar('fert')}`;
+  }
+
+
+  /* ----- field records ----- */
+  const today = () => new Date().toLocaleDateString('en-CA');           // YYYY-MM-DD in local time
+  const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const plotById = id => rec.plots.find(p => p.id === id);
+  const entriesOf = id => rec.entries.filter(e => e.plot === id).sort((a, b) => (b.date + b.id).localeCompare(a.date + a.id));
+  const KIND_KEY = { texture: 'kTexture', ph: 'kPh', slope: 'kSlope', fert: 'kFert', note: 'kNote' };
+  /* an entry's detail, rendered in the current language from the stored numbers */
+  function entryText(e) {
+    const d = e.data || {};
+    if (e.kind === 'texture') return `${tr(TEXTURE[classify(d.sand, d.clay)])}: ${t('sand')} ${d.sand}% · ${t('silt')} ${100 - d.sand - d.clay}% · ${t('clay')} ${d.clay}%`;
+    if (e.kind === 'ph') return `pH ${Number(d.ph).toFixed(1)} · ${tr(PH_BANDS.find(x => d.ph < x.max).name)}`;
+    if (e.kind === 'slope') return `${num(d.rise / d.run * 100)}% · ${num(Math.atan(d.rise / d.run) * 180 / Math.PI)}°`;
+    if (e.kind === 'fert') return `${d.what}: ${kg(Number(d.kg))}`;
+    return String(d.text || '');
+  }
+  function addEntry(plot, date, kind, data) {
+    rec.entries.push({ id: newId(), plot, date: /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : today(), kind, data });
+    saveRec();
+  }
+  /* the lines the fertiliser calculator would apply right now */
+  function fertLines(material) {
+    const a = areaHa();
+    if (fert.mode === 'straight') {
+      return [['n', 'pn'], ['p', 'pp'], ['k', 'pk']].map(([rk, pk]) => {
+        const rate = Number(fert[rk]) || 0, p = prod(fert[pk]);
+        return rate > 0 && a > 0 ? { what: tr(p.name), kg: rate / (p[rk] / 100) * a } : null;
+      }).filter(Boolean);
+    }
+    if (fert.mode === 'compound') {
+      const g = fert.g.map(v => Number(v) || 0), i = { n: 0, p: 1, k: 2 }[fert.basis], rate = Number(fert.crate) || 0;
+      return rate > 0 && g[i] > 0 && a > 0 ? [{ what: `NPK ${g.join('-')}`, kg: rate / (g[i] / 100) * a }] : [];
+    }
+    const what = material.trim() || t('product');
+    if (fert.mode === 'plant') {
+      const need = Number(fert.need) || 0, pctv = Number(fert.pct) || 0, n = Number(fert.plants) || 0;
+      return need > 0 && pctv > 0 && n > 0 ? [{ what, kg: need / (pctv / 100) * n / 1000 }] : [];
+    }
+    if (fert.mode === 'tree') {
+      const rate = Number(fert.trate) || 0, apps = Math.round(Number(fert.tapps) || 0), n = Number(fert.ttrees) || 0;
+      return rate > 0 && apps > 0 && n > 0 ? [{ what, kg: rate / apps * n }] : [];
+    }
+    return [];
+  }
+  function saveBar(kind) {
+    if (!rec.plots.length) return `<p class="savebar hint">${esc(t('needPlot'))} <a href="#/rekod">${esc(t('addPlot'))}</a></p>`;
+    const last = store.get('lastPlot', '');
+    const needsName = kind === 'fert' && (fert.mode === 'plant' || fert.mode === 'tree');
+    return `<form class="savebar" data-save="${kind}">
+      <div class="row2">
+        <label>${esc(t('plots'))}<select name="plot">${rec.plots.map(p => `<option value="${p.id}" ${p.id === last ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>
+        <label>${esc(t('date'))}<input type="date" name="date" value="${today()}"></label>
+      </div>
+      ${needsName ? `<label>${esc(t('what'))}<input type="text" name="what" maxlength="60"></label>` : ''}
+      <button class="btn" type="submit">${esc(t('saveToRec'))}</button>
+      <p class="savemsg" role="status"></p>
+    </form>`;
+  }
+  function handleSave(form) {
+    const f = new FormData(form), plot = plotById(f.get('plot')), kind = form.dataset.save;
+    const msg = form.querySelector('.savemsg');
+    if (!plot) return;
+    const date = f.get('date');
+    let ok = true;
+    if (kind === 'texture') addEntry(plot.id, date, kind, { sand: tex.sand, clay: tex.clay });
+    else if (kind === 'ph') addEntry(plot.id, date, kind, { ph });
+    else if (kind === 'slope') {
+      const rise = Number(slope.rise) || 0, run = Number(slope.run) || 0;
+      if (rise > 0 && run > 0) addEntry(plot.id, date, kind, { rise, run }); else ok = false;
+    } else if (kind === 'fert') {
+      const lines = fertLines(String(f.get('what') || ''));
+      if (lines.length) lines.forEach(l => addEntry(plot.id, date, 'fert', { what: l.what, kg: Math.round(l.kg * 100) / 100 })); else ok = false;
+    }
+    if (ok) store.set('lastPlot', plot.id);
+    msg.className = 'savemsg ' + (ok ? 'ok' : 'err');
+    msg.innerHTML = ok ? `${esc(fill('savedTo', { p: plot.name }))} <a href="#/rekod/${plot.id}">${esc(t('navRecords'))}</a>` : esc(t('nothingToSave'));
+  }
+
+  function latestOf(id, kind) { return entriesOf(id).find(e => e.kind === kind); }
+  function pageRecords() {
+    return `<section class="page">
+      <h1>${esc(t('navRecords'))}</h1>
+      <p class="lede">${esc(t('recIntro'))}</p>
+      <p class="note">${esc(t('recDevice'))}</p>
+      <h2>${esc(t('plots'))}</h2>
+      ${rec.plots.length ? `<ul class="quizlist">${rec.plots.map(p => {
+        const n = entriesOf(p.id).length, phE = latestOf(p.id, 'ph');
+        return `<li><a href="#/rekod/${p.id}"><span class="ltitle"><b>${esc(p.name)}</b><small>${[p.crop, p.area ? `${p.area} ${t(p.unit)}` : '', `${n} ${t('entries')}`, phE ? `pH ${Number(phE.data.ph).toFixed(1)}` : ''].filter(Boolean).map(esc).join(' · ')}</small></span></a></li>`;
+      }).join('')}</ul>` : `<p class="empty">${esc(t('noPlots'))}</p>`}
+      <form class="tool recform" id="plotform">
+        <h2 class="first">${esc(t('addPlot'))}</h2>
+        <label>${esc(t('plotName'))}<input type="text" name="name" maxlength="60" required></label>
+        <label>${esc(t('crop'))}<input type="text" name="crop" maxlength="60"></label>
+        <div class="row2">
+          <label>${esc(t('area'))}<input type="number" inputmode="decimal" min="0" step="any" name="area"></label>
+          <label><span class="vh">${esc(t('area'))}</span><select name="unit">${['ha', 'm2', 'acre'].map(u => `<option value="${u}">${esc(t(u))}</option>`).join('')}</select></label>
+        </div>
+        <label>${esc(t('trees'))}<input type="number" inputmode="numeric" min="0" step="1" name="trees"></label>
+        <button class="btn" type="submit">${esc(t('savePlot'))}</button>
+        <p class="err" role="alert" hidden>${esc(t('nameNeeded'))}</p>
+      </form>
+      <div class="lesson-end">
+        <button type="button" class="btn ghost" data-backup>${esc(t('backup'))}</button>
+        <label class="btn ghost filebtn">${esc(t('restore'))}<input type="file" id="restorefile" accept="application/json,.json" class="vh"></label>
+      </div>
+      <p class="savemsg" id="recmsg" role="status"></p>
+    </section>`;
+  }
+  function pagePlot(id) {
+    const p = plotById(id);
+    if (!p) return pageRecords();
+    const list = entriesOf(id);
+    const latest = kind => { const e = latestOf(id, kind); return e ? `${esc(entryText(e))} <small>${esc(e.date)}</small>` : `<span class="plain">${esc(t('noReading'))}</span>`; };
+    return `<section class="page">
+      <a class="back" href="#/rekod">‹ ${esc(t('allPlots'))}</a>
+      <h1 class="plot-title">${esc(p.name)}</h1>
+      <p class="lede">${[p.crop, p.area ? `${p.area} ${t(p.unit)}` : '', p.trees ? `${t('trees')}: ${p.trees}` : ''].filter(Boolean).map(esc).join(' · ')}</p>
+      <h2>${esc(t('latest'))}</h2>
+      <ul class="res plain-res latest">
+        <li><span>${esc(t('kTexture'))}</span><b>${latest('texture')}</b></li>
+        <li><span>${esc(t('kPh'))}</span><b>${latest('ph')}</b></li>
+        <li><span>${esc(t('kSlope'))}</span><b>${latest('slope')}</b></li>
+      </ul>
+      <h2>${esc(t('log'))}</h2>
+      ${list.length ? `<ul class="loglist">${list.map(e => `<li>
+        <div><small>${esc(e.date)} · ${esc(t(KIND_KEY[e.kind] || 'kNote'))}</small><span>${esc(entryText(e))}</span></div>
+        <button type="button" class="delbtn" data-delentry="${e.id}" aria-label="${esc(t('del'))}: ${esc(entryText(e))}">${esc(t('del'))}</button>
+      </li>`).join('')}</ul>` : `<p class="empty">${esc(t('noEntries'))}</p>`}
+      <form class="tool recform" id="appform" data-plot="${p.id}">
+        <h2 class="first">${esc(t('addApp'))}</h2>
+        <label>${esc(t('date'))}<input type="date" name="date" value="${today()}"></label>
+        <div class="row2">
+          <label>${esc(t('what'))}<input type="text" name="what" maxlength="60"></label>
+          <label>${esc(t('amountKg'))}<input type="number" inputmode="decimal" min="0" step="any" name="kg"></label>
+        </div>
+        <button class="btn" type="submit">${esc(t('save'))}</button>
+        <p class="err" role="alert" hidden>${esc(t('appNeeded'))}</p>
+      </form>
+      <form class="tool recform" id="noteform" data-plot="${p.id}">
+        <h2 class="first">${esc(t('addNote'))}</h2>
+        <label>${esc(t('date'))}<input type="date" name="date" value="${today()}"></label>
+        <label>${esc(t('note'))}<textarea name="text" rows="3" maxlength="500"></textarea></label>
+        <button class="btn" type="submit">${esc(t('save'))}</button>
+        <p class="err" role="alert" hidden>${esc(t('noteNeeded'))}</p>
+      </form>
+      <div class="lesson-end">
+        <button type="button" class="btn ghost" data-csv="${p.id}">${esc(t('csv'))}</button>
+        <button type="button" class="btn ghost danger" data-delplot="${p.id}">${esc(t('delPlot'))}</button>
+      </div>
+    </section>`;
+  }
+  function download(name, text, type) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type }));
+    a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+  function plotCsv(id) {
+    const p = plotById(id);
+    const cell = v => { let s = String(v); if (/^[=+\-@]/.test(s)) s = "'" + s; return `"${s.replace(/"/g, '""')}"`; };  // quote, and stop spreadsheet formulas
+    const rows = [[t('date'), t('plotName'), t('csvType'), t('csvDetail')].map(cell).join(',')]
+      .concat(entriesOf(id).reverse().map(e => [e.date, p.name, t(KIND_KEY[e.kind] || 'kNote'), entryText(e)].map(cell).join(',')));
+    download(`${p.name.replace(/[^\w一-鿿-]+/g, '_') || 'plot'}.csv`, '﻿' + rows.join('\r\n'), 'text/csv;charset=utf-8');
+  }
+  /* accept only the shape this app writes */
+  function cleanBackup(obj) {
+    if (!obj || !Array.isArray(obj.plots) || !Array.isArray(obj.entries)) return null;
+    const str = (v, n) => String(v == null ? '' : v).slice(0, n);
+    const plots = obj.plots.filter(p => p && p.id && p.name).map(p => ({ id: str(p.id, 40), name: str(p.name, 60), crop: str(p.crop, 60), area: Number(p.area) > 0 ? Number(p.area) : '', unit: HA[p.unit] ? p.unit : 'ha', trees: Number(p.trees) > 0 ? Math.round(Number(p.trees)) : '' }));
+    const ids = new Set(plots.map(p => p.id));
+    const fin = v => Number.isFinite(Number(v));
+    const entries = obj.entries.filter(e => e && ids.has(String(e.plot)) && KIND_KEY[e.kind] && e.data && typeof e.data === 'object').map(e => {
+      const d = e.data;
+      let data = null;
+      if (e.kind === 'texture' && fin(d.sand) && fin(d.clay) && d.sand >= 0 && d.clay >= 0 && Number(d.sand) + Number(d.clay) <= 100) data = { sand: Number(d.sand), clay: Number(d.clay) };
+      else if (e.kind === 'ph' && fin(d.ph) && d.ph >= 0 && d.ph <= 14) data = { ph: Number(d.ph) };
+      else if (e.kind === 'slope' && Number(d.rise) > 0 && Number(d.run) > 0) data = { rise: Number(d.rise), run: Number(d.run) };
+      else if (e.kind === 'fert' && Number(d.kg) > 0) data = { what: str(d.what, 60), kg: Number(d.kg) };
+      else if (e.kind === 'note') data = { text: str(d.text, 500) };
+      return data && { id: str(e.id, 40) || newId(), plot: String(e.plot), date: /^\d{4}-\d{2}-\d{2}$/.test(e.date) ? e.date : today(), kind: e.kind, data };
+    }).filter(Boolean);
+    return { plots, entries };
   }
 
   /* ----- quiz ----- */
@@ -660,6 +852,7 @@
       r[0] === 'amali' ? pageActivity(r[1]) :
       r[0] === 'kuiz' ? pageQuiz(r[1]) :
       r[0] === 'alat' ? pageTools(r[1]) :
+      r[0] === 'rekod' ? (r[1] ? pagePlot(r[1]) : pageRecords()) :
       r[0] === 'istilah' ? pageGlossary() :
       r[0] === 'buku' ? pageBook() :
       r[0] === 'sumber' ? pageSources() : pageHome();
@@ -685,6 +878,19 @@
       done = done.includes(d.done) ? done.filter(x => x !== d.done) : done.concat(d.done);
       store.set('done', done); render(true); return;
     }
+    if (d.delentry) {
+      if (window.confirm(t('confirmDelEntry'))) { rec.entries = rec.entries.filter(x => x.id !== d.delentry); saveRec(); render(true); }
+      return;
+    }
+    if (d.delplot) {
+      if (window.confirm(t('confirmDelPlot'))) {
+        rec.plots = rec.plots.filter(x => x.id !== d.delplot); rec.entries = rec.entries.filter(x => x.plot !== d.delplot);
+        saveRec(); location.hash = '#/rekod';
+      }
+      return;
+    }
+    if (d.csv) { plotCsv(d.csv); return; }
+    if (d.backup !== undefined) { download('soil-records.json', JSON.stringify(rec, null, 1), 'application/json'); return; }
     if (d.defwhere) { def.where = d.defwhere; def.pick = null; redrawTool(toolDef); return; }
     if (d.defpick) { def.pick = d.defpick; redrawTool(toolDef); return; }
     if (d.mode) { fert.mode = d.mode; store.set('fert', fert); redrawTool(toolFert); return; }
@@ -730,6 +936,25 @@
     }
   });
   document.addEventListener('submit', e => {
+    const form = e.target;
+    if (form.dataset.save) { e.preventDefault(); handleSave(form); return; }
+    if (form.classList.contains('recform')) {
+      e.preventDefault();
+      const f = new FormData(form), err = form.querySelector('.err');
+      const text = k => String(f.get(k) || '').trim();
+      let ok = false;
+      if (form.id === 'plotform' && text('name')) {
+        const id = newId();
+        rec.plots.push({ id, name: text('name'), crop: text('crop'), area: Number(f.get('area')) > 0 ? Number(f.get('area')) : '', unit: f.get('unit'), trees: Number(f.get('trees')) > 0 ? Math.round(Number(f.get('trees'))) : '' });
+        saveRec(); store.set('lastPlot', id); ok = true;
+      } else if (form.id === 'appform' && text('what') && Number(f.get('kg')) > 0) {
+        addEntry(form.dataset.plot, f.get('date'), 'fert', { what: text('what'), kg: Number(f.get('kg')) }); ok = true;
+      } else if (form.id === 'noteform' && text('text')) {
+        addEntry(form.dataset.plot, f.get('date'), 'note', { text: text('text') }); ok = true;
+      }
+      if (ok) render(true); else err.hidden = false;
+      return;
+    }
     if (e.target.id !== 'jar') return;
     e.preventDefault();
     const f = new FormData(e.target);
@@ -742,6 +967,19 @@
     tex.clay = Math.min(100 - tex.sand, Math.round(c / total * 100));
     updateTexture();
     document.getElementById('texout').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+
+  document.addEventListener('change', e => {
+    if (e.target.id !== 'restorefile' || !e.target.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let clean = null;
+      try { clean = cleanBackup(JSON.parse(reader.result)); } catch (err) { clean = null; }
+      if (clean && window.confirm(t('confirmRestore'))) { rec = clean; saveRec(); render(true); document.getElementById('recmsg').textContent = t('restoreOk'); }
+      else if (!clean) { const m = document.getElementById('recmsg'); m.className = 'savemsg err'; m.textContent = t('restoreBad'); }
+    };
+    reader.readAsText(e.target.files[0]);
+    e.target.value = '';
   });
 
   render(false);

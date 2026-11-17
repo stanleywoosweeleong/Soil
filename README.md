@@ -4,6 +4,7 @@ A soil field guide in Bahasa Melayu, English and Chinese, built from the topics 
 
 - **Guide**: seven units in the order the work is done in the field: know your soil, soil properties, reading a site, protecting soil, improving soil, feeding crops, then oil palm and fruit trees. Each unit ends with a practical activity and a quiz.
 - **Tools**: USDA soil texture triangle (with jar-test input), soil pH explorer with crop targets and a lime estimate, slope calculator, nutrient deficiency key, fertiliser calculator (straight, compound, per plant, tree programme, bag contents and cost).
+- **Records**: a per-plot field record. Save texture, pH, slope and fertiliser results from the tools, add notes, export a plot as CSV, and back up or restore everything as a JSON file. Data stays in the browser on the device.
 - **Glossary**: searchable terms shown in all three languages.
 - **Textbook index**: maps the lecture-note section numbers (1.1 to 1.3.2) to the guide.
 
