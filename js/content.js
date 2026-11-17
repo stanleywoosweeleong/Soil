@@ -86,9 +86,9 @@ const UI = {
   textureClass: ['Kelas tekstur', 'Texture class', '质地类别'],
   jarTitle: ['Dari ujian balang', 'From a jar test', '由沉降瓶试验换算'],
   jarDesc: [
-    'Ukur ketebalan setiap lapisan yang mendap dalam balang (mm atau cm, asalkan unit sama).',
-    'Measure the thickness of each settled layer in the jar (mm or cm, as long as the unit is the same).',
-    '量出瓶中各沉积层的厚度（毫米或厘米皆可，单位一致即可）。',
+    'Ukur ketebalan setiap lapisan yang mendap dalam balang (mm atau cm, asalkan unit sama). Hasilnya anggaran kasar, bukan analisis makmal.',
+    'Measure the thickness of each settled layer in the jar (mm or cm, as long as the unit is the same). The result is a rough estimate, not a laboratory analysis.',
+    '量出瓶中各沉积层的厚度（毫米或厘米皆可，单位一致即可）。结果只是粗略估计，并非实验室分析。',
   ],
   jarSand: ['Lapisan bawah (pasir)', 'Bottom layer (sand)', '底层（砂粒）'],
   jarSilt: ['Lapisan tengah (kelodak)', 'Middle layer (silt)', '中层（粉粒）'],
@@ -250,9 +250,9 @@ const TEXTURE_NOTE = {
   medium: ['Seimbang antara saliran dengan pegangan air dan nutrien. Sesuai untuk kebanyakan tanaman.',
            'A balance of drainage with water and nutrient holding. Suits most crops.',
            '排水与保水保肥之间较为均衡，适合大多数作物。'],
-  fine: ['Memegang banyak air dan nutrien, tetapi bersaliran perlahan dan mudah terpadat. Elakkan mengerjakannya ketika basah.',
-         'Holds a lot of water and nutrient, but drains slowly and compacts easily. Avoid working it when wet.',
-         '保水保肥力强，但排水慢且容易压实。避免在潮湿时耕作。'],
+  fine: ['Memegang banyak air, selalunya bersaliran perlahan dan mudah terpadat. Pegangan nutrien bergantung pada jenis liat dan bahan organik. Elakkan mengerjakannya ketika basah.',
+         'Holds a lot of water, often drains slowly and compacts easily. Nutrient holding depends on the clay type and organic matter. Avoid working it when wet.',
+         '保水力强，通常排水慢且容易压实。保肥力取决于黏土类型和有机质。避免在潮湿时耕作。'],
 };
 /* polygons in [sand, clay] for drawing the triangle */
 const TEXTURE_POLY = {
@@ -308,6 +308,16 @@ const SOURCES = [
     ['University of Illinois Extension – Soil Basics', 'https://extension.illinois.edu/soil/soil-basics'],
     ['Cornell University – The Science of Soil', 'https://blogs.cornell.edu/soilnow/the-science-of-soil'],
     ['European Geosciences Union, Soil System Sciences – What is soil structure? (FAO 2006 classes)', 'https://blogs.egu.eu/divisions/sss/2013/08/19/what-is-soil-structure/'],
+  ] },
+  { topic: ['Sumber agensi Malaysia', 'Malaysian agency resources', '马来西亚官方资源'], items: [
+    ['Jabatan Pertanian Malaysia – GeoTanih (siri tanah, Semenanjung)', 'https://geotanih.doa.gov.my/'],
+    ['Jabatan Pertanian Malaysia – Perkhidmatan analisis makmal (tanah, daun, baja, air)', 'https://www.doa.gov.my/index.php/pages/view/351'],
+    ['Jabatan Pertanian Malaysia – Garis Panduan Pembangunan Pertanian di Tanah Bercerun (2020)', 'https://www.doa.gov.my/doa/resources/aktiviti_sumber/sumber_awam/penerbitan/buku/garis_panduan_pembangunan_pertanian_tanah_bercerun_2020_ISBN_v2.pdf'],
+    ['Jabatan Pertanian Malaysia – Garis panduan dan pelan tindakan tanah gambut pertanian', 'https://www.doa.gov.my/index.php/pages/view/320'],
+    ['Jabatan Pertanian Malaysia – Pelan Tindakan Pengurusan Tanah Gambut Pertanian', 'https://www.doa.gov.my/doa/resources/aktiviti_sumber/sumber_awam/penerbitan/buku/pelan_tindakan_pengurusan_tanah_gambut_pertanian.pdf'],
+    ['Asian Journal of Agriculture and Food Sciences – FTIR and XRD analyses of highly weathered Ultisols and Oxisols in Peninsular Malaysia', 'https://www.ajouronline.com/index.php/AJAFS/article/view/3898'],
+    ['Colorado State University Extension – Irrigation water quality criteria', 'https://extension.colostate.edu/resource/irrigation-water-quality-criteria'],
+    ['Oregon State University Extension – Managing salt-affected soils for crop production (PNW 601)', 'https://extension.oregonstate.edu/es/catalog/pnw-601-managing-salt-affected-soils-crop-production'],
   ] },
   { topic: ['Persampelan tanah', 'Soil sampling', '土壤取样'], items: [
     ['Michigan State University Extension – A Field Guide to Soil Sampling', 'https://www.canr.msu.edu/resources/a-field-guide-to-soil-sampling'],

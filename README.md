@@ -2,8 +2,8 @@
 
 A soil field guide in Bahasa Melayu, English and Chinese, built from the topics of Chapter 1 (Sains Tanah).
 
-- **Guide**: seven units in the order the work is done in the field: know your soil, soil properties, reading a site, protecting soil, improving soil, feeding crops, then oil palm and fruit trees. Each unit ends with a practical activity and a quiz.
-- **Tools**: USDA soil texture triangle (with jar-test input), soil pH explorer with crop targets and a lime estimate, slope calculator, nutrient deficiency key, fertiliser calculator (straight, compound, per plant, tree programme, bag contents and cost).
+- **Guide**: seven units in the order the work is done in the field: know your soil, soil properties, reading a site, protecting soil, improving soil, feeding crops, then oil palm, selected fruit trees and paddy. Each unit ends with a practical activity and a quiz.
+- **Tools**: USDA soil texture triangle (with jar-test input), soil pH explorer with guide ranges per crop (it gives no lime rate; that needs a laboratory lime requirement), slope calculator, nutrient deficiency key, fertiliser calculator (straight, compound, per plant, tree programme, bag contents and cost).
 - **Records**: a per-plot field record. Save texture, pH, slope and fertiliser results from the tools, add notes, export a plot as CSV, and back up or restore everything as a JSON file. Data stays in the browser on the device.
 - **Glossary**: searchable terms shown in all three languages.
 - **Textbook index**: maps the lecture-note section numbers (1.1 to 1.3.2) to the guide.
@@ -13,3 +13,5 @@ No build step. Open `index.html`, or serve the folder:
     python3 -m http.server 8000
 
 Content lives in `js/content.js` (interface text, tool data, sources) `js/units.js` (units, lessons, activities, quizzes, glossary) and `js/crops.js` (the crop unit and its tool data). Each text is a tuple `[ms, en, zh]`; to add a language, add it to `LANGS` and append one entry to each tuple (missing entries fall back to English). References are listed on the Sources page of the app.
+
+Numbers in the lessons are teaching examples. Each carries a source line saying where it came from and where it applies; crop fertiliser tables are published examples, not field recommendations.

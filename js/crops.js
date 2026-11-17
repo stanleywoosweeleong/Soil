@@ -1,9 +1,14 @@
-/* Crop unit (oil palm and tropical fruit trees) and the field extras that go with it:
-   slope measurement, lime estimate, nitrogen losses, organic manure values.
-   Loaded after content.js and units.js; text tuples are [ms, en, zh]. */
+/* Crop unit (oil palm, selected fruit trees, paddy) and the field extras that go with it.
+   Loaded after content.js and units.js; text tuples are [ms, en, zh].
+
+   Numbers in this file are teaching examples from named sources. Each one carries a
+   ['src', …] block saying where it came from and where it applies. */
 
 Object.assign(UI, {
   toolsIntro: ['Lima alat untuk digunakan di tapak.', 'Five tools to use at the site.', '五个可在田间使用的工具。'],
+  srcLabel: ['Sumber', 'Source', '来源'],
+  appliesLabel: ['Terpakai untuk', 'Applies to', '适用范围'],
+  caseLabel: ['Kajian kes', 'Case study', '案例'],
 
   /* slope tool */
   tSlope: ['Kalkulator cerun', 'Slope calculator', '坡度计算器'],
@@ -12,22 +17,28 @@ Object.assign(UI, {
   run: ['Jarak mendatar (m)', 'Horizontal run (m)', '水平距离（米）'],
   slope: ['Cerun', 'Slope', '坡度'],
   enterSlope: ['Masukkan beza tinggi (0 atau lebih) dan jarak mendatar yang lebih daripada 0.', 'Enter a rise of 0 or more and a run greater than 0.', '请输入高差（0 或以上）和大于 0 的水平距离。'],
-  slopePalm: ['Had tanah untuk kelapa sawit', 'Soil limitation for oil palm', '对油棕的土地限制'],
-  slopeDo: ['Langkah pemuliharaan', 'Conservation measures', '保育措施'],
-  slopeNote: ['Kelas kelapa sawit mengikut satu skema kesesuaian tanah Malaysia; langkah pemuliharaan mengikut satu panduan pekebun kecil kelapa sawit.', 'Oil palm classes follow one Malaysian land suitability scheme; the measures follow one oil palm smallholder guide.', '油棕等级依据马来西亚的一套土地适宜性标准；保育措施依据一份油棕小园主指南。'],
+  slopePalm: ['Kelas kecerunan untuk kelapa sawit di tanah mineral', 'Terrain class for oil palm on mineral soil', '矿质土上油棕的坡度等级'],
+  slopeDo: ['Contoh langkah dalam satu panduan kelapa sawit', 'Example measures in one oil palm guide', '一份油棕指南中的示例措施'],
+  slopeNote: ['Kecerunan hanyalah satu faktor. Panjang cerun, laluan air larian dan keamatan ribut juga menentukan hakisan. Untuk perancangan, rujuk Garis Panduan Pembangunan Pertanian di Tanah Bercerun (Jabatan Pertanian, 2020).',
+              'Steepness is only one factor. Slope length, runoff paths and storm intensity also decide erosion. For planning, refer to the Jabatan Pertanian guideline on agricultural development on sloping land (2020).',
+              '坡度只是因素之一。坡长、径流路径和暴雨强度同样决定侵蚀程度。规划时请参考农业局《坡地农业发展指南》（2020）。'],
 
-  /* pH tool: crop target and lime estimate */
+  /* pH tool: crop target, no lime rate */
   crop: ['Tanaman', 'Crop', '作物'],
-  target: ['Julat pH sasaran', 'Target pH range', '目标 pH 范围'],
-  soilTex: ['Tekstur tanah', 'Soil texture', '土壤质地'],
-  limeEst: ['Anggaran kapur', 'Lime estimate', '石灰估算'],
-  limeText: ['Untuk menaikkan pH dari {a} ke {b}: kira-kira {t} tan kapur sehektar.', 'To raise the pH from {a} to {b}: about {t} tonnes of lime per hectare.', '把 pH 从 {a} 提高到 {b}：每公顷约需 {t} 吨石灰。'],
-  limeMore: ['Sasaran masih belum tercapai. Uji semula sebelum mengapur kali kedua.', 'This is still short of the target. Retest before liming a second time.', '这仍未达到目标。再次施石灰前请重新检测。'],
-  limeNote: ['Panduan kasar: (pH sasaran − pH semasa) × faktor tekstur, iaitu 2 untuk pasir, 3 untuk lom berpasir dan 4 untuk lom hingga lom liat, bagi kapur tulen. Naikkan paling banyak 1 unit pH pada satu masa, dan kurangkan kadar 25% pada tanah yang sangat rendah bahan organik. Formula ini berasal dari Australia Selatan dan berdasarkan pH dalam kalsium klorida; ujian tanah tempatan lebih tepat.',
-             'A rough guide: (target pH − current pH) × texture factor, which is 2 for sand, 3 for sandy loam and 4 for loam to clay loam, for pure lime. Raise the pH by at most 1 unit at a time, and cut the rate by 25% on soil very low in organic matter. The formula comes from South Australia and is based on pH in calcium chloride; a local soil test is more accurate.',
-             '粗略估算：（目标 pH − 当前 pH）× 质地系数，砂土为 2、砂质壤土为 3、壤土至黏壤土为 4，按纯石灰计。每次最多提高 1 个 pH 单位；有机质极低的土壤减量 25%。此公式来自南澳大利亚，以氯化钙测得的 pH 为基准；本地的土壤检测更为准确。'],
-  inRange: ['pH berada dalam julat sasaran tanaman ini. Kapur tidak diperlukan.', 'The pH is within this crop’s target range. No lime is needed.', 'pH 在该作物的目标范围内，无需施石灰。'],
-  aboveRange: ['pH melebihi julat sasaran. Jangan mengapur.', 'The pH is above the target range. Do not lime.', 'pH 高于目标范围，不要施石灰。'],
+  target: ['Julat pH panduan', 'Guide pH range', '参考 pH 范围'],
+  limeEst: ['Perlukah kapur?', 'Is lime needed?', '需要施石灰吗？'],
+  inRange: ['pH berada dalam julat panduan tanaman ini. Kapur tidak diperlukan.', 'The pH is within this crop’s guide range. No lime is needed.', 'pH 在该作物的参考范围内，无需施石灰。'],
+  aboveRange: ['pH melebihi julat panduan. Jangan mengapur.', 'The pH is above the guide range. Do not lime.', 'pH 高于参考范围，不要施石灰。'],
+  belowRange: ['pH di bawah julat panduan. Kapur mungkin diperlukan, tetapi alat ini tidak memberi kadar.', 'The pH is below the guide range. Lime may be needed, but this tool does not give a rate.', 'pH 低于参考范围，可能需要施石灰，但本工具不提供用量。'],
+  limeSteps: [
+    ['Hantar sampel tanah ke makmal dan minta keperluan kapur, bukan pH sahaja.', 'Send a soil sample to a laboratory and ask for the lime requirement, not only the pH.', '把土样送到实验室，要求测定石灰需要量，而不只是 pH。'],
+    ['Semak nilai peneutralan pada label kapur; kapur yang kurang tulen memerlukan kuantiti lebih.', 'Check the neutralising value on the lime label; less pure lime needs a larger amount.', '查看石灰标签上的中和值；纯度较低的石灰需要更多用量。'],
+    ['Ikut kadar dan pecahan pemberian yang disyorkan oleh makmal atau pegawai pertanian.', 'Follow the rate and the split applications recommended by the laboratory or agriculture officer.', '按实验室或农业官员建议的用量和分次方式施用。'],
+    ['Uji semula sebelum mengapur lagi.', 'Retest before liming again.', '再次施石灰前重新检测。'],
+  ],
+  limeNote: ['Julat panduan ialah nilai umum untuk pH dalam air. Makmal mungkin melaporkan pH dalam kalsium klorida, yang bacaannya lebih rendah.',
+             'Guide ranges are general values for pH in water. A laboratory may report pH in calcium chloride, which reads lower.',
+             '参考范围是针对水浸提 pH 的一般数值。实验室可能报告氯化钙 pH，其读数较低。'],
 
   /* fertiliser tool: tree programme */
   modeTree: ['Program pokok', 'Tree programme', '果树施肥计划'],
@@ -38,30 +49,28 @@ Object.assign(UI, {
   perRound: ['Semua pokok, setiap pemberian', 'All trees, each application', '全部树每次'],
   perYear: ['Semua pokok, setahun', 'All trees, per year', '全部树每年'],
   organicPresets: ['Baja organik (nilai lazim)', 'Organic manures (typical values)', '有机肥（常见数值）'],
+  costNote: ['Harga dibahagi dengan jumlah N + P₂O₅ + K₂O dalam beg. Ini perbandingan kasar sahaja: ia tidak mengambil kira nutrien yang sebenarnya diperlukan, Mg, S, mikronutrien atau kelarutan.',
+             'Price divided by the total N + P₂O₅ + K₂O in the bag. This is only a rough comparison: it ignores which nutrient you actually need, Mg, S, micronutrients and solubility.',
+             '价格除以包内 N + P₂O₅ + K₂O 的总量。这只是粗略比较：它没有考虑你实际需要哪种养分，也不计镁、硫、微量元素和溶解性。'],
 });
 
-/* target pH ranges (pH in water) */
+/* guide pH ranges (pH in water); general values, not calibrated recommendations */
 const CROP_PH = [
   { id: 'gen', range: [5.5, 7.0], name: ['Umum', 'General', '一般作物'] },
   { id: 'palm', range: [4.5, 6.5], name: ['Kelapa sawit', 'Oil palm', '油棕'] },
   { id: 'durian', range: [5.5, 6.5], name: ['Durian', 'Durian', '榴莲'] },
   { id: 'fruit', range: [5.5, 7.0], name: ['Pokok buah lain', 'Other fruit trees', '其他果树'] },
 ];
-const LIME_TEX = [
-  { id: 'sand', f: 2, name: ['Pasir', 'Sand', '砂土'] },
-  { id: 'sloam', f: 3, name: ['Lom berpasir', 'Sandy loam', '砂质壤土'] },
-  { id: 'loam', f: 4, name: ['Lom hingga lom liat', 'Loam to clay loam', '壤土至黏壤土'] },
-];
 
 /* slope classes */
-const SLOPE_PALM = [   // terrain in degrees
+const SLOPE_PALM = [   // terrain in degrees, mineral soils
   { max: 12, name: ['Julat yang diingini', 'Desirable range', '理想范围'] },
   { max: 16, name: ['Had kecil', 'Minor limitation', '轻度限制'] },
   { max: 24, name: ['Had serius', 'Serious limitation', '严重限制'] },
   { max: 999, name: ['Had sangat serius', 'Very serious limitation', '极严重限制'] },
 ];
 const SLOPE_DO = [     // slope in percent
-  { max: 9, text: ['Tiada langkah khas diperlukan; kekalkan litupan tanah.', 'No special measures needed; keep the ground covered.', '无需特别措施；保持地面覆盖。'] },
+  { max: 9, text: ['Tiada langkah khas; kekalkan litupan tanah.', 'No special measures; keep the ground covered.', '无特别措施；保持地面覆盖。'] },
   { max: 16, text: ['Susun pelepah mengikut kontur dan gali lubang kelodak.', 'Stack fronds along the contour and dig silt pits.', '沿等高线堆放叶柄并挖集泥坑。'] },
   { max: 40, text: ['Teres dan kekacang penutup bumi.', 'Terraces and legume cover crops.', '修梯田并种植豆科覆盖作物。'] },
   { max: 9999, text: ['Tidak ditanam.', 'Not planted.', '不种植。'] },
@@ -73,61 +82,75 @@ const ORGANIC_PRESETS = [
   { g: [0.5, 0.2, 0.5], name: ['Baja kandang reput', 'Rotted farmyard manure', '腐熟厩肥'] },
 ];
 
+/* shared wording */
+const EXAMPLE_ONLY = ['Jadual di bawah ialah contoh yang diterbitkan, untuk memahami bentuk sesuatu program dan berlatih mengira. Ia bukan syor untuk ladang anda. Untuk perancangan sebenar, dapatkan syor tempatan berdasarkan analisis tanah dan daun, baca analisis pada label baja, dan sesuaikan dengan keadaan pokok serta beban buah.',
+  'The table below is a published example, for seeing what a programme looks like and practising the arithmetic. It is not a recommendation for your farm. For real planning, get a local recommendation based on soil and leaf analysis, read the analysis on the fertiliser label, and adjust for tree condition and crop load.',
+  '下表是已发表的示例，用来了解施肥计划的形式并练习计算，并不是针对你农地的建议。实际规划时，应取得基于土壤和叶片分析的本地建议，查看肥料标签上的成分，并根据树势和挂果量调整。'];
+const GRADE_HEAD = ['Gred baja seperti dicetak', 'Fertiliser grade as printed', '肥料配比（按原文）'];
+const GRADE_NOTE = ['Gred ditulis seperti dalam sumber. Mengikut kelaziman label baja, nombor itu ialah peratus N, P₂O₅, K₂O dan MgO, bukan unsur P, K dan Mg. Sahkan pada label beg.',
+  'Grades are written as in the source. By fertiliser-label convention the numbers are percent N, P₂O₅, K₂O and MgO, not elemental P, K and Mg. Confirm on the bag label.',
+  '配比按来源原文书写。依肥料标签惯例，这些数字是 N、P₂O₅、K₂O 和 MgO 的百分比，而不是元素 P、K、Mg。请以包装标签为准。'];
+const TFNET_APPLIES = ['Contoh umum; halaman tidak bertarikh dan tidak menyatakan jenis tanah atau hasil.', 'A general example; the page is undated and states no soil type or yield.', '一般性示例；该网页未注明日期，也未说明土壤类型或产量。'];
+
 /* ---------- Unit 7 ---------- */
-UNITS.push({ n: 7, chip: '#3f6e63', title: ['Kelapa sawit dan pokok buah', 'Oil palm and fruit trees', '油棕与果树'],
-  blurb: ['Keperluan tanah dan program pembajaan untuk kelapa sawit, durian, rambutan dan mangga.', 'Soil needs and feeding programmes for oil palm, durian, rambutan and mango.', '油棕、榴莲、红毛丹和芒果的土壤要求与施肥计划。'],
-  lessons: ['7-1', '7-2', '7-3'] });
+UNITS.push({ n: 7, chip: '#3f6e63', title: ['Kelapa sawit, pokok buah terpilih dan padi', 'Oil palm, selected fruit trees and paddy', '油棕、部分果树与水稻'],
+  blurb: ['Keperluan tanah dan contoh program pembajaan. Sayur-sayuran, nanas dan getah tidak diliputi.', 'Soil needs and example feeding programmes. Vegetables, pineapple and rubber are not covered.', '土壤要求与施肥计划示例。不包括蔬菜、黄梨和橡胶。'],
+  lessons: ['7-1', '7-2', '7-3', '7-4'] });
 
 LESSONS['7-1'] = { book: '', title: ['Kelapa sawit', 'Oil palm', '油棕'], body: [
-  ['p', ['Kelapa sawit tahan tanah berasid, tetapi memerlukan tanah yang dalam dan bersaliran baik, dan mengambil banyak nutrien, terutamanya kalium.',
-         'Oil palm tolerates acidic soil, but it needs deep, well-drained soil and takes up a lot of nutrients, potassium above all.',
-         '油棕耐酸性土壤，但需要深厚且排水良好的土壤，并吸收大量养分，尤其是钾。']],
-  ['h', ['Kesesuaian tanah', 'Soil suitability', '土壤适宜性']],
+  ['p', ['Kelapa sawit tahan tanah berasid dan mengambil banyak nutrien, terutamanya kalium. Nasihat untuk tanah mineral dan untuk tanah gambut berbeza, jadi kedua-duanya diasingkan di sini.',
+         'Oil palm tolerates acidic soil and takes up a lot of nutrients, potassium above all. Advice for mineral soil and for peat differs, so the two are kept apart here.',
+         '油棕耐酸性土壤，并吸收大量养分，尤其是钾。矿质土和泥炭土的建议不同，因此这里分开说明。']],
+  ['h', ['Tanah mineral: kesesuaian', 'Mineral soils: suitability', '矿质土：适宜性']],
   ['table', { head: [['Sifat', 'Property', '性质'], ['Julat yang diingini', 'Desirable range', '理想范围'], ['Had serius', 'Serious limitation', '严重限制']],
     rows: [
       [['Kecerunan', 'Terrain', '地形坡度'], '0 – 12°', '16 – 24°'],
       [['Kedalaman tanah berkesan', 'Effective soil depth', '有效土层深度'], '> 90 cm', '30 – 60 cm'],
       [['Tekstur', 'Texture', '质地'], ['Lom liat berpasir, lom liat atau lebih berat', 'Sandy clay loam, clay loam or heavier', '砂质黏壤土、黏壤土或更黏重'], ['Pasir berlom', 'Loamy sand', '壤质砂土']],
       [['Saliran', 'Drainage', '排水'], ['Sederhana baik hingga baik', 'Moderately well to well drained', '排水中等良好至良好'], ['Saliran lemah atau berlebihan', 'Poorly or excessively drained', '排水不良或过度排水']],
-      [['Kedalaman aras air', 'Water table depth', '地下水位深度'], '75 – 90 cm', '30 – 60 cm'],
-      [['Kedalaman gambut', 'Peat depth', '泥炭层厚度'], '< 30 cm', '100 – 150 cm'],
     ] }],
-  ['p', ['Kecerunan melebihi 24°, kedalaman kurang daripada 30 cm atau tekstur pasir dianggap had yang sangat serius.',
-         'Terrain steeper than 24°, depth under 30 cm or a sand texture counts as a very serious limitation.',
-         '坡度超过 24°、土层不足 30 厘米或质地为砂土，均属极严重限制。']],
+  ['src', { s: 'Applied Agricultural Resources (Malaysia), Soil requirements of plantation tree crops', u: 'https://aarsb.com.my/soil-management-soil-requirements-of-plantation-tree-crops',
+    a: ['Menilai tanah mineral untuk kelapa sawit. Bukan untuk tanah gambut.', 'Assessing mineral soils for oil palm. Not for peat.', '评估矿质土对油棕的适宜性，不适用于泥炭土。'] }],
   ['tool', 'cerun'],
+  ['h', ['Ladang sedia ada di tanah gambut', 'Existing plantations on peat', '泥炭土上的现有种植园']],
+  ['p', ['Bahagian ini adalah tentang mengurus tanah gambut yang sudah ditanam, bukan tentang membuka gambut baharu. Di tanah gambut, aras air diurus supaya cukup tinggi untuk memperlahankan pemendapan dan mengurangkan risiko kebakaran, tetapi cukup rendah untuk akar.',
+         'This section is about managing peat that is already planted, not about opening new peat. On peat, the water level is managed to be high enough to slow subsidence and reduce fire risk, yet low enough for roots.',
+         '本节讲的是管理已经种植的泥炭土，而不是开发新的泥炭地。在泥炭土上，水位要管理得足够高，以减缓沉降并降低火灾风险，同时又要足够低，让根系正常生长。']],
+  ['table', { head: [['Tempat diukur', 'Where measured', '测量位置'], ['Julat', 'Range', '范围'], ['Purata', 'Average', '平均']],
+    rows: [
+      [['Aras air dalam parit pengumpul, di bawah tebing', 'Water level in collection drains, below the bank', '集水沟水位（低于沟岸）'], '50 – 70 cm', '60 cm'],
+      [['Aras air bawah tanah dalam telaga pemantauan', 'Groundwater level in a monitoring well', '监测井的地下水位'], '40 – 60 cm', '50 cm'],
+    ] }],
+  ['src', { s: 'RSPO, Manual on Best Management Practices for existing oil palm cultivation on peat', u: 'https://rspo.org/wp-content/uploads/2-water-management-the-flood-risk-assessment-template-is-attached-separately.pdf',
+    a: ['Ladang kelapa sawit sedia ada di tanah gambut sahaja. Jangan gunakan sebagai sasaran saliran untuk tanah mineral.', 'Existing oil palm on peat only. Do not use as a drainage target for mineral soil.', '仅适用于泥炭土上的现有油棕园，不要用作矿质土的排水目标。'] }],
+  ['p', ['Lihat pelajaran tentang tanah gambut dan tanah asid sulfat dalam Unit 3 untuk pemantauan aras air, pemendapan dan kebakaran.',
+         'See the lesson on peat and acid sulfate soils in Unit 3 for water-level monitoring, subsidence and fire.',
+         '关于水位监测、沉降和火灾，请参阅第 3 单元中有关泥炭土和酸性硫酸盐土的课。']],
   ['h', ['Menentukan kadar baja', 'Setting fertiliser rates', '确定施肥量']],
-  ['p', ['Kadar untuk kelapa sawit ditetapkan daripada analisis daun dan hasil, bukan daripada satu resipi tetap. Contoh daripada kajian yang diterbitkan untuk pokok matang:',
-         'Rates for oil palm are set from leaf analysis and yield, not from one fixed recipe. Examples from published work on mature palms:',
-         '油棕的施肥量是根据叶片分析和产量确定的，而不是一成不变的配方。已发表研究中成龄树的例子：']],
-  ['ul', [
-    ['Satu percubaan di Sabah mencadangkan 4.0 hingga 5.0 kg ammonium sulfat, 1.5 hingga 2.0 kg batuan fosfat dan 3.0 hingga 4.0 kg MOP sepokok setahun. Magnesium tidak disyorkan di situ kerana magnesium boleh tukar dalam tanah sangat tinggi.',
-     'One trial in Sabah suggested 4.0 to 5.0 kg ammonium sulphate, 1.5 to 2.0 kg rock phosphate and 3.0 to 4.0 kg MOP per palm per year. Magnesium was not recommended there because exchangeable magnesium in the soil was very high.',
-     '沙巴的一项试验建议每株每年施 4.0 至 5.0 公斤硫酸铵、1.5 至 2.0 公斤磷矿粉和 3.0 至 4.0 公斤氯化钾。由于当地土壤的交换性镁很高，该试验不建议施镁。'],
-    ['Satu contoh imbangan nutrien untuk hasil 30 tan sehektar di tanah kurang subur berjumlah 10.75 kg baja sepokok setahun.',
-     'One nutrient-balance example for a 30 tonne per hectare yield on poor soil came to 10.75 kg of fertiliser per palm per year.',
-     '一个养分平衡实例显示，在贫瘠土壤上要达到每公顷 30 吨的产量，每株每年共需 10.75 公斤肥料。'],
-    ['Untuk pokok belum matang, satu panduan pekebun kecil menyenaraikan boraks kira-kira 0.05 hingga 0.10 kg sepokok setahun.',
-     'For immature palms, one smallholder guide lists borax at about 0.05 to 0.10 kg per palm per year.',
-     '对于幼龄树，一份小园主指南列出硼砂约每株每年 0.05 至 0.10 公斤。'],
-  ]],
-  ['note', ['Angka ini ialah contoh daripada tapak tertentu, bukan syor umum. Tanah dan hasil yang berbeza memerlukan kadar yang berbeza.',
-            'These figures are examples from particular sites, not general recommendations. Different soils and yields need different rates.',
-            '这些数字是特定地点的例子，并非通用建议。不同的土壤和产量需要不同的用量。']],
+  ['p', ['Kadar untuk kelapa sawit ditetapkan daripada analisis daun, analisis tanah dan hasil bagi setiap blok. Tiada satu resipi yang sesuai untuk semua ladang.',
+         'Rates for oil palm are set from leaf analysis, soil analysis and yield for each block. No single recipe fits every estate.',
+         '油棕的施肥量是根据每个地块的叶片分析、土壤分析和产量确定的，没有适用于所有种植园的统一配方。']],
+  ['case', ['Satu percubaan di Sabah pada tanah siri Sahabat (1996) mencadangkan 4.0 hingga 5.0 kg ammonium sulfat, 1.5 hingga 2.0 kg batuan fosfat dan 3.0 hingga 4.0 kg MOP sepokok setahun untuk pokok matang. Magnesium tidak disyorkan di situ kerana magnesium boleh tukar dalam tanah itu sangat tinggi, yang menunjukkan betapa kadar bergantung pada tapak.',
+            'One trial in Sabah on Sahabat series soil (1996) suggested 4.0 to 5.0 kg ammonium sulphate, 1.5 to 2.0 kg rock phosphate and 3.0 to 4.0 kg MOP per palm per year for mature palms. Magnesium was not recommended there because exchangeable magnesium in that soil was very high, which shows how far rates depend on the site.',
+            '沙巴在 Sahabat 土系上的一项试验（1996 年）建议成龄树每株每年施 4.0 至 5.0 公斤硫酸铵、1.5 至 2.0 公斤磷矿粉和 3.0 至 4.0 公斤氯化钾。由于该土壤的交换性镁很高，试验不建议施镁，这说明施肥量在很大程度上取决于地点。']],
+  ['src', { s: 'Malaysian Palm Oil Board, Oil Palm Bulletin: Oil palm fertiliser recommendation for Sabah soils', u: 'https://opb.mpob.gov.my/oil-palm-fertiliser-recommendation-for-sabah-soils/',
+    a: ['Satu siri tanah di Sabah; pokok matang.', 'One soil series in Sabah; mature palms.', '沙巴的一个土系；成龄树。'] }],
   ['h', ['Persampelan daun: pelepah ke-17', 'Leaf sampling: frond 17', '叶片取样：第 17 片叶']],
   ['steps', [
     ['Cari pelepah 1, iaitu pelepah termuda yang telah terbuka sepenuhnya.', 'Find frond 1, the youngest fully opened frond.', '找出第 1 片叶，即最年轻且已完全展开的叶。'],
-    ['Ikut pilin pelepah itu ke bawah: pelepah di bawah pelepah 1 pada pilin yang sama ialah pelepah 8.', 'Follow its spiral downward: the frond below frond 1 on the same spiral is frond 8.', '沿其螺旋线向下：同一螺旋线上第 1 片叶下方的是第 8 片叶。'],
-    ['Pelepah di bawah pelepah 8 pada pilin itu ialah pelepah 17. Ambil sampel daripada pelepah ini.', 'The frond below frond 8 on that spiral is frond 17. Sample this frond.', '该螺旋线上第 8 片叶下方的是第 17 片叶。从这片叶取样。'],
+    ['Pelepah tersusun dalam lapan pilin. Ikut pilin pelepah 1 ke bawah: pelepah seterusnya pada pilin yang sama ialah pelepah 9.', 'Fronds are arranged in eight spirals. Follow the spiral of frond 1 downward: the next frond on the same spiral is frond 9.', '叶片排列成八条螺旋线。沿第 1 片叶所在的螺旋线向下：同一螺旋线上的下一片是第 9 片叶。'],
+    ['Pelepah di bawah pelepah 9 pada pilin itu ialah pelepah 17. Ambil sampel daripada pelepah ini.', 'The frond below frond 9 on that spiral is frond 17. Sample this frond.', '该螺旋线上第 9 片叶下方的是第 17 片叶。从这片叶取样。'],
   ]],
-  ['p', ['Mengenal pelepah 1 dan 17 dengan betul memerlukan latihan di lapangan daripada orang yang berpengalaman.',
-         'Recognising fronds 1 and 17 correctly takes field training from someone experienced.',
-         '要正确辨认第 1 片和第 17 片叶，需要有经验的人在田间指导。']],
-  ['h', ['Tandan kosong sebagai sungkupan', 'Empty fruit bunches as mulch', '空果串作覆盖物']],
-  ['p', ['Dalam satu kajian, 37.5 tan tandan kosong sehektar setahun bersama baja N dan K menambah baik N dan K daun serta hasil, tetapi menurunkan magnesium daun. Sungkupan tandan kosong juga menambah baik kalium, kalsium dan magnesium boleh tukar serta pH tanah.',
-         'In one study, 37.5 tonnes of empty fruit bunches per hectare per year with N and K fertiliser improved leaf N and K and yield, but lowered leaf magnesium. Empty fruit bunch mulch also improved soil exchangeable potassium, calcium and magnesium, and pH.',
-         '在一项研究中，每公顷每年施 37.5 吨空果串并配合氮钾肥，提高了叶片氮、钾含量和产量，但降低了叶片的镁含量。空果串覆盖还改善了土壤的交换性钾、钙、镁和 pH。']],
-  ['tool', 'baja'],
+  ['src', { s: 'InfoSAWIT (PPKS), Understanding leaf patterns and counting fronds on oil palm', u: 'https://www.en.infosawit.com/news/16670/understanding-leaf-patterns-and-counting-fronds-on-oil-palm',
+    a: ['Pokok matang. Pokok muda disampel secara berbeza; ikut protokol makmal.', 'Mature palms. Young palms are sampled differently; follow the laboratory’s protocol.', '成龄树。幼龄树的取样方式不同，请按实验室的规程进行。'] }],
+  ['p', ['Mengenal pelepah 1 dengan betul memerlukan latihan di lapangan daripada orang yang berpengalaman.',
+         'Recognising frond 1 correctly takes field training from someone experienced.',
+         '要正确辨认第 1 片叶，需要有经验的人在田间指导。']],
+  ['case', ['Dalam satu kajian, 37.5 tan tandan kosong sehektar setahun bersama baja N dan K menambah baik N dan K daun serta hasil, tetapi menurunkan magnesium daun. Tandan kosong membekalkan kalium, jadi nutriennya perlu dikira sebagai sebahagian daripada program, bukan tambahan kepadanya.',
+            'In one study, 37.5 tonnes of empty fruit bunches per hectare per year with N and K fertiliser improved leaf N and K and yield, but lowered leaf magnesium. Empty fruit bunches supply potassium, so their nutrients should be counted as part of the programme, not added on top of it.',
+            '在一项研究中，每公顷每年施 37.5 吨空果串并配合氮钾肥，提高了叶片氮、钾含量和产量，但降低了叶片的镁含量。空果串本身提供钾，因此其养分应计入施肥计划之内，而不是额外追加。']],
+  ['src', { s: 'Journal of Oil Palm Research (MPOB), The effects of oil palm empty fruit bunches on oil palm nutrition and yield, and soil chemical properties', u: 'https://jopr.mpob.gov.my/the-effects-of-oil-palm-empty-fruit-bunches-on-oil-palm-nutrition-and-yield-and-soil-chemical-properties/?v=true',
+    a: ['Satu tapak percubaan; bukan kadar sungkupan yang disyorkan.', 'One trial site; not a recommended mulch rate.', '单一试验点；并非推荐的覆盖用量。'] }],
 ] };
 
 LESSONS['7-2'] = { book: '', title: ['Durian', 'Durian', '榴莲'], body: [
@@ -138,12 +161,12 @@ LESSONS['7-2'] = { book: '', title: ['Durian', 'Durian', '榴莲'], body: [
       [['Risiko utama', 'Main risk', '主要风险'], ['Air bertakung, yang merosakkan akar. Elakkan tanah rendah yang rata dengan aras air tinggi.', 'Waterlogging, which damages the roots. Avoid flat lowland with a high water table.', '积水会损伤根系。避开地下水位高的平坦低地。']],
       [['Akar', 'Roots', '根系'], ['Cetek, jadi sensitif kepada kemarau dan kepada baja yang terlalu pekat', 'Shallow, so sensitive to drought and to concentrated fertiliser', '根浅，因此对干旱和过浓的肥料敏感']],
     ] }],
-  ['p', ['Di tapak yang salirannya meragukan, tanam di atas busut dan gali parit lencongan di bahagian atas cerun.',
-         'Where drainage is doubtful, plant on mounds and dig diversion drains on the uphill side.',
-         '在排水可疑的地点，应起墩种植，并在上坡一侧开挖截水沟。']],
+  ['src', { s: 'Top Fruits (Malaysia), Durian soil and climate essentials', u: 'https://topfruits.com.my/durian-soil-and-climate-essentials/',
+    a: ['Panduan umum daripada perunding komersial, bukan garis panduan agensi kerajaan.', 'General guidance from a commercial consultancy, not a government agency guideline.', '商业顾问公司的一般指引，并非政府机构的指南。'] }],
   ['tool', 'ph'],
-  ['h', ['Program pembajaan mengikut umur', 'Feeding programme by age', '按树龄的施肥计划']],
-  ['table', { head: [['Umur (tahun)', 'Age (years)', '树龄（年）'], ['kg sepokok setahun', 'kg per tree per year', '每株每年公斤数'], ['Pemberian setahun', 'Applications per year', '每年次数'], ['Gred N:P:K:Mg', 'Grade N:P:K:Mg', '配比 N:P:K:Mg']],
+  ['h', ['Contoh program pembajaan mengikut umur', 'An example feeding programme by age', '按树龄的施肥计划示例']],
+  ['note', EXAMPLE_ONLY],
+  ['table', { head: [['Umur (tahun)', 'Age (years)', '树龄（年）'], ['kg sepokok setahun', 'kg per tree per year', '每株每年公斤数'], ['Pemberian setahun', 'Applications per year', '每年次数'], GRADE_HEAD],
     rows: [
       ['1', '0.6', '6', '14:13:9:2.5'],
       ['2', '1.0', '4', '15:15:15'],
@@ -156,15 +179,16 @@ LESSONS['7-2'] = { book: '', title: ['Durian', 'Durian', '榴莲'], body: [
       ['9', '10', '3', '15:7:18:2'],
       [['10 dan ke atas', '10 and over', '10 年及以上'], '10', '3', ['Tidak dinyatakan', 'Not stated', '未说明']],
     ] }],
+  ['src', { s: 'International Tropical Fruits Network (TFNet), Durian: agronomy, fertiliser', u: 'http://www.itfnet.org/gfruit/Templates%20English/durian.agro.fert.htm', a: TFNET_APPLIES }],
+  ['p', GRADE_NOTE],
+  ['h', ['Apa yang ditunjukkan oleh contoh itu', 'What the example shows', '这个示例说明了什么']],
   ['ul', [
-    ['Peringkat awal memerlukan nitrogen dan fosforus yang tinggi; pokok yang berbuah memerlukan kalium yang tinggi.', 'The early years need high nitrogen and phosphorus; bearing trees need high potassium.', '幼龄期需要较多的氮和磷；结果树需要较多的钾。'],
-    ['Tambah 15 hingga 30 kg tahi ayam atau tahi lembu sepokok setiap tahun.', 'Add 15 to 30 kg of chicken or cow dung per tree each year.', '每株每年另施 15 至 30 公斤鸡粪或牛粪。'],
-    ['Tabur di sekeliling kanopi, sedikit melepasi jejari kanopi. Di tanah curam, masukkan baja ke dalam lubang di sekeliling kanopi dan timbus.', 'Broadcast around the canopy, slightly beyond its radius. On steep land, put the fertiliser in holes around the canopy and cover them.', '撒施在树冠周围，略超出树冠半径。在陡坡地，把肥料放入树冠周围的穴中并覆土。'],
-    ['Baja pada bulan-bulan yang lebih basah.', 'Fertilise during the wetter months.', '在较湿润的月份施肥。'],
+    ['Peringkat awal menekankan nitrogen dan fosforus; pokok yang berbuah beralih kepada gred yang tinggi kalium.', 'The early years emphasise nitrogen and phosphorus; bearing trees move to high-potassium grades.', '幼龄期侧重氮和磷；结果树转用高钾配比。'],
+    ['Baja ditabur di sekeliling kanopi, sedikit melepasi jejarinya. Di tanah curam, baja dimasukkan ke dalam lubang di sekeliling kanopi dan ditimbus.', 'Fertiliser is broadcast around the canopy, slightly beyond its radius. On steep land, it goes into holes around the canopy and is covered.', '肥料撒施在树冠周围，略超出树冠半径。在陡坡地，则放入树冠周围的穴中并覆土。'],
+    ['Sumber itu juga menyenaraikan 15 hingga 30 kg tahi ayam atau tahi lembu sepokok setahun. Gunakan hanya baja kandang yang telah dikompos sepenuhnya, dan kira nutriennya sebagai sebahagian daripada program, bukan sebagai tambahan kepada program baja mineral yang penuh.',
+     'The source also lists 15 to 30 kg of chicken or cow dung per tree per year. Use only fully composted manure, and count its nutrients as part of the programme, not on top of a full mineral fertiliser programme.',
+     '该来源还列出每株每年 15 至 30 公斤鸡粪或牛粪。只可使用充分腐熟的粪肥，并把其养分计入施肥计划之内，而不是在完整的化肥计划之外额外追加。'],
   ]],
-  ['note', ['Jadual ini ialah panduan umum daripada Rangkaian Buah-buahan Tropika Antarabangsa (TFNet). Sesuaikan dengan ujian tanah, keadaan pokok dan hasil.',
-            'This schedule is a general guide from the International Tropical Fruits Network (TFNet). Adjust it to the soil test, tree condition and crop load.',
-            '此表是国际热带水果网络（TFNet）提供的一般指引，应根据土壤检测、树势和挂果量调整。']],
   ['tool', 'baja'],
 ] };
 
@@ -173,7 +197,9 @@ LESSONS['7-3'] = { book: '', title: ['Rambutan dan mangga', 'Rambutan and mango'
   ['p', ['Rambutan paling sesuai di tanah lom yang dalam dan bersaliran baik, di kawasan rata hingga beralun.',
          'Rambutan does best in deep, well-drained loam on flat to undulating land.',
          '红毛丹最适合种在平坦至缓起伏地带的深厚、排水良好的壤土上。']],
-  ['table', { head: [['Umur (tahun)', 'Age (years)', '树龄（年）'], ['Baja', 'Fertiliser', '肥料'], ['kg sepokok setahun', 'kg per tree per year', '每株每年公斤数'], ['Pemberian setahun', 'Applications per year', '每年次数']],
+  ['src', { s: 'Department of Agriculture Sarawak, Rambutan', u: 'https://doa.sarawak.gov.my/web/subpage/webpage_view/137', a: ['Sarawak; panduan umum.', 'Sarawak; general guidance.', '砂拉越；一般指引。'] }],
+  ['note', EXAMPLE_ONLY],
+  ['table', { head: [['Umur (tahun)', 'Age (years)', '树龄（年）'], GRADE_HEAD, ['kg sepokok setahun', 'kg per tree per year', '每株每年公斤数'], ['Pemberian setahun', 'Applications per year', '每年次数']],
     rows: [
       ['1', 'NPK 15:15:15', '0.5', '3'],
       ['2', 'NPK 15:15:15', '1.0', '3'],
@@ -186,12 +212,13 @@ LESSONS['7-3'] = { book: '', title: ['Rambutan dan mangga', 'Rambutan and mango'
       ['11 – 15', 'NPKMg 12:12:17:2', '6.0', '4'],
       ['16+', 'NPKMg 12:12:17:2', '7.0', '4'],
     ] }],
+  ['src', { s: 'International Tropical Fruits Network (TFNet), Rambutan: agronomy, fertiliser', u: 'http://www.itfnet.org/gfruit/Templates%20English/rambutan.agro.fert.htm', a: TFNET_APPLIES }],
+  ['p', GRADE_NOTE],
   ['ul', [
-    ['Gunakan NPK tanpa klorida; rambutan sensitif kepada ketoksikan klorida.', 'Use chloride-free NPK; rambutan is sensitive to chloride toxicity.', '使用不含氯的 NPK；红毛丹对氯毒害敏感。'],
-    ['Lubang tanaman: gaulkan 5 hingga 10 kg bahan organik, 0.5 kg batu kapur dan 0.2 kg batuan fosfat dengan tanah atas.', 'Planting hole: mix 5 to 10 kg of organic matter, 0.5 kg of limestone and 0.2 kg of rock phosphate into the topsoil.', '种植穴：把 5 至 10 公斤有机质、0.5 公斤石灰石和 0.2 公斤磷矿粉与表土混匀。'],
-    ['Kapur sebelum menanam. Menaikkan pH dari bawah 5 ke 6 mungkin memerlukan sehingga 5 tan sehektar.', 'Lime before planting. Raising the pH from below 5 to 6 may take up to 5 tonnes per hectare.', '种植前施石灰。把 pH 从 5 以下提高到 6，每公顷可能需要多达 5 吨。'],
-    ['Tabur 60 cm dari batang, atau dalam jalur lebar di bawah pinggir kanopi.', 'Broadcast 60 cm from the trunk, or in a wide band below the canopy edge.', '撒施在距树干 60 厘米处，或在树冠边缘下方作宽带状施用。'],
-    ['Masa penting: sebelum berbunga, semasa berbunga dan pembentukan buah, beberapa minggu selepas buah terbentuk, dan selepas menuai.', 'Key times: before flowering, during flowering and fruit set, a few weeks after fruit set, and after harvest.', '关键时期：开花前、开花和坐果期、坐果后数周，以及采收后。'],
+    ['Rambutan sensitif kepada ketoksikan klorida, jadi sumber itu menyarankan NPK tanpa klorida. Ini bermakna kalium daripada kalium sulfat (SOP), bukan MOP.', 'Rambutan is sensitive to chloride toxicity, so the source advises chloride-free NPK. That means potassium from sulphate of potash (SOP), not MOP.', '红毛丹对氯毒害敏感，因此该来源建议使用不含氯的 NPK，即钾来自硫酸钾（SOP），而不是氯化钾（MOP）。'],
+    ['Masa penting dalam contoh itu: sebelum berbunga, semasa berbunga dan pembentukan buah, beberapa minggu selepas buah terbentuk, dan selepas menuai.', 'Key times in the example: before flowering, during flowering and fruit set, a few weeks after fruit set, and after harvest.', '示例中的关键时期：开花前、开花和坐果期、坐果后数周，以及采收后。'],
+    ['Baja ditabur 60 cm dari batang, atau dalam jalur lebar di bawah pinggir kanopi.', 'Fertiliser is broadcast 60 cm from the trunk, or in a wide band below the canopy edge.', '肥料撒施在距树干 60 厘米处，或在树冠边缘下方作宽带状施用。'],
+    ['Tanah berasid dikapur sebelum menanam, pada kadar yang ditentukan oleh ujian tanah.', 'Acidic soil is limed before planting, at a rate set by a soil test.', '酸性土壤在种植前施石灰，用量由土壤检测确定。'],
   ]],
   ['h', ['Mangga', 'Mango', '芒果']],
   ['p', ['Mangga agak tahan kemarau dan tanah kurang subur, tetapi saliran yang baik perlu untuk hasil yang memuaskan.',
@@ -203,37 +230,72 @@ LESSONS['7-3'] = { book: '', title: ['Rambutan dan mangga', 'Rambutan and mango'
     ['Elakkan membaja sejurus sebelum berbunga.', 'Avoid fertilising just before flowering.', '避免在开花前不久施肥。'],
     ['Nitrogen berlebihan semasa berbuah menjejaskan kualiti buah: isi lembik, buah kekal hijau dan masak tidak sekata.', 'Too much nitrogen during fruiting harms fruit quality: soft flesh, fruit staying green and uneven ripening.', '结果期氮过多会影响果实品质：果肉变软、果皮不转色、成熟不均。'],
     ['Mikronutrien diberi sebagai semburan daun hanya apabila kekurangan berlaku.', 'Give micronutrients as a foliar spray only when a deficiency appears.', '只有出现缺素时，才以叶面喷施方式补充微量元素。'],
-    ['Tanah berpasir memerlukan lebih banyak baja daripada lom atau tanah liat.', 'Sandy soil needs more fertiliser than loam or clay.', '砂质土比壤土或黏质土需要更多肥料。'],
+    ['Tanah berpasir selalunya memerlukan pemberian yang lebih kecil dan lebih kerap; tentukan jumlah keperluan daripada keperluan tanaman dan analisis tanah serta daun.', 'Sandy soils often need smaller, more frequent applications; determine the total requirement from crop demand and soil and leaf analysis.', '砂质土往往需要少量多次施用；总需要量应根据作物需求以及土壤和叶片分析来确定。'],
   ]],
-  ['tool', 'baja'],
+  ['src', { s: 'International Tropical Fruits Network (TFNet), Mango: agronomy, fertiliser', u: 'http://www.itfnet.org/gfruit/Templates%20English/mango.agro.fert.htm', a: TFNET_APPLIES }],
 ] };
 
-ACTIVITIES[7] = { title: ['Rancang baja setahun untuk satu blok pokok', 'Plan a year of fertiliser for one block of trees', '为一个地块的果树制定全年施肥计划'],
-  need: ['Buku nota; kalkulator baja dalam aplikasi ini', 'A notebook; the fertiliser calculator in this app', '笔记本；本应用的肥料计算器'],
+LESSONS['7-4'] = { book: '', title: ['Padi', 'Paddy', '水稻'], body: [
+  ['p', ['Tanah sawah berkelakuan berbeza daripada tanah tanah tinggi kerana ia ditenggelami air. Nasihat “tanah bersaliran baik” untuk tanaman lain tidak boleh dipindahkan terus ke sawah.',
+         'Paddy soil behaves differently from upland soil because it is flooded. The “well-drained soil” advice for other crops cannot simply be carried over to the rice field.',
+         '稻田土壤因为被水淹没，表现与旱地土壤不同。适用于其他作物的“排水良好”的建议不能直接套用到稻田。']],
+  ['h', ['Apa yang berubah apabila tanah ditenggelami', 'What changes when soil is flooded', '土壤淹水后发生什么变化']],
+  ['table', { head: [['Perubahan', 'Change', '变化'], ['Kesan pada padi', 'Effect on rice', '对水稻的影响']],
+    rows: [
+      [['Oksigen dalam tanah habis', 'Oxygen in the soil runs out', '土壤中的氧气耗尽'], ['Besi dan mangan berubah kepada bentuk yang larut', 'Iron and manganese change to soluble forms', '铁和锰转变为可溶形态']],
+      [['pH tanah berasid naik', 'The pH of acidic soil rises', '酸性土壤的 pH 上升'], ['Dalam satu kajian, pH naik dari 4.2 kepada 5.5 hingga 6.0 selepas ditenggelami', 'In one study, pH rose from 4.2 to between 5.5 and 6.0 after flooding', '在一项研究中，淹水后 pH 从 4.2 升至 5.5 至 6.0']],
+      [['Fosforus lebih tersedia', 'Phosphorus becomes more available', '磷的有效性提高'], ['Padi sawah selalunya kurang bertindak balas terhadap fosfat berbanding tanaman tanah tinggi', 'Flooded rice often responds less to phosphate than upland crops', '淹水稻对磷肥的反应往往小于旱地作物']],
+      [['Nitrat tidak stabil', 'Nitrate is unstable', '硝态氮不稳定'], ['Nitrat hilang ke udara melalui denitrifikasi', 'Nitrate is lost to the air by denitrification', '硝态氮通过反硝化作用散失到空气中']],
+    ] }],
+  ['src', { s: 'Plant and Soil, Phosphorus nutrition of rice in relation to flooding', u: 'https://link.springer.com/article/10.1023/A:1026452029146',
+    a: ['Angka pH daripada tanah di Kemboja; arah perubahan adalah umum, magnitudnya bergantung pada tanah.', 'The pH figures are from soils in Cambodia; the direction of change is general, the size depends on the soil.', 'pH 数字来自柬埔寨的土壤；变化方向具有普遍性，幅度则因土壤而异。'] }],
+  ['h', ['Akibatnya untuk pembajaan', 'What this means for fertilising', '对施肥的意义']],
+  ['ul', [
+    ['Gunakan nitrogen dalam bentuk ammonium atau urea, bukan nitrat.', 'Use nitrogen as ammonium or urea, not nitrate.', '使用铵态氮或尿素，不要用硝态氮。'],
+    ['Nitrogen dalam air sawah boleh hilang sebagai gas ammonia, terutamanya apabila pH air naik pada waktu siang. Bahagikan nitrogen kepada beberapa kali pemberian mengikut peringkat pertumbuhan.', 'Nitrogen in the floodwater can be lost as ammonia gas, especially when the water’s pH rises during the day. Split nitrogen into several applications by growth stage.', '田面水中的氮可能以氨气形式损失，尤其是白天水的 pH 升高时。应按生育期把氮肥分几次施用。'],
+    ['Mengeringkan dan menenggelamkan sawah berulang kali mengubah keadaan tanah, jadi pengurusan air dan pembajaan perlu dirancang bersama.', 'Repeated drying and reflooding changes the soil conditions, so water management and fertilising have to be planned together.', '反复落干和复水会改变土壤状况，因此水分管理和施肥必须一并规划。'],
+  ]],
+  ['src', { s: 'JIRCAS / IRRI, Japan Agricultural Research Quarterly 40(4)', u: 'https://www.jircas.go.jp/sites/default/files/publication/jarq/40-04-09_0.pdf', a: ['Prinsip umum tanah sawah.', 'General principles of flooded rice soils.', '淹水稻田土壤的一般原理。'] }],
+  ['h', ['Di Malaysia', 'In Malaysia', '在马来西亚']],
+  ['ul', [
+    ['Kebanyakan sawah berada di tanah aluvium. Sesetengah kawasan jelapang mempunyai tanah asid sulfat, yang memerlukan pengurusan air yang teliti.', 'Most rice fields are on alluvial soils. Some granary areas have acid sulfate soils, which need careful water management.', '大多数稻田位于冲积土上。部分粮仓区有酸性硫酸盐土，需要谨慎的水分管理。'],
+    ['Kadar baja, masa dan pengurusan air untuk padi ditetapkan mengikut kawasan dan musim. Ikut panduan semakan tanaman padi dan nasihat pejabat pertanian kawasan anda.', 'Fertiliser rates, timing and water management for rice are set by area and season. Follow the rice crop-check guidance and the advice of your area’s agriculture office.', '水稻的施肥量、时间和水分管理按地区和季节确定。请遵循水稻作物检查指引和所在地区农业办事处的建议。'],
+  ]],
+  ['case', ['Di kawasan jelapang MADA di Kedah dan Perlis, hasil padi pada tanah asid sulfat meningkat dengan ketara selepas 2.5 tan batu kapur magnesium terkisar sehektar ditabur.',
+            'In the MADA granary area of Kedah and Perlis, rice yield on acid sulfate soil improved significantly after 2.5 tonnes of ground magnesium limestone per hectare were applied.',
+            '在吉打和玻璃市的 MADA 粮仓区，酸性硫酸盐土上施用每公顷 2.5 吨磨细镁质石灰石后，水稻产量显著提高。']],
+  ['src', { s: 'Universiti Putra Malaysia, research on liming acid and acid sulfate soils (lihat Sumber / see Sources)', u: '', a: ['Tanah asid sulfat di kawasan MADA; bukan kadar umum.', 'Acid sulfate soils in the MADA area; not a general rate.', 'MADA 地区的酸性硫酸盐土；并非通用用量。'] }],
+] };
+
+ACTIVITIES[7] = { title: ['Sediakan pelan baja untuk satu blok pokok', 'Prepare a fertiliser plan for one block of trees', '为一个地块的果树准备施肥计划'],
+  need: ['Buku nota; laporan analisis tanah atau daun jika ada; label baja', 'A notebook; a soil or leaf analysis report if you have one; the fertiliser label', '笔记本；土壤或叶片分析报告（如有）；肥料标签'],
   steps: [
-    ['Kira bilangan pokok dalam blok dan catat umurnya.', 'Count the trees in the block and note their age.', '数清地块内的树并记下树龄。'],
-    ['Cari kadar sepokok setahun dan bilangan pemberian daripada jadual tanaman itu.', 'Find the rate per tree per year and the number of applications from the crop’s table.', '从该作物的表中查出每株每年的用量和施肥次数。'],
+    ['Kira bilangan pokok dalam blok, catat umurnya, keadaan pokok dan beban buah.', 'Count the trees in the block and note their age, condition and crop load.', '数清地块内的树，记下树龄、树势和挂果量。'],
+    ['Dapatkan syor untuk blok itu daripada pejabat pertanian atau perunding, berdasarkan analisis tanah dan daun. Untuk latihan dalam kelas sahaja, gunakan jadual contoh dalam unit ini.', 'Get a recommendation for the block from the agriculture office or an adviser, based on soil and leaf analysis. For classroom practice only, use the example tables in this unit.', '向农业办事处或顾问取得基于土壤和叶片分析的地块建议。仅作课堂练习时，才使用本单元的示例表。'],
+    ['Baca analisis pada label baja dan sahkan ia sepadan dengan syor.', 'Read the analysis on the fertiliser label and confirm it matches the recommendation.', '查看肥料标签上的成分，确认与建议相符。'],
     ['Gunakan mod “Program pokok” untuk mendapatkan kuantiti setiap pemberian dan jumlah beg setahun.', 'Use the “Tree programme” mode to get the amount per application and the bags needed for the year.', '用“果树施肥计划”模式算出每次的用量和全年所需包数。'],
-    ['Tulis kalendar: bulan setiap pemberian, mengikut musim hujan dan peringkat pokok.', 'Write a calendar: the month of each application, following the wet season and the tree’s stage.', '写出日历：每次施肥的月份，配合雨季和树的生育期。'],
-    ['Selepas setiap pemberian, catat tarikh, kuantiti dan keadaan pokok.', 'After each application, record the date, the amount and how the trees look.', '每次施肥后，记录日期、用量和树的状况。'],
+    ['Tulis kalendar mengikut hujan tempatan dan peringkat pokok, dan rekod setiap pemberian dalam Rekod.', 'Write a calendar that follows local rainfall and the tree’s stage, and log each application in Records.', '按当地降雨和树的生育期写出日历，并在“记录”中登记每次施肥。'],
   ] };
 
 QUIZ[7] = [
-  Q(['Pelepah yang manakah diambil untuk analisis daun kelapa sawit?', 'Which frond is sampled for oil palm leaf analysis?', '油棕叶片分析取哪一片叶？'],
+  Q(['Pelepah yang manakah diambil untuk analisis daun kelapa sawit matang?', 'Which frond is sampled for leaf analysis of mature oil palm?', '成龄油棕的叶片分析取哪一片叶？'],
     [['Pelepah ke-17', 'Frond 17', '第 17 片叶'], ['Pelepah ke-1', 'Frond 1', '第 1 片叶'], ['Pelepah paling tua', 'The oldest frond', '最老的叶'], ['Mana-mana pelepah', 'Any frond', '任何一片叶']],
-    ['Pelepah 17 ditemui dengan mengikut pilin dari pelepah 1 ke 8 ke 17.', 'Frond 17 is found by following the spiral from frond 1 to 8 to 17.', '沿螺旋线从第 1 片叶到第 8 片再到第 17 片即可找到。']),
-  Q(['Apakah kecerunan yang diingini untuk kelapa sawit?', 'What terrain is desirable for oil palm?', '油棕理想的地形坡度是多少？'],
-    ['0 – 12°', '16 – 24°', '24 – 30°', '> 30°'],
-    ['Melebihi 16° dianggap had serius, dan melebihi 24° sangat serius.', 'Above 16° counts as a serious limitation, and above 24° as very serious.', '超过 16° 属严重限制，超过 24° 属极严重限制。']),
+    ['Pelepah 17 ditemui dengan mengikut pilin dari pelepah 1 ke 9 ke 17.', 'Frond 17 is found by following the spiral from frond 1 to 9 to 17.', '沿螺旋线从第 1 片叶到第 9 片再到第 17 片即可找到。']),
+  Q(['Mengapa julat aras air untuk gambut tidak boleh digunakan pada tanah mineral?', 'Why can the water-level range for peat not be used on mineral soil?', '为什么泥炭土的水位范围不能用于矿质土？'],
+    [['Ia ditetapkan untuk memperlahankan pemendapan gambut dan mengurangkan risiko kebakaran', 'It is set to slow peat subsidence and reduce fire risk', '它是为减缓泥炭沉降和降低火灾风险而定的'], ['Tanah mineral tidak mempunyai air', 'Mineral soil holds no water', '矿质土不含水'], ['Gambut tidak perlu disaliri', 'Peat needs no drainage', '泥炭土不需要排水'], ['Julat itu hanya untuk padi', 'The range is only for rice', '该范围只适用于水稻']],
+    ['Gambut memendap dan mudah terbakar apabila terlalu kering; tanah mineral tidak berkelakuan begitu.', 'Peat subsides and burns when it is too dry; mineral soil does not behave that way.', '泥炭过干时会沉降并容易起火，矿质土则不会如此。']),
   Q(['Apakah risiko tanah yang utama bagi durian?', 'What is the main soil risk for durian?', '榴莲最主要的土壤风险是什么？'],
     [['Air bertakung', 'Waterlogging', '积水'], ['Tanah terlalu dalam', 'Soil that is too deep', '土层太深'], ['pH 6', 'A pH of 6', 'pH 为 6'], ['Terlalu banyak bahan organik', 'Too much organic matter', '有机质太多']],
     ['Akar durian cetek dan mudah rosak dalam tanah yang tepu air.', 'Durian roots are shallow and easily damaged in waterlogged soil.', '榴莲根浅，在积水的土壤中容易受损。']),
-  Q(['Mengapa rambutan memerlukan NPK tanpa klorida?', 'Why does rambutan need chloride-free NPK?', '为什么红毛丹需要不含氯的 NPK？'],
-    [['Ia sensitif kepada ketoksikan klorida', 'It is sensitive to chloride toxicity', '它对氯毒害敏感'], ['Klorida menaikkan pH', 'Chloride raises the pH', '氯会提高 pH'], ['Klorida terlalu mahal', 'Chloride is too expensive', '氯太贵'], ['Klorida menarik perosak', 'Chloride attracts pests', '氯会招来害虫']],
-    ['Baja seperti MOP mengandungi klorida yang tinggi.', 'Fertilisers such as MOP are high in chloride.', '氯化钾等肥料含氯量高。']),
-  Q(['Apakah kesan nitrogen berlebihan pada mangga yang sedang berbuah?', 'What does too much nitrogen do to a fruiting mango?', '结果期的芒果氮过多会怎样？'],
-    [['Kualiti buah merosot', 'Fruit quality suffers', '果实品质下降'], ['Buah masak lebih awal', 'Fruit ripens earlier', '果实提早成熟'], ['pH tanah naik', 'Soil pH rises', '土壤 pH 升高'], ['Akar tumbuh lebih dalam', 'Roots grow deeper', '根长得更深']],
-    ['Isi menjadi lembik dan buah masak tidak sekata.', 'The flesh turns soft and the fruit ripens unevenly.', '果肉变软，成熟不均。']),
+  Q(['Rambutan sensitif kepada klorida. Sumber kalium yang manakah sesuai?', 'Rambutan is sensitive to chloride. Which potassium source suits it?', '红毛丹对氯敏感，哪一种钾肥适合？'],
+    [['Kalium sulfat (SOP)', 'Sulphate of potash (SOP)', '硫酸钾（SOP）'], ['Muriate of potash (MOP)', 'Muriate of potash (MOP)', '氯化钾（MOP）'], ['Urea', 'Urea', '尿素'], ['Batuan fosfat', 'Rock phosphate', '磷矿粉']],
+    ['MOP ialah kalium klorida dan tinggi klorida; SOP tidak mengandungi klorida.', 'MOP is potassium chloride and is high in chloride; SOP contains none.', 'MOP 是氯化钾，含氯量高；SOP 不含氯。']),
+  Q(['Mengapa baja nitrat tidak sesuai untuk sawah yang ditenggelami?', 'Why is nitrate fertiliser unsuitable for a flooded rice field?', '为什么硝态氮肥不适合淹水的稻田？'],
+    [['Nitrat hilang ke udara melalui denitrifikasi', 'Nitrate is lost to the air by denitrification', '硝态氮通过反硝化作用散失到空气中'], ['Nitrat menaikkan pH kepada 9', 'Nitrate raises the pH to 9', '硝态氮把 pH 提高到 9'], ['Padi tidak memerlukan nitrogen', 'Rice needs no nitrogen', '水稻不需要氮'], ['Nitrat tidak larut dalam air', 'Nitrate does not dissolve in water', '硝态氮不溶于水']],
+    ['Tanpa oksigen, mikrob menukar nitrat kepada gas nitrogen.', 'Without oxygen, microbes turn nitrate into nitrogen gas.', '在缺氧条件下，微生物把硝态氮转化为氮气。']),
+  Q(['Untuk merancang baja bagi satu blok pokok buah, apakah yang patut menjadi asas kadar?', 'When planning fertiliser for a block of fruit trees, what should the rate be based on?', '为一个果树地块规划施肥时，用量应以什么为依据？'],
+    [['Syor tempatan daripada analisis tanah dan daun, disesuaikan dengan keadaan pokok dan beban buah', 'A local recommendation from soil and leaf analysis, adjusted for tree condition and crop load', '基于土壤和叶片分析的本地建议，并按树势和挂果量调整'], ['Jadual contoh dalam buku tanpa diubah', 'An example table from a book, unchanged', '书上的示例表，原样照搬'], ['Kadar yang digunakan jiran', 'The rate a neighbour uses', '邻居所用的用量'], ['Kadar tertinggi yang mampu dibeli', 'The highest rate you can afford', '买得起的最高用量']],
+    ['Jadual yang diterbitkan ialah contoh; tanah, umur dan hasil setiap blok berbeza.', 'Published tables are examples; every block differs in soil, age and yield.', '已发表的表格只是示例；每个地块的土壤、树龄和产量都不同。']),
 ];
 
 /* ---------- Additions to existing lessons ---------- */
@@ -246,11 +308,15 @@ LESSONS['3-1'].body.push(
     ['Di hujung bawah, ukur ketinggian dari tali ke tanah. Inilah beza tinggi.', 'At the downhill end, measure the height from the string to the ground. This is the rise.', '在下坡一端，量出绳子到地面的高度，这就是垂直高差。'],
   ]],
   ['formula', ['Cerun (%) = beza tinggi ÷ jarak mendatar × 100', 'Slope (%) = rise ÷ run × 100', '坡度（%）= 垂直高差 ÷ 水平距离 × 100']],
-  ['p', ['Contoh: beza tinggi 1.5 m pada jarak mendatar 10 m ialah cerun 15%.', 'Example: a rise of 1.5 m over a run of 10 m is a 15% slope.', '例如：水平距离 10 米、高差 1.5 米，坡度即为 15%。']],
+  ['p', ['Contoh: beza tinggi 1.5 m pada jarak mendatar 10 m ialah cerun 15%. Catat juga panjang cerun dan ke mana air larian mengalir, kerana kedua-duanya mempengaruhi hakisan.', 'Example: a rise of 1.5 m over a run of 10 m is a 15% slope. Note the slope length and where runoff flows as well, because both affect erosion.', '例如：水平距离 10 米、高差 1.5 米，坡度即为 15%。同时记下坡长和径流的去向，因为两者都影响侵蚀。']],
   ['tool', 'cerun'],
 );
 
 LESSONS['6-2'].body.push(
+  ['h', ['Memilih sumber kalium', 'Choosing a potassium source', '选择钾肥']],
+  ['p', ['MOP ialah sumber kalium yang biasa, tetapi ia tinggi klorida. Untuk tanaman yang sensitif kepada klorida seperti rambutan, kalium sulfat (SOP) digunakan.',
+         'MOP is the usual potassium source, but it is high in chloride. For chloride-sensitive crops such as rambutan, sulphate of potash (SOP) is used instead.',
+         'MOP 是常用的钾肥，但含氯量高。对红毛丹等对氯敏感的作物，应改用硫酸钾（SOP）。']],
   ['h', ['Kandungan nutrien baja organik', 'Nutrients in organic manures', '有机肥的养分含量']],
   ['table', { head: [['Bahan', 'Material', '材料'], 'N', 'P₂O₅', 'K₂O'],
     rows: [
@@ -258,9 +324,13 @@ LESSONS['6-2'].body.push(
       [['Tahi lembu', 'Cattle manure', '牛粪'], '1.4', '0.4', '2.0'],
       [['Baja kandang yang reput sepenuhnya', 'Well-rotted farmyard manure', '充分腐熟的厩肥'], '0.5', '0.2', '0.5'],
     ] }],
-  ['note', ['Peratus mengikut berat, sebagai nilai lazim. Kandungan sebenar sangat berbeza mengikut makanan ternakan, alas kandang, penyimpanan dan kelembapan. Tandan kosong kelapa sawit kaya kalium, tetapi nilai yang diterbitkan berbeza-beza.',
-            'Percent by weight, as typical values. Actual content varies widely with feed, bedding, storage and moisture. Oil palm empty fruit bunches are rich in potassium, but published values differ.',
-            '按重量计的百分比，属常见数值。实际含量因饲料、垫料、贮存和含水量而差别很大。油棕空果串富含钾，但已发表的数值并不一致。']],
+  ['src', { s: 'FAO, Fertilizer use by crop in Ghana: organic sources of nutrients', u: 'https://www.fao.org/4/a0013e/a0013e08.htm',
+    a: ['Nilai lazim dari Ghana, mengikut berat. Kandungan sebenar sangat berbeza; analisis bahan anda sendiri.', 'Typical values from Ghana, by weight. Actual content varies widely; have your own material analysed.', '来自加纳的常见数值，按重量计。实际含量差别很大，应对自己的材料进行分析。'] }],
+  ['ul', [
+    ['Nilai ini ialah jumlah nutrien. Hanya sebahagian yang tersedia kepada tanaman pada musim pertama; selebihnya dibebaskan perlahan-lahan.', 'These are total nutrients. Only part is available to the crop in the first season; the rest is released slowly.', '这些是养分总量。第一季只有一部分可被作物利用，其余缓慢释放。'],
+    ['Kira nutrien daripada baja kandang, kompos dan tandan kosong sebagai sebahagian daripada program, kemudian kurangkan baja mineral sewajarnya.', 'Count the nutrients from manure, compost and empty fruit bunches as part of the programme, then reduce the mineral fertiliser to match.', '把厩肥、堆肥和空果串提供的养分计入施肥计划，再相应减少化肥用量。'],
+    ['Program yang lengkap juga meliputi magnesium, sulfur dan mikronutrien, bukan N, P dan K sahaja.', 'A complete programme also covers magnesium, sulphur and micronutrients, not only N, P and K.', '完整的施肥计划还应包括镁、硫和微量元素，而不仅是氮磷钾。'],
+  ]],
 );
 
 LESSONS['6-3'].body.push(
@@ -271,20 +341,27 @@ LESSONS['6-3'].body.push(
     ['Gaulkan atau timbus urea, atau letak dalam jalur dan bukan ditabur rata.', 'Mix or cover the urea with soil, or place it in a band instead of broadcasting.', '把尿素混入土中或覆土，或者条施而不是撒施。'],
     ['Kehilangan lebih tinggi pada tanah berpasir, pada pH yang tinggi dan dalam cuaca panas serta berangin. Oleh itu, jangan tabur urea bersama kapur.', 'Losses are higher on sandy soil, at high pH and in warm, windy weather. For that reason, do not apply urea together with lime.', '在砂质土、pH 高以及炎热多风的天气下损失更大。因此，不要把尿素和石灰一起施用。'],
   ]],
+  ['src', { s: 'Purdue University Extension; Government of Manitoba; Montana State University Extension (lihat Sumber / see Sources)', u: '',
+    a: ['Prinsip umum daripada kajian iklim sederhana; jumlah kehilangan di kawasan tropika mungkin berbeza.', 'General principles from temperate studies; the size of losses in the tropics may differ.', '来自温带研究的一般原理；热带地区的损失量可能不同。'] }],
 );
 
-SOURCES.push({ topic: ['Kelapa sawit, pokok buah dan kapur', 'Oil palm, fruit trees and lime', '油棕、果树与石灰'], items: [
+SOURCES.push({ topic: ['Kelapa sawit, pokok buah, padi dan kapur', 'Oil palm, fruit trees, paddy and lime', '油棕、果树、水稻与石灰'], items: [
   ['Applied Agricultural Resources (Malaysia) – Soil requirements of plantation tree crops', 'https://aarsb.com.my/soil-management-soil-requirements-of-plantation-tree-crops'],
-  ['Applied Agricultural Resources (Malaysia) – Fertilizer management: principles', 'https://aarsb.com.my/fertilizer-management-principles'],
+  ['RSPO – Manual on Best Management Practices for existing oil palm cultivation on peat: water management', 'https://rspo.org/wp-content/uploads/2-water-management-the-flood-risk-assessment-template-is-attached-separately.pdf'],
+  ['RSPO – Best Management Practices on peat: fire prevention', 'https://rspo.org/wp-content/uploads/6-fire-prevention.pdf'],
+  ['Journal of Oil Palm Research (MPOB) – Ground water-table maintenance in relation to peat subsidence, Sessang, Sarawak', 'https://jopr.mpob.gov.my/best-management-practices-for-oil-palm-cultivation-on-peat-ground-water-table-maintenance-in-relation-to-peat-subsidence-and-estimation-of-co2-emissions-at-sessang-sarawak/'],
   ['Malaysian Palm Oil Board, Oil Palm Bulletin – Oil palm fertiliser recommendation for Sabah soils', 'https://opb.mpob.gov.my/oil-palm-fertiliser-recommendation-for-sabah-soils/'],
-  ['Akvopedia (SNV / Wageningen University) – Sustainable Oil Palm Farming: Fertiliser recommendations', 'https://akvopedia.org/wiki/Sustainable_Oil_Palm_Farming_/_Fertiliser_recommendations'],
-  ['Malaysian Palm Oil Board, Journal of Oil Palm Research – Effects of oil palm empty fruit bunches on nutrition, yield and soil', 'https://jopr.mpob.gov.my/the-effects-of-oil-palm-empty-fruit-bunches-on-oil-palm-nutrition-and-yield-and-soil-chemical-properties/?v=true'],
+  ['InfoSAWIT (PPKS) – Understanding leaf patterns and counting fronds on oil palm', 'https://www.en.infosawit.com/news/16670/understanding-leaf-patterns-and-counting-fronds-on-oil-palm'],
+  ['Journal of Oil Palm Research (MPOB) – Effects of oil palm empty fruit bunches on nutrition, yield and soil', 'https://jopr.mpob.gov.my/the-effects-of-oil-palm-empty-fruit-bunches-on-oil-palm-nutrition-and-yield-and-soil-chemical-properties/?v=true'],
   ['International Tropical Fruits Network (TFNet) – Durian: fertiliser', 'http://www.itfnet.org/gfruit/Templates%20English/durian.agro.fert.htm'],
   ['International Tropical Fruits Network (TFNet) – Rambutan: fertiliser', 'http://www.itfnet.org/gfruit/Templates%20English/rambutan.agro.fert.htm'],
   ['International Tropical Fruits Network (TFNet) – Mango: fertiliser', 'http://www.itfnet.org/gfruit/Templates%20English/mango.agro.fert.htm'],
   ['Department of Agriculture Sarawak – Rambutan', 'https://doa.sarawak.gov.my/web/subpage/webpage_view/137'],
   ['Top Fruits (Malaysia) – Durian soil and climate essentials', 'https://topfruits.com.my/durian-soil-and-climate-essentials/'],
-  ['Rare Fruit Council of Australia archives – Durian culture', 'https://mail.rfcarchives.org.au/Next/Fruits/Durian/DurianCulture3-81.htm'],
+  ['Plant and Soil – Phosphorus nutrition of rice in relation to flooding', 'https://link.springer.com/article/10.1023/A:1026452029146'],
+  ['JIRCAS / IRRI – Japan Agricultural Research Quarterly 40(4), rice soil nutrient study', 'https://www.jircas.go.jp/sites/default/files/publication/jarq/40-04-09_0.pdf'],
+  ['Universiti Putra Malaysia – research on liming acid and acid sulfate soils (CORE repository)', 'https://core.ac.uk/download/153827785.pdf'],
+  ['Universiti Putra Malaysia – research on liming acid soils for annual crops (CORE repository)', 'https://core.ac.uk/download/18446285.pdf'],
   ['Government of South Australia – Soil acidity and liming notes (lime requirement formula)', 'https://cdn.environment.sa.gov.au/landscape/docs/hf/soil-lime-notepad.pdf'],
   ['Purdue University Extension – Improving the efficient use of urea-containing fertilizers', 'https://www.ag.purdue.edu/agry/agry-extension/_docs/soil-fertility/improving-the-efficient-use-of-urea-containing-fertilizers.pdf'],
   ['Government of Manitoba – Volatilization losses from surface applied nitrogen', 'https://gov.mb.ca/agriculture/crops/soil-fertility/volatilization-losses-from-surface-applied-nitrogen.html'],

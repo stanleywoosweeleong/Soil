@@ -71,7 +71,7 @@
   const def = { where: null, pick: null };
   const tex = { sand: 40, clay: 20 };
   let ph = 5.0;
-  const phx = { crop: 'gen', tex: 'sloam' };
+  const phx = { crop: 'gen' };
   const slope = { rise: '', run: '' };
   const fert = Object.assign({
     mode: 'straight', area: 1, unit: 'ha',
@@ -188,6 +188,8 @@
       case 'ul': return `<ul>${v.map(x => `<li>${rich(x)}</li>`).join('')}</ul>`;
       case 'steps': return `<ol class="steps">${v.map(x => `<li>${rich(x)}</li>`).join('')}</ol>`;
       case 'note': return `<p class="note">${rich(v)}</p>`;
+      case 'case': return `<p class="note case"><b>${esc(t('caseLabel'))}.</b> ${rich(v)}</p>`;
+      case 'src': return `<p class="src"><b>${esc(t('srcLabel'))}:</b> ${v.u ? `<a href="${esc(v.u)}" target="_blank" rel="noopener">${esc(v.s)}</a>` : esc(v.s)}.${v.a ? ` <b>${esc(t('appliesLabel'))}:</b> ${rich(v.a)}` : ''}</p>`;
       case 'formula': return `<p class="formula">${rich(v)}</p>`;
       case 'fig': return FIGS[v]();
       case 'tool': return `<a class="toolcard" href="#/alat/${v}"><span><b>${esc(t(TOOL_KEYS[v]))}</b><small>${esc(t(TOOL_KEYS[v] + 'Desc'))}</small></span><em>${esc(t('openTool'))}</em></a>`;
@@ -401,22 +403,16 @@
       <p class="hint">${esc(t('availNote'))}</p>
       ${limeCard()}`;
   }
+  /* says whether the reading is inside the crop's guide range; gives no lime rate */
   function limeCard() {
     const crop = CROP_PH.find(c => c.id === phx.crop);
     const [lo, hi] = crop.range;
-    let body;
-    if (ph > hi) body = `<p>${esc(t('aboveRange'))}</p>`;
-    else if (ph >= lo) body = `<p>${esc(t('inRange'))}</p>`;
-    else {
-      const f = LIME_TEX.find(x => x.id === phx.tex).f;
-      const to = Math.min(lo, ph + 1);
-      const tonnes = (to - ph) * f;
-      body = `<p class="big">${num(tonnes)} t/ha</p>
-        <p>${esc(fill('limeText', { a: ph.toFixed(1), b: to.toFixed(1), t: num(tonnes) }))}${to < lo ? ' ' + esc(t('limeMore')) : ''}</p>
-        <details><summary>${esc(t('working'))}</summary><p class="work">(${to.toFixed(1)} − ${ph.toFixed(1)}) × ${f} = ${num(tonnes)} t/ha</p><p class="hint">${esc(t('limeNote'))}</p></details>`;
-    }
+    const body = ph > hi ? `<p>${esc(t('aboveRange'))}</p>`
+      : ph >= lo ? `<p>${esc(t('inRange'))}</p>`
+      : `<p>${esc(t('belowRange'))}</p><ol class="steps">${UI.limeSteps.map(x => `<li>${esc(tr(x))}</li>`).join('')}</ol>`;
     return `<h2>${esc(t('limeEst'))}</h2>
-      <p class="label">${esc(tr(crop.name))}: ${esc(t('target'))} ${lo.toFixed(1)} – ${hi.toFixed(1)}</p>${body}`;
+      <p class="label">${esc(tr(crop.name))}: ${esc(t('target'))} ${lo.toFixed(1)} – ${hi.toFixed(1)}</p>${body}
+      <p class="hint">${esc(t('limeNote'))}</p>`;
   }
   function toolPh() {
     return `<p class="tool-desc">${esc(t('tPhDesc'))}</p>
@@ -424,10 +420,7 @@
         <input type="range" id="r-ph" min="3" max="9" step="0.1" value="${ph}" style="--track:${PH_GRADIENT}">
         ${phTicks()}
       </label>
-      <div class="row2">
-        <label>${esc(t('crop'))}<select data-phx="crop">${CROP_PH.map(c => `<option value="${c.id}" ${phx.crop === c.id ? 'selected' : ''}>${esc(tr(c.name))}</option>`).join('')}</select></label>
-        <label>${esc(t('soilTex'))}<select data-phx="tex">${LIME_TEX.map(c => `<option value="${c.id}" ${phx.tex === c.id ? 'selected' : ''}>${esc(tr(c.name))}</option>`).join('')}</select></label>
-      </div>
+      <label>${esc(t('crop'))}<select data-phx="crop">${CROP_PH.map(c => `<option value="${c.id}" ${phx.crop === c.id ? 'selected' : ''}>${esc(tr(c.name))}</option>`).join('')}</select></label>
       <div id="phout" aria-live="polite">${phResult()}</div>
       ${saveBar('ph')}`;
   }
