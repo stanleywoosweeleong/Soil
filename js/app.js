@@ -1010,11 +1010,18 @@
     if (!words.length) return null;
     if (!searchIndex) searchIndex = buildIndex();
     const sets = words.map(variants);
+    /* a word in Latin letters must match from the start of a word, so "ring" does not find "weathering" */
+    const matcher = v => {
+      if (!/^[a-z0-9 \-]+$/.test(v)) return hay => hay.includes(v);
+      const re = new RegExp('(^|[^a-z0-9])' + v.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&'));
+      return hay => re.test(hay);
+    };
+    const tests = sets.map(vs => vs.map(matcher));
     const hits = [];
     for (const e of searchIndex) {
       let score = 0, ok = true;
-      for (const vs of sets) {
-        const inTitle = vs.some(v => e.hay.title.includes(v)), inSub = vs.some(v => e.hay.sub.includes(v)), inText = vs.some(v => e.hay.text.includes(v));
+      for (const ms of tests) {
+        const inTitle = ms.some(m => m(e.hay.title)), inSub = ms.some(m => m(e.hay.sub)), inText = ms.some(m => m(e.hay.text));
         if (!inTitle && !inSub && !inText) { ok = false; break; }
         score += (inTitle ? 6 : 0) + (inSub ? 4 : 0) + (inText ? 1 : 0);
       }

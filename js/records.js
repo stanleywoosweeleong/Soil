@@ -115,6 +115,10 @@ const SEARCH_ALIASES = [
   ['kira', 'pengiraan', 'kalkulator', 'calculate', 'calculation', 'calculator', '计算'],
   ['bris', 'bekas lombong', 'tin tailings', '锡矿尾砂'],
   ['lom', 'loam', '壤土'],
+  ['warna', 'colour', 'color', 'munsell', '颜色', '土色'],
+  ['usle', 'soil loss', 'kehilangan tanah', '土壤流失'],
+  ['penghutanan semula', 'reforestation', '造林'],
+  ['cincin', 'rod', 'ring test', 'ball', 'bebola', '搓条'],
   ['zarah', 'kumin', 'particle', 'particles', '颗粒'],
   ['berbutir', 'butir rapuh', 'granular', 'crumb', '粒状'],
   ['gumpal', 'berblok', 'blocky', '块状'],
@@ -172,9 +176,9 @@ Object.assign(UI, {
 /* the lesson each quiz question draws on, in question order */
 const QUIZ_LESSON = {
   1: ['1-1', '1-2', '1-1', '1-2', '1-1'],
-  2: ['2-1', '2-1', '2-2', '2-3', '2-4', '2-4', '2-1'],
+  2: ['2-1', '2-1', '2-2', '2-3', '2-4', '2-4', '2-1', '2-6'],
   3: ['3-2', '3-2', '3-1', '3-2', '3-4', '3-4'],
-  4: ['4-1', '4-1', '4-2', '4-2', '4-2'],
+  4: ['4-1', '4-1', '4-2', '4-2', '4-2', '4-1'],
   5: ['5-1', '5-1', '5-2', '5-2', '5-3', '5-4', '5-5'],
   6: ['6-1', '6-1', '6-4', '6-2', '6-3', '6-5', '6-2'],
   7: ['7-1', '7-1', '7-2', '7-3', '7-4', '7-2'],
