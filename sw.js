@@ -203,21 +203,4 @@ self.addEventListener('message', e => {
     );
     return;
   }
-  /* The page asks what is saved, so it can say whether the app will open without a connection.
-     "updated" is the newest Last-Modified among the saved files: when the content was last published. */
-  if (e.data && e.data.type === 'soil-status' && e.ports && e.ports[0]) {
-    e.waitUntil(
-      whenSettled().then(current).then(async c => {
-        let cached = 0, newest = 0;
-        for (const f of SHELL) {
-          const hit = await c.match(f);
-          if (!hit) continue;
-          cached++;
-          const when = Date.parse(hit.headers.get('last-modified') || '');
-          if (when > newest) newest = when;
-        }
-        e.ports[0].postMessage({ cached, total: SHELL.length, updated: newest ? new Date(newest).toISOString() : null });
-      })
-    );
-  }
 });

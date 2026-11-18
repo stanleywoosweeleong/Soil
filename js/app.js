@@ -221,42 +221,13 @@
     }
   }
 
-  /* ---------- field readiness ---------- */
-  const offline = { state: 'checking', cached: 0, total: 0, updated: null };
+  /* ---------- backup status ---------- */
   const day = iso => { const d = new Date(iso); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(lang === 'zh' ? 'zh-CN' : lang === 'ms' ? 'ms-MY' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); };
   function backupStatus() {
     if (!rec.plots.length && !rec.entries.length) return t('rNoRecords');
     const last = store.get('lastBackup', null), change = store.get('lastChange', null);
     if (!last || !day(last)) return t('rNever');
     return fill(change && change > last ? 'rStale' : 'rBackedUp', { d: day(last) });
-  }
-  function readinessRows() {
-    const off = offline.state === 'ready' ? `<b class="risk riskLow">${esc(t('rReady'))}</b>`
-      : offline.state === 'unsupported' ? esc(t('rUnsupported'))
-      : offline.state === 'checking' ? esc(t('rChecking'))
-      : `<b class="risk riskHigh">${esc(t('rNotReady'))}</b>${offline.total ? ` <span class="plain">${esc(fill('rFiles', { a: offline.cached, b: offline.total }))}</span>` : ''}`;
-    const stale = /^(rStale|rNever)$/.test(!rec.plots.length && !rec.entries.length ? '' : (!store.get('lastBackup', null) ? 'rNever' : (store.get('lastChange', '') > store.get('lastBackup', '') ? 'rStale' : '')));
-    return `<li><span>${esc(t('rOffline'))}</span><div>${off}</div></li>
-      <li><span>${esc(t('rContent'))}</span><div>${offline.updated && day(offline.updated) ? esc(day(offline.updated)) : '—'}</div></li>
-      <li><span>${esc(t('rBackup'))}</span><div>${stale ? `<b class="risk riskSome">${esc(backupStatus())}</b> <a href="#/rekod">${esc(t('navRecords'))}</a>` : esc(backupStatus())}</div></li>`;
-  }
-  /* ask the service worker what it has saved; the answer updates the panel if it is on screen */
-  function checkOffline() {
-    const paint = () => { const el = document.getElementById('ready'); if (el) el.innerHTML = readinessRows(); };
-    if (!('serviceWorker' in navigator)) { offline.state = 'unsupported'; paint(); return; }
-    const sw = navigator.serviceWorker.controller;
-    if (!sw) { offline.state = 'notready'; paint(); return; }
-    const channel = new MessageChannel();
-    const timer = setTimeout(() => { offline.state = 'notready'; paint(); }, 4000);
-    channel.port1.onmessage = e => {
-      clearTimeout(timer);
-      const d = e.data || {};
-      offline.cached = Number(d.cached) || 0; offline.total = Number(d.total) || 0;
-      offline.updated = typeof d.updated === 'string' ? d.updated : null;
-      offline.state = offline.total > 0 && offline.cached === offline.total ? 'ready' : 'notready';
-      paint();
-    };
-    sw.postMessage({ type: 'soil-status' }, [channel.port2]);
   }
 
   /* ---------- pages ---------- */
@@ -271,10 +242,6 @@
     <section>
       <h2 class="sec">${esc(t('tasksTitle'))}</h2>
       <ul class="tasks">${TASKS.map(k => `<li><a href="#/${k.href}">${esc(tr(k.t))}</a></li>`).join('')}</ul>
-    </section>
-    <section>
-      <h2 class="sec">${esc(t('readyTitle'))}</h2>
-      <ul class="res plain-res ready" id="ready">${readinessRows()}</ul>
     </section>
     <section>
       <h2 class="sec">${esc(t('unitsTitle'))}</h2>
@@ -1122,7 +1089,6 @@
     const h1 = main.querySelector('h1');
     if (h1 && r[0]) document.title = `${h1.textContent.trim()} · ${t('appName')}`;
     if (!keepScroll) window.scrollTo(0, 0);
-    if (!r[0]) checkOffline();
     if (!keepScroll) {
       /* after moving to another page the keyboard starts at its content, and a screen reader hears it */
       const target = r[0] === 'nota' && /^s\d+$/.test(r[2] || '') ? document.getElementById(r[2]) : null;
@@ -1312,11 +1278,9 @@
       const msg = document.getElementById('toastmsg');
       msg.textContent = ''; toast.hidden = false;
       setTimeout(() => { msg.textContent = t('toastMsg'); }, 100);
-      checkOffline();
     } });
-    navigator.serviceWorker.addEventListener('controllerchange', () => setTimeout(checkOffline, 800));
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').then(askForUpdate).then(() => setTimeout(checkOffline, 800)).catch(() => {});
+      navigator.serviceWorker.register('./sw.js').then(askForUpdate).catch(() => {});
     });
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') askForUpdate(); });
   }
