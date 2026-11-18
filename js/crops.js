@@ -440,9 +440,9 @@ putBefore('5-1', 'Kinds of liming material',
     ['Kelapa sawit bertoleransi terhadap asid: pH melebihi 4.0 sudah memadai, dan getah sesuai pada 4.5 hingga 5.5.', 'Oil palm tolerates acid: a pH above 4.0 is already adequate, and rubber suits 4.5 to 5.5.', '油棕耐酸：pH 高于 4.0 即已足够，橡胶适宜 4.5 至 5.5。'],
     ['Dalam kajian padi di Malaysia, GML digaul kira-kira dua minggu sebelum menanam.', 'In Malaysian rice studies, GML was mixed in about two weeks before planting.', '在马来西亚的水稻研究中，GML 在种植前约两周混入土中。'],
   ]],
-  ['note', ['Jadual dalam buku teks, 20 hingga 25 tan sehektar untuk gambut dan 3 hingga 6 tan untuk tanah mineral, tidak ditemui dalam mana-mana penerbitan MARDI. Angka gambut itu hanya munasabah sebagai dos untuk mencapai kira-kira pH 5, yang tidak diperlukan oleh kebanyakan tanaman di gambut. Angka di atas ialah contoh kajian, bukan syor: dapatkan keperluan kapur daripada ujian tanah.',
-            'The textbook table, 20 to 25 tonnes per hectare for peat and 3 to 6 tonnes for mineral soil, was not found in any MARDI publication. The peat figure only makes sense as the dose to reach about pH 5, which most crops on peat do not need. The figures above are examples from research, not recommendations: get the lime requirement from a soil test.',
-            '课本中的表（泥炭土每公顷 20 至 25 吨，矿质土 3 至 6 吨）在任何 MARDI 出版物中都未找到。泥炭土的数字只有作为达到约 pH 5 的用量才说得通，而泥炭土上的大多数作物并不需要这么高。以上数字是研究实例，不是建议：石灰需要量应以土壤检测为准。']],
+  ['note', ['Kadar yang jauh lebih tinggi, 20 hingga 25 tan sehektar, kadangkala disebut untuk gambut. Kadar itu hanya munasabah sebagai dos untuk mencapai kira-kira pH 5, yang tidak diperlukan oleh kebanyakan tanaman di gambut. Angka di atas ialah contoh kajian, bukan syor: dapatkan keperluan kapur daripada ujian tanah.',
+            'Much higher rates, 20 to 25 tonnes per hectare, are sometimes quoted for peat. That only makes sense as the dose to reach about pH 5, which most crops on peat do not need. The figures above are examples from research, not recommendations: get the lime requirement from a soil test.',
+            '有时会见到泥炭土每公顷 20 至 25 吨这样高得多的用量。这只有作为达到约 pH 5 的用量才说得通，而泥炭土上的大多数作物并不需要这么高。以上数字是研究实例，不是建议：石灰需要量应以土壤检测为准。']],
   ['src', { s: 'FAO, Fertilizer use by crop in Malaysia; Shamshuddin et al. (2016), Sains Malaysiana 45(3); Chew et al. (MARDI, 1980 to 1982), Experimental Agriculture; Applied Agricultural Resources, Soil requirements of plantation tree crops', u: 'https://www.fao.org/4/y5797e/y5797e05.htm',
     a: ['Malaysia. Setiap angka datang daripada satu tanah dan satu tanaman.', 'Malaysia. Each figure comes from one soil and one crop.', '马来西亚。每个数字都来自某一种土壤和某一种作物。'] }],
 );
@@ -480,7 +480,7 @@ putBefore('5-2', 'Green manure',
          'How long? Rapid composting methods take 2 to 7 weeks; traditional heaps and pits take 2 to 4 months. In one study in Sabah, goat dung compost was mature after 56 days. Judge readiness by look and smell, not by a count of days.',
          '需要多久？快速堆肥法需 2 至 7 周；传统的堆置和坑沤需 2 至 4 个月。沙巴的一项研究中，羊粪堆肥在 56 天后腐熟。要凭外观和气味判断是否腐熟，而不是数天数。']],
   ['src', { s: 'FAO, On-farm composting methods (2003), Chapter 1; Kamal et al. (2025), Universiti Malaysia Sabah', u: 'http://www.fao.org/4/y5104e/y5104e05.htm',
-    a: ['Panduan umum dan satu kajian di Sabah. Tempoh 40 hari dalam buku teks tidak ditemui dalam mana-mana sumber.', 'General guidance and one Sabah study. The 40 days given in the textbook was not found in any source.', '一般指引和沙巴的一项研究。课本中 40 天的说法未在任何资料中找到。'] }],
+    a: ['Panduan umum dan satu kajian di Sabah.', 'General guidance and one Sabah study.', '一般指引和沙巴的一项研究。'] }],
 );
 
 putBefore('6-2', 'Commonly used fertilisers',
@@ -497,9 +497,9 @@ putBefore('6-2', 'Commonly used fertilisers',
   t[1].rows.splice(at, 0, [['Superfosfat tunggal (SSP)', 'Single superphosphate (SSP)', '过磷酸钙 (SSP)'], '0', '16–20', '0', '18–21% Ca, 11–12% S']);
   const note = LESSONS['6-2'].body.find(b => b[0] === 'note' && b[1][1].startsWith('Christmas Island rock phosphate'));
   if (!note) throw new Error('the note on Christmas Island rock phosphate is missing');
-  note[1] = ['MPOB mengukur batuan fosfat Pulau Christmas (CIRP) pada 32.5% P₂O₅, dan batuan fosfat lain antara 30 dan 34%. Gred eksport lama ialah kira-kira 35%, angka yang digunakan dalam buku teks. Gunakan angka pada beg.',
-    'MPOB measured Christmas Island rock phosphate (CIRP) at 32.5% P₂O₅, and other rock phosphates at between 30 and 34%. The old export grade was about 35%, the figure the textbook uses. Use the figure on the bag.',
-    'MPOB 测得圣诞岛磷矿粉（CIRP）含 32.5% P₂O₅，其他磷矿粉在 30% 至 34% 之间。早期的出口品位约为 35%，即课本采用的数字。请以包装上的数字为准。'];
+  note[1] = ['MPOB mengukur batuan fosfat Pulau Christmas (CIRP) pada 32.5% P₂O₅, dan batuan fosfat lain antara 30 dan 34%. Gred eksport lama ialah kira-kira 35%. Gunakan angka pada beg.',
+    'MPOB measured Christmas Island rock phosphate (CIRP) at 32.5% P₂O₅, and other rock phosphates at between 30 and 34%. The old export grade was about 35%. Use the figure on the bag.',
+    'MPOB 测得圣诞岛磷矿粉（CIRP）含 32.5% P₂O₅，其他磷矿粉在 30% 至 34% 之间。早期的出口品位约为 35%。请以包装上的数字为准。'];
 }
 
 SOURCES.push({ topic: ['Amalan ladang: sukatan, campuran, simpanan, hujan, daun dan makmal', 'Field practice: measures, mixing, storage, rain, leaf and laboratories', '田间实务：计量、混合、储存、降雨、叶片与实验室'], items: [
