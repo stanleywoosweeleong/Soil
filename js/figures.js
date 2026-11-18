@@ -434,6 +434,219 @@ const ILLUS = {};
       <rect x="200" y="112" width="30" height="46" rx="2" fill="${C.mute}"/><circle cx="206" cy="136" r="2.5" fill="${C.paper}"/>
       <rect x="270" y="126" width="36" height="34" rx="4" fill="${C.bad}" opacity="0.8"/><path d="M270 110l36 60M306 110l-36 60" stroke="${C.ink}" stroke-width="2"/>
       ${call(140, 44, 1)}${call(54, 120, 2)}${call(288, 100, 3)}${call(215, 96, 4)}`; });
+
+  /* ---------- a fourth set ---------- */
+  const tick = (x, y) => `<circle cx="${x}" cy="${y}" r="10" fill="${C.leaf}"/><path d="M${x - 5} ${y}l4 4l6-8" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const cross = (x, y) => `<circle cx="${x}" cy="${y}" r="10" fill="${C.bad}"/><path d="M${x - 4} ${y - 4}l8 8M${x + 4} ${y - 4}l-8 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>`;
+  const grains = (pts, col, r = 5) => pts.map(d => `<circle cx="${d[0]}" cy="${d[1]}" r="${r}" fill="${col}" stroke="${C.mute}" stroke-width="0.6"/>`).join('');
+
+  add('tendencies', ['Pasir, lom dan liat dibandingkan', 'Sand, loam and clay compared', '砂土、壤土与黏土的比较'], [
+    ['Saliran: paling cepat pada pasir', 'Drainage: fastest in sand', '排水：砂土最快'],
+    ['Menyimpan air: paling banyak pada liat', 'Water storage: greatest in clay', '储水：黏土最多'],
+    ['Memegang nutrien: paling kuat pada liat', 'Holding nutrients: strongest in clay', '保肥：黏土最强'],
+    ['Mudah dikerjakan: paling mudah pada pasir; lom seimbang dalam semua perkara', 'Ease of working: easiest in sand; loam is balanced in everything', '易耕性：砂土最易；壤土各方面均衡'],
+  ], () => { const vals = [[0.95, 0.6, 0.2], [0.2, 0.65, 0.95], [0.15, 0.6, 0.95], [0.95, 0.7, 0.25]], cols = [C.sand, C.silt, C.clay];
+    return vals.map((row, r) => row.map((v, c) => `<rect x="${44 + c * 92}" y="${24 + r * 36}" width="${80 * v}" height="20" rx="5" fill="${cols[c]}"/><rect x="${44 + c * 92}" y="${24 + r * 36}" width="80" height="20" rx="5" fill="none" stroke="${C.mute}" stroke-width="1"/>`).join('') + call(20, 34 + r * 36, r + 1)).join('') +
+      cols.map((c, i) => `<circle cx="${84 + i * 92}" cy="10" r="6" fill="${c}"/>`).join(''); });
+
+  add('builders', ['Apa yang membina dan merosakkan struktur', 'What builds and what damages structure', '什么改善结构，什么破坏结构'], [
+    ['Akar dan kulat mengikat zarah menjadi gumpalan', 'Roots and fungi bind particles into crumbs', '根系和真菌把颗粒黏结成团粒'],
+    ['Cacing tanah membuat saluran dan mencampur bahan organik', 'Earthworms make channels and mix in organic matter', '蚯蚓开通孔道并混入有机质'],
+    ['Sungkupan melindungi permukaan', 'Mulch protects the surface', '覆盖物保护地表'],
+    ['Jentera di atas tanah basah menghimpit liang', 'Machinery on wet soil squeezes the pores shut', '机械在湿土上碾压使孔隙闭合'],
+    ['Hujan di atas tanah terdedah memecahkan gumpalan dan membentuk kerak', 'Rain on bare soil breaks crumbs and forms a crust', '雨滴打在裸土上击碎团粒并形成结皮'],
+  ], () => `<rect x="10" y="100" width="300" height="70" fill="${C.sub}"/><path d="M10 100h140" stroke="${C.ochre}" stroke-width="7"/><path d="M160 100h150" stroke="${C.top}" stroke-width="4"/><path d="M160 20v150" stroke="${C.paper}" stroke-width="3" stroke-dasharray="5 5"/>
+    ${sprout(50, 96, 30)}<path d="M50 100q-16 20-24 44M50 100q10 24 22 40M50 100v50" fill="none" stroke="${C.paper}" stroke-width="2"/><path d="M92 130q8-10 16 0t16 0" fill="none" stroke="#d98b8b" stroke-width="6" stroke-linecap="round"/>
+    <rect x="186" y="60" width="60" height="26" rx="5" fill="${C.ink}"/><circle cx="198" cy="92" r="10" fill="${C.ink}"/><circle cx="234" cy="92" r="10" fill="${C.ink}"/><path d="M180 102h72" stroke="${C.top}" stroke-width="8"/>${rain(268, 300, 50, 3)}
+    ${call(22, 140, 1)}${call(130, 150, 2)}${call(110, 82, 3)}${call(216, 40, 4)}${call(286, 84, 5)}`);
+
+  add('acidcauses', ['Bagaimana tanah menjadi berasid', 'How soil becomes acidic', '土壤如何变酸'], [
+    ['Hujan lebat membawa kalsium dan magnesium turun melepasi akar', 'Heavy rain carries calcium and magnesium down past the roots', '大雨把钙和镁带到根层以下'],
+    ['Baja ammonium membebaskan asid apabila bakteria menukarnya kepada nitrat', 'Ammonium fertiliser releases acid as bacteria turn it into nitrate', '细菌把铵转化为硝酸盐时释放出酸'],
+    ['Hasil tuaian membawa kalsium, magnesium dan kalium keluar dari ladang', 'The harvest carries calcium, magnesium and potassium off the farm', '收获物把钙、镁、钾带离农地'],
+    ['Yang tinggal ialah hidrogen dan aluminium', 'What stays behind is hydrogen and aluminium', '留下来的是氢和铝'],
+  ], () => { const ion = (x, y, t, col) => `<circle cx="${x}" cy="${y}" r="10" fill="${col}"/><text x="${x}" y="${y + 4}" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">${t}</text>`;
+    return `<rect x="10" y="70" width="300" height="100" fill="${C.sub}"/>${rain(24, 84, 12, 4)}${arr(40, 80, 40, 150, C.water)}${ion(62, 150, 'Ca', C.leaf)}${ion(84, 138, 'Mg', C.leaf)}
+      ${grains([[140, 66], [152, 66], [164, 66]], '#fff', 4)}${arr(152, 76, 152, 104, C.mute)}${ion(152, 118, 'H', C.bad)}
+      <path d="M214 70h40v-22h-40z" fill="${C.wash}" stroke="${C.mute}" stroke-width="2"/>${ion(226, 36, 'K', C.leaf)}${ion(248, 30, 'Ca', C.leaf)}${arr(262, 44, 296, 30)}
+      ${ion(200, 140, 'H', C.bad)}${ion(226, 150, 'Al', C.bad)}${ion(252, 138, 'H', C.bad)}${ion(280, 150, 'Al', C.bad)}
+      ${call(24, 100, 1)}${call(176, 96, 2)}${call(290, 58, 3)}${call(240, 116, 4)}`; });
+
+  add('fivetypes', ['Lima jenis tanah dalam tangan', 'Five soil types in the hand', '手中的五种土壤'], [
+    ['Pasir: kasar, tidak melekat', 'Sand: gritty, does not hold together', '砂土：粗糙，不成团'],
+    ['Kelodak: licin seperti tepung', 'Silt: smooth like flour', '粉土：像面粉一样滑'],
+    ['Liat: melekit, boleh dibentuk', 'Clay: sticky, can be moulded', '黏土：黏，可塑形'],
+    ['Lom: campuran seimbang, gembur', 'Loam: a balanced mix, crumbly', '壤土：均衡的混合，疏松'],
+    ['Gambut: gelap, ringan, berserat', 'Peat: dark, light in weight, fibrous', '泥炭土：色深、质轻、多纤维'],
+  ], () => { const hand = x => `<path d="M${x - 26} 140c0-26 10-36 26-36s26 10 26 36z" fill="${C.deep}" opacity="0.5"/>`;
+    return [0, 1, 2, 3, 4].map(i => { const x = 36 + i * 62;
+      const top = i === 0 ? grains([[x - 10, 100], [x, 96], [x + 10, 100], [x - 4, 88], [x + 6, 88]], C.sand, 5)
+        : i === 1 ? `<path d="M${x - 18} 104q18-26 36 0z" fill="${C.silt}"/>`
+        : i === 2 ? `<ellipse cx="${x}" cy="92" rx="16" ry="12" fill="${C.clay}"/>`
+        : i === 3 ? grains([[x - 10, 98], [x + 2, 94], [x + 12, 100], [x - 2, 84]], C.sub, 8)
+        : `<path d="M${x - 18} 104q18-30 36 0z" fill="#2a1f17"/><path d="M${x - 8} 96l6-10M${x + 2} 98l8-12M${x - 2} 100l-8-8" stroke="${C.silt}" stroke-width="1.5"/>`;
+      return hand(x) + top + call(x, 158, i + 1); }).join(''); });
+
+  add('samplebag', ['Melabel sampel', 'Labelling the sample', '给样本贴标签'], [
+    ['Nama anda dan nama plot', 'Your name and the name of the plot', '你的姓名和地块名称'],
+    ['Tarikh sampel diambil', 'The date the sample was taken', '取样日期'],
+    ['Kedalaman, contohnya 0 hingga 15 cm', 'The depth, for example 0 to 15 cm', '深度，例如 0 至 15 厘米'],
+    ['Tanaman, dan apa yang anda mahu diuji', 'The crop, and what you want tested', '作物，以及要检测的项目'],
+    ['Kira-kira 1 kg tanah dalam beg plastik yang bersih', 'About 1 kg of soil in a clean plastic bag', '约 1 公斤土，装在干净的塑料袋里'],
+  ], () => `<path d="M100 20h120l14 26v100a16 16 0 0 1-16 16H102a16 16 0 0 1-16-16V46z" fill="${C.wash}" stroke="${C.mute}" stroke-width="2"/><path d="M92 96h136v52a12 12 0 0 1-12 12H104a12 12 0 0 1-12-12z" fill="${C.sub}"/>
+    <path d="M100 20h120" stroke="${C.mute}" stroke-width="6" stroke-linecap="round"/><rect x="112" y="40" width="96" height="48" rx="5" fill="#fff" stroke="${C.mute}"/>${[50, 60, 70, 80].map(y => `<path d="M120 ${y}h${y === 80 ? 50 : 80}" stroke="${C.mute}" stroke-width="2.5" stroke-linecap="round"/>`).join('')}
+    ${[[50, 1], [60, 2], [70, 3], [80, 4]].map(([y, i]) => `<path d="M${i % 2 ? 112 : 208} ${y}h${i % 2 ? -44 : 44}" stroke="${C.ink}" stroke-width="1.2"/>${call(i % 2 ? 58 : 262, y + (i > 2 ? 14 : -8), i)}`).join('')}${call(160, 132, 5)}`);
+
+  add('gauge', ['Membaca penarafan pada laporan', 'Reading the rating on a report', '解读报告上的评级'], [
+    ['Rendah: tanaman berkemungkinan besar bertindak balas terhadap baja itu', 'Low: the crop is very likely to respond to that fertiliser', '低：作物很可能对该肥料有反应'],
+    ['Sederhana: tindak balas mungkin; beri dos penyelenggaraan', 'Medium: a response is possible; give a maintenance dose', '中：可能有反应；施维持量'],
+    ['Tinggi: menambah lagi tidak banyak membantu dan membazir wang', 'High: adding more helps little and wastes money', '高：再多施帮助不大，还浪费金钱'],
+  ], () => `<path d="M40 130a120 120 0 0 1 80-102l14 38a80 80 0 0 0-54 64z" fill="${C.bad}" opacity="0.85"/><path d="M124 26a120 120 0 0 1 72 0l-14 38a80 80 0 0 0-44 0z" fill="${C.yellow}"/><path d="M200 28a120 120 0 0 1 80 102h-40a80 80 0 0 0-54-64z" fill="${C.leaf}"/>
+    <path d="M160 140L96 84" stroke="${C.ink}" stroke-width="5" stroke-linecap="round"/><circle cx="160" cy="140" r="10" fill="${C.ink}"/>${sprout(60, 172, 14)}${sprout(160, 172, 20)}${sprout(260, 172, 26)}
+    ${call(74, 74, 1)}${call(160, 44, 2)}${call(246, 74, 3)}`);
+
+  add('landscape', ['Di mana tanah Malaysia terdapat', 'Where Malaysian soils are found', '马来西亚各类土壤的分布位置'], [
+    ['Bukit dan tanah tinggi: Ultisol dan Oksisol yang merah atau kuning dan berasid', 'Hills and uplands: red or yellow, acidic Ultisols and Oxisols', '丘陵和高地：红色或黄色的酸性老成土和氧化土'],
+    ['Lembah sungai: aluvium, banyak ditanam padi', 'River valleys: alluvium, widely planted with paddy', '河谷：冲积土，多种水稻'],
+    ['Paya di belakang pantai: gambut', 'Swamps behind the coast: peat', '海岸后方的沼泽：泥炭土'],
+    ['Dataran pantai berlumpur: tanah asid sulfat', 'Muddy coastal plains: acid sulfate soils', '泥质沿海平原：酸性硫酸盐土'],
+    ['Permatang pantai: pasir BRIS', 'Beach ridges: BRIS sand', '海滩沙脊：BRIS 砂土'],
+  ], () => `<path d="M10 150V70q40-50 80-10q20 20 40 60v30z" fill="#b5532f"/><path d="M130 120q30-6 50 4v26h-50z" fill="${C.silt}"/><path d="M150 122q10-3 20 0" stroke="${C.water}" stroke-width="4" fill="none"/>
+    <path d="M180 124h46v26h-46z" fill="#2a1f17"/><path d="M226 126h40v24h-40z" fill="#6d7a76"/><path d="M266 128q14-12 26 0v22h-26z" fill="${C.sand}"/><path d="M292 134h18v16h-18z" fill="${C.water}" opacity="0.7"/><path d="M10 150h300v20H10z" fill="${C.rock}" opacity="0.5"/>
+    ${tree(54, 62, 0.7)}${tree(86, 70, 0.6)}${[140, 152, 164].map(x => sprout(x, 120, 10)).join('')}${palm(200, 124, 0.7)}
+    ${call(40, 110, 1)}${call(156, 140, 2)}${call(204, 140, 3)}${call(246, 140, 4)}${call(280, 104, 5)}`);
+
+  add('usle', ['Lima perkara yang menentukan kehilangan tanah', 'Five things that decide soil loss', '决定土壤流失量的五个因素'], [
+    ['R: hujan, iaitu jumlah dan kelebatannya', 'R: rainfall, its amount and intensity', 'R：降雨的量和强度'],
+    ['K: jenis tanah, iaitu betapa mudah ia terhakis', 'K: the soil, how easily it erodes', 'K：土壤的可蚀性'],
+    ['LS: panjang dan kecuraman cerun', 'LS: the length and steepness of the slope', 'LS：坡长和坡度'],
+    ['C: litupan tanaman dan sungkupan', 'C: crop cover and mulch', 'C：作物覆盖和覆盖物'],
+    ['P: amalan pemuliharaan seperti teres dan kontur', 'P: conservation practice such as terraces and contours', 'P：梯田、等高种植等保育措施'],
+  ], () => { const box = i => `<rect x="${8 + i * 62}" y="40" width="54" height="80" rx="8" fill="${C.wash}" stroke="${C.mute}"/>`;
+    return [0, 1, 2, 3, 4].map(box).join('') + rain(20, 48, 56, 3) + rain(22, 50, 80, 3) + grains([[86, 96], [98, 88], [108, 98], [94, 104]], C.clay, 7) + `<path d="M140 108l44-44v44z" fill="${C.sub}"/>` + sprout(210, 108, 20) + sprout(228, 108, 26) + `<path d="M200 108h44" stroke="${C.ochre}" stroke-width="5"/>` +
+      `<path d="M262 76h18v14h14v14h14" fill="none" stroke="${C.sub}" stroke-width="6"/>` + [0, 1, 2, 3, 4].map(i => call(35 + i * 62, 140, i + 1)).join('') + [0, 1, 2, 3].map(i => `<text x="${66 + i * 62}" y="86" text-anchor="middle" font-size="16" font-weight="700" fill="${C.ink}">×</text>`).join(''); });
+
+  add('fronds', ['Pemuliharaan tanah di ladang sawit', 'Soil conservation in an oil palm field', '油棕园中的水土保持'], [
+    ['Pelepah yang dipangkas disusun melintang cerun, bukan menuruninya', 'Pruned fronds are stacked across the slope, not down it', '修剪下的叶片横坡堆放，而不是顺坡'],
+    ['Kekacang penutup bumi di antara barisan', 'Legume cover crop between the rows', '行间种植豆科覆盖作物'],
+    ['Tandan kosong sebagai sungkupan di sekeliling pokok', 'Empty fruit bunches as mulch around the palm', '空果串铺在树周作覆盖物'],
+    ['Baja ditabur di atas barisan pelepah, tempat air larian paling sedikit', 'Fertiliser is spread over the frond row, where runoff is least', '肥料撒在叶片堆放行上，那里径流最少'],
+  ], () => `<path d="M10 60L310 130v40H10z" fill="${C.sub}"/><path d="M10 60L310 130" stroke="${C.leaf}" stroke-width="6"/>${palm(70, 74, 1)}${palm(240, 114, 1)}
+    <path d="M124 82l44 10M128 76l40 10M126 90l40 9" stroke="${C.ochre}" stroke-width="5" stroke-linecap="round"/><ellipse cx="240" cy="118" rx="26" ry="6" fill="${C.top}"/>${grains([[136, 74], [150, 78], [160, 80]], '#fff', 3)}
+    ${call(148, 112, 1)}${call(196, 86, 2)}${call(282, 140, 3)}${call(150, 54, 4)}`);
+
+  add('limesteps', ['Empat langkah mengapur', 'Liming in four steps', '施石灰四步骤'], [
+    ['Uji tanah dahulu untuk mengetahui pH dan keperluan kapur', 'Test the soil first for pH and the lime requirement', '先测土，了解 pH 和石灰需要量'],
+    ['Tabur kapur sekata di seluruh kawasan', 'Spread the lime evenly over the whole area', '把石灰均匀撒遍全区'],
+    ['Gaulkan ke dalam tanah atas', 'Mix it into the topsoil', '混入表土'],
+    ['Tunggu sebelum menanam, kemudian uji semula dari semasa ke semasa', 'Wait before planting, then retest from time to time', '等待一段时间再种植，之后定期复测'],
+  ], () => { const g = x => `<rect x="${x}" y="110" width="66" height="50" fill="${C.sub}"/>`;
+    return g(10) + g(88) + g(166) + g(244) + `<rect x="34" y="60" width="16" height="50" rx="4" fill="${C.ink}"/><rect x="37" y="66" width="10" height="10" rx="2" fill="${C.wash}"/>` +
+      `<path d="M88 110h66" stroke="#f1eee6" stroke-width="7"/>` + grains([[104, 92], [120, 84], [136, 94]], '#f1eee6', 3) + `<path d="M166 110h66v22h-66z" fill="${C.deep}"/>` + grains([[178, 118], [196, 124], [214, 116], [206, 128], [186, 128]], '#f1eee6', 2.5) + `<path d="M232 74l-28 34" stroke="${C.ink}" stroke-width="3"/><path d="M198 104l10 8" stroke="${C.mute}" stroke-width="6" stroke-linecap="round"/>` +
+      sprout(277, 110, 26) + `<circle cx="296" cy="70" r="12" fill="none" stroke="${C.ink}" stroke-width="2"/><path d="M296 63v7l5 3" stroke="${C.ink}" stroke-width="2" fill="none" stroke-linecap="round"/>` + [43, 121, 199, 277].map((x, i) => call(x, 172, i + 1)).join('') + arr(78, 136, 86, 136) + arr(156, 136, 164, 136) + arr(234, 136, 242, 136); }, '0 0 320 186');
+
+  add('implements', ['Bahagian kerja alat pembajakan', 'The working parts of tillage implements', '耕作机具的工作部件'], [
+    ['Bajak piring: piring cekung memotong dan membalikkan', 'Disc plough: concave discs cut and turn', '圆盘犁：凹面圆盘切土翻土'],
+    ['Bajak sepak: mata dan sayap membalikkan kepingan tanah', 'Mouldboard plough: a share and board turn the furrow slice', '铧式犁：犁铧和犁壁翻转垡片'],
+    ['Bajak pahat: kaki tirus memecahkan lapisan keras', 'Chisel plough: narrow legs break the hard pan', '凿式犁：窄齿打破硬土层'],
+    ['Bajak putar: bilah berputar menghancurkan tanah', 'Rotary tiller: spinning blades pulverise the soil', '旋耕机：旋转刀片打碎土壤'],
+    ['Bajak sisir: gigi halus meratakan batas semaian', 'Tine harrow: fine teeth level the seedbed', '钉齿耙：细齿耙平苗床'],
+  ], () => `<path d="M8 130h304" stroke="${C.sub}" stroke-width="6"/><path d="M8 60h304" stroke="${C.ink}" stroke-width="4"/>
+    <path d="M40 60v36" stroke="${C.ink}" stroke-width="4"/><ellipse cx="40" cy="116" rx="9" ry="24" fill="${C.mute}" stroke="${C.ink}" stroke-width="2"/>
+    <path d="M100 60v44" stroke="${C.ink}" stroke-width="4"/><path d="M100 96q26 6 30 38h-34q8-14 4-38z" fill="${C.mute}" stroke="${C.ink}" stroke-width="2"/>
+    <path d="M160 60q0 50 -8 86" fill="none" stroke="${C.ink}" stroke-width="5" stroke-linecap="round"/><path d="M152 146l-8-10h12z" fill="${C.ink}"/>
+    <circle cx="220" cy="112" r="8" fill="${C.ink}"/><path d="M220 60v44M220 112l22-12q6 10-2 16M220 112l-22 12q-6-10 2-16M220 112l12 22q-10 6-16-2M220 112l-12-22q10-6 16 2" fill="none" stroke="${C.ink}" stroke-width="3" stroke-linecap="round"/>
+    ${[264, 276, 288, 300].map(x => `<path d="M${x} 60v72" stroke="${C.ink}" stroke-width="2.5"/>`).join('')}
+    ${[40, 104, 160, 220, 282].map((x, i) => call(x, 160, i + 1)).join('')}`);
+
+  add('npk', ['Apa yang dilakukan oleh N, P dan K', 'What N, P and K do', '氮、磷、钾的作用'], [
+    ['Nitrogen: daun dan batang yang hijau dan subur', 'Nitrogen: green, vigorous leaves and stems', '氮：茎叶浓绿茁壮'],
+    ['Fosforus: akar, bunga dan pemindahan tenaga', 'Phosphorus: roots, flowers and energy transfer', '磷：根系、花和能量转移'],
+    ['Kalium: kualiti buah, kawalan air dan ketahanan penyakit', 'Potassium: fruit quality, water control and disease resistance', '钾：果实品质、水分调节和抗病力'],
+  ], () => `<path d="M10 120h300" stroke="${C.sub}" stroke-width="6"/><path d="M160 120V40" stroke="${C.leaf}" stroke-width="5" stroke-linecap="round"/>
+    ${[[100, 1], [78, -1], [56, 1]].map(q => `<path d="M160 ${q[0]}q${q[1] * 26}-18 ${q[1] * 54}-6q${-q[1] * 24} 18 ${-q[1] * 54} 6z" fill="${C.leaf}"/>`).join('')}
+    <circle cx="160" cy="34" r="9" fill="${C.yellow}"/>${[0, 72, 144, 216, 288].map(a => `<circle cx="${160 + 13 * Math.cos(a * Math.PI / 180)}" cy="${34 + 13 * Math.sin(a * Math.PI / 180)}" r="6" fill="#e58aa0"/>`).join('')}
+    <circle cx="196" cy="96" r="13" fill="${C.ochre}"/><circle cx="216" cy="76" r="10" fill="${C.ochre}"/>
+    <path d="M160 120q-20 20-50 30M160 120q14 26 44 34M160 120v48M160 140q-14 14-22 24" fill="none" stroke="${C.sub}" stroke-width="3" stroke-linecap="round"/>
+    ${call(84, 60, 1)}${call(108, 160, 2)}${call(250, 90, 3)}`);
+
+  add('kinds', ['Baja tunggal, sebatian dan campuran', 'Straight, compound and mixed fertiliser', '单质肥料、复合肥料与混合肥料'], [
+    ['Tunggal: setiap butir membawa satu nutrien utama', 'Straight: every granule carries one primary nutrient', '单质：每一粒只含一种大量元素'],
+    ['Sebatian: setiap butir membawa nutrien yang sama, dalam nisbah yang sama', 'Compound: every granule carries the same nutrients in the same ratio', '复合：每一粒都含相同养分，比例相同'],
+    ['Campuran: butir yang berlainan digaul; boleh terasing semasa diangkut', 'Mixed: different granules blended together; they can separate in transport', '混合：不同的颗粒掺混在一起；运输中可能分层'],
+  ], () => { const pts = [[0, 0], [22, 4], [44, 0], [11, 20], [33, 20], [22, 40], [0, 40], [44, 40]]; const tri = (x, y) => `<circle cx="${x}" cy="${y}" r="9" fill="${C.leaf}"/><path d="M${x} ${y}V${y - 9}A9 9 0 0 1 ${x + 7.8} ${y + 4.5}z" fill="${C.clay}"/><path d="M${x} ${y}L${x + 7.8} ${y + 4.5}A9 9 0 0 1 ${x - 7.8} ${y + 4.5}z" fill="${C.ochre}"/>`;
+    return pts.map(d => `<circle cx="${34 + d[0]}" cy="${50 + d[1]}" r="9" fill="${C.leaf}"/>`).join('') + pts.map(d => tri(138 + d[0], 50 + d[1])).join('') + pts.map((d, i) => `<circle cx="${242 + d[0]}" cy="${50 + d[1]}" r="9" fill="${[C.leaf, C.clay, C.ochre][i % 3]}"/>`).join('') +
+      [56, 160, 264].map((x, i) => call(x, 130, i + 1)).join('') + `<circle cx="110" cy="164" r="6" fill="${C.leaf}"/>${label(122, 168, 'N', 'start')}<circle cx="150" cy="164" r="6" fill="${C.clay}"/>${label(162, 168, 'P', 'start')}<circle cx="190" cy="164" r="6" fill="${C.ochre}"/>${label(202, 168, 'K', 'start')}`; });
+
+  add('overuse', ['Apabila baja berlebihan sampai ke sungai', 'When surplus fertiliser reaches the river', '过量肥料进入河流之后'],  [
+    ['Hujan menghanyutkan baja yang berlebihan dari ladang', 'Rain washes surplus fertiliser off the field', '雨水把多余的肥料冲离农田'],
+    ['Nitrat meresap ke dalam air bawah tanah', 'Nitrate seeps down into the groundwater', '硝酸盐渗入地下水'],
+    ['Alga tumbuh dengan pesat di dalam air', 'Algae grow rapidly in the water', '藻类在水中迅速繁殖'],
+    ['Apabila alga mati dan mereput, oksigen habis dan ikan mati', 'As the algae die and rot, oxygen runs out and fish die', '藻类死亡腐烂时耗尽氧气，鱼类死亡'],
+  ], () => `<path d="M10 70L190 100v70H10z" fill="${C.sub}"/><path d="M190 100h120v70H190z" fill="${C.water}" opacity="0.6"/><path d="M190 100h120" stroke="${C.leaf}" stroke-width="7" stroke-dasharray="14 6"/>
+    ${[40, 70, 100].map((x, i) => sprout(x, 74 + i * 5, 18)).join('')}${rain(30, 110, 20, 4)}${arr(124, 96, 184, 108, C.ochre, 3)}${arr(90, 100, 90, 150, C.ochre)}<path d="M10 150h180" stroke="${C.water}" stroke-width="3" stroke-dasharray="6 4"/>
+    <path d="M236 140q10-6 20 0q-10 6-20 0zM256 140l8-5v10z" fill="${C.mute}" transform="rotate(180 250 140)"/>
+    ${call(150, 78, 1)}${call(60, 132, 2)}${call(250, 84, 3)}${call(290, 150, 4)}`);
+
+  add('calcflow', ['Daripada syor kepada kuantiti baja', 'From a recommendation to an amount of fertiliser', '从推荐量到肥料用量'], [
+    ['Mulakan dengan nutrien yang diperlukan, contohnya 100 kg N sehektar', 'Start with the nutrient needed, for example 100 kg N per hectare', '从所需养分开始，例如每公顷 100 公斤氮'],
+    ['Bahagi dengan pecahan nutrien dalam baja: urea ialah 46%, jadi 0.46', 'Divide by the fraction of nutrient in the fertiliser: urea is 46%, so 0.46', '除以肥料中养分的比例：尿素为 46%，即 0.46'],
+    ['Hasilnya ialah baja sehektar: 217 kg urea', 'The result is fertiliser per hectare: 217 kg of urea', '得出每公顷的肥料量：217 公斤尿素'],
+    ['Darab dengan keluasan plot anda', 'Multiply by the area of your plot', '再乘以地块面积'],
+  ], () => { const box = (x, t, col) => `<rect x="${x}" y="60" width="64" height="48" rx="8" fill="${col}"/><text x="${x + 32}" y="90" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">${t}</text>`;
+    return box(8, '100', C.leaf) + box(88, '÷ 0.46', C.sub) + box(168, '217', C.clay) + box(248, '× ha', C.water) + arr(74, 84, 86, 84) + arr(154, 84, 166, 84) + arr(234, 84, 246, 84) + [40, 120, 200, 280].map((x, i) => call(x, 130, i + 1)).join(''); });
+
+  add('fpj', ['Membuat jus tumbuhan tertapai', 'Making fermented plant juice', '制作发酵植物汁'], [
+    ['Pucuk tumbuhan dan gula perang, sama berat', 'Plant tips and brown sugar, equal weights', '植物嫩梢与红糖，等重'],
+    ['Padatkan ke dalam balang hingga dua pertiga penuh', 'Pack into a jar until two thirds full', '装瓶压实至三分之二满'],
+    ['Tutup dengan kain atau kertas yang telap udara, bukan penutup yang ketat', 'Cover with breathable cloth or paper, not a tight lid', '用透气的布或纸盖住，不要拧紧盖子'],
+    ['Simpan di tempat teduh; tapis apabila cecair sudah terbentuk', 'Keep in the shade; strain once the liquid has formed', '放在阴凉处；液体析出后过滤'],
+  ], () => { const jar = (x, fill, h) => `<path d="M${x} 60h56v84a8 8 0 0 1-8 8h-40a8 8 0 0 1-8-8z" fill="${C.wash}" stroke="${C.mute}" stroke-width="2"/><path d="M${x + 2} ${150 - h}h52v${h - 6}a6 6 0 0 1-6 6h-40a6 6 0 0 1-6-6z" fill="${fill}"/>`;
+    return sprout(34, 110, 30) + `<rect x="54" y="92" width="26" height="18" rx="3" fill="${C.sub}"/><path d="M10 110h80" stroke="${C.mute}" stroke-width="3"/>` + jar(110, C.leaf, 60) + `<path d="M108 90h60" stroke="${C.ink}" stroke-width="1.5" stroke-dasharray="4 3"/>` +
+      jar(186, C.leaf, 60) + `<path d="M182 60q32-14 64 0" fill="#fff" stroke="${C.mute}" stroke-width="2"/><path d="M184 66h60" stroke="${C.bad}" stroke-width="2.5"/>` + jar(260, C.top, 40) + `<path d="M262 104h52v10h-52z" fill="${C.leaf}" opacity="0.7"/>` +
+      [48, 138, 214, 288].map((x, i) => call(x, 170, i + 1)).join(''); }, '0 0 326 186');
+
+  add('mixing', ['Tiga peraturan mencampur baja', 'Three rules for mixing fertiliser', '混合肥料的三条规则'], [
+    ['Urea dengan superfosfat: jangan; ia menjadi melekit', 'Urea with superphosphate: no; it turns sticky', '尿素加过磷酸钙：不可；会变黏'],
+    ['Urea atau baja ammonium dengan kapur: jangan tabur bersama; nitrogen hilang sebagai gas', 'Urea or ammonium fertiliser with lime: do not apply together; nitrogen is lost as gas', '尿素或铵态肥加石灰：不要同时施；氮会变成气体损失'],
+    ['Urea dengan MOP atau kieserit: boleh, tetapi tabur sebaik sahaja dicampur', 'Urea with MOP or kieserite: yes, but spread as soon as it is mixed', '尿素加氯化钾或硫镁矾：可以，但混后立即施用'],
+  ], () => { const pile = (x, y, col) => `<path d="M${x - 22} ${y}q22-34 44 0z" fill="${col}" stroke="${C.mute}"/>`; const plus = (x, y) => `<text x="${x}" y="${y}" text-anchor="middle" font-size="18" font-weight="700" fill="${C.ink}">+</text>`;
+    return [0, 1, 2].map(r => { const y = 46 + r * 52; return pile(60, y, '#f3f1ea') + plus(100, y - 6) + pile(140, y, [C.grey, '#e6e1d6', C.clay][r]) + arr(176, y - 12, 214, y - 12, C.mute) + (r < 2 ? cross(240, y - 12) : tick(240, y - 12)) + call(290, y - 12, r + 1); }).join('') +
+      `<path d="M228 20q6-8 0-14M252 20q6-8 0-14" fill="none" stroke="${C.mute}" stroke-width="2" stroke-dasharray="3 3" transform="translate(-14 62)"/>`; });
+
+  add('areas', ['Hektar, ekar dan relong dibandingkan', 'A hectare, an acre and a relong compared', '公顷、英亩与 relong 的比较'], [
+    ['1 hektar: 100 m × 100 m', '1 hectare: 100 m × 100 m', '1 公顷：100 米 × 100 米'],
+    ['1 ekar: kira-kira 0.4 hektar', '1 acre: about 0.4 hectare', '1 英亩：约 0.4 公顷'],
+    ['1 relong (Kedah): kira-kira 0.29 hektar', '1 relong (Kedah): about 0.29 hectare', '1 relong（吉打）：约 0.29 公顷'],
+  ], () => `<rect x="20" y="20" width="140" height="140" fill="${C.leaf}" opacity="0.3" stroke="${C.leaf}" stroke-width="2"/><rect x="20" y="71" width="89" height="89" fill="${C.ochre}" opacity="0.5" stroke="${C.ochre}" stroke-width="2"/><rect x="20" y="85" width="75" height="75" fill="${C.clay}" opacity="0.7" stroke="${C.clay}" stroke-width="2"/>
+    <path d="M20 170h140M20 166v8M160 166v8" stroke="${C.ink}" stroke-width="1.5"/>${label(90, 184, '100 m')}
+    <rect x="200" y="50" width="100" height="18" rx="4" fill="${C.leaf}" opacity="0.5"/><rect x="200" y="84" width="40" height="18" rx="4" fill="${C.ochre}" opacity="0.8"/><rect x="200" y="118" width="29" height="18" rx="4" fill="${C.clay}"/>
+    ${call(140, 40, 1)}${call(98, 82, 2)}${call(56, 124, 3)}${call(186, 59, 1)}${call(186, 93, 2)}${call(186, 127, 3)}`, '0 0 320 192');
+
+  add('leaflets', ['Anak daun yang disampel', 'Which leaflets to sample', '应采哪些小叶'], [
+    ['Cari tempat rabung di atas rakis berubah daripada rata kepada tirus', 'Find where the ridge on top of the rachis changes from flat to pointed', '找到叶轴上面的脊由平变尖的位置'],
+    ['Ambil enam anak daun dari setiap belah di tempat itu', 'Take six leaflets from each side at that point', '在该处两侧各取六片小叶'],
+    ['Simpan sepertiga tengah setiap anak daun', 'Keep the middle third of each leaflet', '保留每片小叶的中间三分之一'],
+    ['Buang hujung, pangkal dan lidi', 'Discard the tip, the base and the midrib', '丢弃叶尖、叶基和中脉'],
+  ], () => `<path d="M10 60h300" stroke="${C.sub}" stroke-width="7" stroke-linecap="round"/>${Array.from({ length: 19 }, (_, i) => { const x = 22 + i * 15, hi = i >= 9 && i <= 11; return `<path d="M${x} 60l10-36M${x} 60l10 36" stroke="${hi ? C.ochre : C.leaf}" stroke-width="${hi ? 4 : 3}" stroke-linecap="round" opacity="${hi ? 1 : 0.55}"/>`; }).join('')}
+    <path d="M172 52l6-8l6 8" fill="none" stroke="${C.ink}" stroke-width="2"/>
+    <path d="M40 150h240" stroke="${C.leaf}" stroke-width="16" stroke-linecap="round" opacity="0.4"/><path d="M120 150h80" stroke="${C.leaf}" stroke-width="16"/><path d="M40 150h240" stroke="${C.paper}" stroke-width="2"/><path d="M120 136v28M200 136v28" stroke="${C.ink}" stroke-width="2" stroke-dasharray="4 3"/>
+    ${call(178, 28, 1)}${call(204, 104, 2)}${call(160, 126, 3)}${call(64, 126, 4)}${call(256, 126, 4)}`);
+
+  add('durianyear', ['Baja durian mengikut peringkat', 'Durian fertiliser by stage', '榴莲按生长阶段施肥'], [
+    ['Selepas menuai: baja seimbang untuk pucuk dan daun baharu', 'After harvest: a balanced fertiliser for the new flush of leaves', '采收后：施均衡肥，促进新梢新叶'],
+    ['Sebelum berbunga: kurangkan nitrogen, tambah fosforus dan kalium', 'Before flowering: less nitrogen, more phosphorus and potassium', '开花前：减氮，增磷钾'],
+    ['Semasa buah membesar: kalium tinggi untuk kualiti buah', 'While the fruit swells: high potassium for fruit quality', '果实膨大期：高钾以提高果实品质'],
+  ], () => `<circle cx="160" cy="92" r="64" fill="none" stroke="${C.mute}" stroke-width="3" stroke-dasharray="6 6"/><path d="M160 28a64 64 0 0 1 55 96" fill="none" stroke="${C.leaf}" stroke-width="7" marker-end="url(#ah)"/><path d="M212 130a64 64 0 0 1-108-4" fill="none" stroke="${C.yellow}" stroke-width="7" marker-end="url(#ah)"/><path d="M102 120a64 64 0 0 1 52-92" fill="none" stroke="${C.ochre}" stroke-width="7" marker-end="url(#ah)"/>
+    ${tree(160, 118, 0.9)}<circle cx="150" cy="80" r="5" fill="${C.ochre}"/><circle cx="172" cy="88" r="5" fill="${C.ochre}"/>
+    ${call(232, 60, 1)}${call(160, 170, 2)}${call(86, 60, 3)}`);
+
+  add('paddyn', ['Meletakkan urea di sawah', 'Placing urea in a paddy field', '稻田中尿素的施放位置'], [
+    ['Urea yang ditabur ke dalam air bertakung: banyak yang hilang ke udara', 'Urea broadcast into standing water: much is lost to the air', '撒入田面水中的尿素：大量挥发到空气中'],
+    ['Urea yang digaul atau dibenamkan ke dalam lapisan terturun: kekal sebagai ammonium dan diambil oleh akar', 'Urea mixed or pushed into the reduced layer: stays as ammonium and is taken up by roots', '混入或深施到还原层的尿素：保持铵态并被根系吸收'],
+  ], () => { const half = x => `<rect x="${x}" y="70" width="140" height="24" fill="${C.water}" opacity="0.6"/><rect x="${x}" y="94" width="140" height="8" fill="${C.sub}"/><rect x="${x}" y="102" width="140" height="68" fill="#7d8a86"/><path d="M${x + 70} 102V40M${x + 70} 70q-12-16-16-30M${x + 70} 66q12-16 16-28" fill="none" stroke="${C.leaf}" stroke-width="3" stroke-linecap="round"/><path d="M${x + 70} 102q-10 20-18 30M${x + 70} 102q10 20 18 30M${x + 70} 102v36" fill="none" stroke="${C.paper}" stroke-width="1.5"/>`;
+    return half(10) + half(170) + grains([[34, 80], [50, 84], [110, 80], [126, 84]], '#fff', 4) + `<path d="M40 66q6-10 0-20t0-18M118 66q6-10 0-20t0-18" fill="none" stroke="${C.mute}" stroke-width="2.5" stroke-dasharray="4 4" marker-end="url(#ah)"/>` +
+      grains([[214, 130], [266, 130]], '#fff', 5) + arr(220, 126, 234, 116, C.leaf) + arr(260, 126, 246, 116, C.leaf) + call(26, 150, 1) + call(186, 150, 2); });
 })();
 
 /* Where each illustration appears: [lesson, the English heading it follows (null = near the top), id].
@@ -455,6 +668,12 @@ const ILLUS_AT = [
   ['6-2', 'Organic and inorganic fertilisers', 'release'], ['6-2', 'Forms of fertiliser', 'forms'], ['6-3', 'Methods', 'methods'],
   ['7-4', 'What changes when soil is flooded', 'paddy'],
   ['6-6', 'Measuring without a scale', 'scoop'], ['6-6', 'Storing and handling', 'store'],
+  ['2-1', 'General tendencies', 'tendencies'], ['2-2', 'What damages and what builds structure', 'builders'], ['2-4', 'What makes soil acidic', 'acidcauses'],
+  ['2-5', null, 'fivetypes'], ['3-2', 'Where to send it', 'samplebag'], ['3-2', 'Reading the report', 'gauge'], ['3-3', null, 'landscape'],
+  ['4-1', 'Estimating soil loss', 'usle'], ['7-1', 'Mineral soils: suitability', 'fronds'], ['5-1', 'How to lime', 'limesteps'], ['5-5', 'Tillage implements', 'implements'],
+  ['6-1', 'What the macronutrients do', 'npk'], ['6-2', 'Straight, compound and mixed fertilisers', 'kinds'], ['6-2', 'When chemical fertiliser is overused', 'overuse'],
+  ['6-4', null, 'calcflow'], ['6-5', 'Making FPJ', 'fpj'], ['6-6', 'Which fertilisers can be mixed', 'mixing'], ['6-6', 'Local units of area', 'areas'],
+  ['7-1', 'Taking the leaf sample', 'leaflets'], ['7-2', 'An example feeding programme by age', 'durianyear'], ['7-4', 'What this means for fertilising', 'paddyn'],
 ];
 if (typeof LESSONS !== 'undefined') {
   for (const [lesson, heading, id] of ILLUS_AT) {

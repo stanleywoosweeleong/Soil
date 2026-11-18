@@ -1,5 +1,5 @@
 /* Field guide content: units, lessons, practical activities, quizzes, glossary,
-   deficiency key and the textbook cross-reference.
+   deficiency key.
    Text tuples follow LANGS in content.js: [ms, en, zh]. */
 
 const UNITS = [
@@ -36,7 +36,7 @@ const TASKS = [
 ];
 
 const LESSONS = {
-  '1-1': { book: '1.1', title: ['Kandungan tanah', 'What soil is made of', '土壤的组成'], body: [
+  '1-1': { title: ['Kandungan tanah', 'What soil is made of', '土壤的组成'], body: [
     ['p', ['Tanah ialah lapisan nipis di permukaan bumi yang terbentuk daripada batuan terluluhawa dan bahan organik. Tanah menyokong akar, menyimpan air dan udara, membekalkan nutrien dan menjadi tempat tinggal berbilion organisma.',
            'Soil is the thin layer at the earth’s surface formed from weathered rock and organic matter. It anchors roots, stores water and air, supplies nutrients and is home to billions of organisms.',
            '土壤是地球表面由风化岩石和有机物形成的薄层。它固定根系、储存水分和空气、供应养分，也是无数生物的栖息地。']],
@@ -56,7 +56,7 @@ const LESSONS = {
               '田间判断：表土颜色深、疏松、有泥土清香且蚯蚓多，说明有机质状况良好。']],
   ] },
 
-  '1-2': { book: '1.1', title: ['Pembentukan dan profil tanah', 'How soil forms and the profile', '土壤的形成与剖面'], body: [
+  '1-2': { title: ['Pembentukan dan profil tanah', 'How soil forms and the profile', '土壤的形成与剖面'], body: [
     ['h', ['Lima faktor pembentukan tanah', 'Five soil-forming factors', '五大成土因素']],
     ['ul', [
       ['**Bahan induk**: batuan atau enapan asal menentukan mineral dan tekstur.', '**Parent material**: the original rock or sediment sets the minerals and texture.', '**母质**：原始岩石或沉积物决定矿物成分和质地。'],
@@ -78,7 +78,7 @@ const LESSONS = {
               '表土形成极其缓慢。一旦被侵蚀，剩下的是紧实而贫瘠的心土，因此保护表土是首要工作。']],
   ] },
 
-  '2-1': { book: '1.1.1', title: ['Tekstur', 'Texture', '质地'], body: [
+  '2-1': { title: ['Tekstur', 'Texture', '质地'], body: [
     ['p', ['Bahagian mineral tanah terdiri daripada pasir, kelodak dan liat. Nisbah ketiga-tiganya dipanggil **tekstur tanah**, dan pengurusan ladang hampir tidak mengubahnya. Anda bekerja mengikut tekstur, bukan menukarnya.',
            'The mineral part of soil is made of sand, silt and clay. Their proportions are called **soil texture**, and farm management hardly changes it. You work with texture; you do not change it.',
            '土壤的矿质部分由砂粒、粉粒和黏粒组成。三者的比例称为**土壤质地**，耕作管理几乎无法改变它。你只能顺应质地，而不是改变它。']],
@@ -133,7 +133,7 @@ const LESSONS = {
       a: ['Segi tiga tekstur USDA.', 'The USDA texture triangle.', 'USDA 质地三角图。'] }],
   ] },
 
-  '2-2': { book: '1.2.1', title: ['Struktur', 'Structure', '结构'], body: [
+  '2-2': { title: ['Struktur', 'Structure', '结构'], body: [
     ['p', ['Struktur tanah ialah cara zarah bergabung membentuk gumpalan yang dipanggil agregat. Berbeza dengan tekstur, struktur boleh dibaiki atau dirosakkan dalam satu musim.',
            'Soil structure is the way particles bind into clumps called aggregates. Unlike texture, structure can be improved or ruined in a single season.',
            '土壤结构是指颗粒结合成团块（团聚体）的方式。与质地不同，结构在一个季节内就可能被改善或破坏。']],
@@ -165,7 +165,7 @@ const LESSONS = {
               '简易测试：取一块湿润的土，轻轻掰开。结构好的土会散成圆形小粒；压实的土则裂成薄片或硬块。']],
   ] },
 
-  '2-3': { book: '', title: ['Air dalam tanah', 'Water in soil', '土壤中的水'], body: [
+  '2-3': { title: ['Air dalam tanah', 'Water in soil', '土壤中的水'], body: [
     ['p', ['Bukan semua air dalam tanah boleh digunakan oleh tumbuhan. Tiga keadaan menerangkan berapa banyak yang tersedia.',
            'Not all the water in a soil can be used by plants. Three states describe how much is available.',
            '土壤中的水并非都能被植物利用。三种状态说明有多少水可用。']],
@@ -201,7 +201,7 @@ const LESSONS = {
               '灌溉经验法则：作物大约用掉一半有效水之后就会开始受旱。应在土壤完全干透之前浇水。']],
   ] },
 
-  '2-4': { book: '1.2.2', title: ['pH tanah', 'Soil pH', '土壤酸碱度'], body: [
+  '2-4': { title: ['pH tanah', 'Soil pH', '土壤酸碱度'], body: [
     ['p', ['pH mengukur keasidan atau kealkalian tanah. Nilai 7 adalah neutral, di bawah 7 berasid dan di atas 7 beralkali. Skala ini logaritma: tanah pH 5 adalah sepuluh kali lebih berasid daripada tanah pH 6.',
            'pH measures how acidic or alkaline a soil is. A value of 7 is neutral, below 7 is acidic and above 7 is alkaline. The scale is logarithmic: a soil at pH 5 is ten times more acidic than one at pH 6.',
            'pH 衡量土壤的酸碱程度。7 为中性，低于 7 为酸性，高于 7 为碱性。这是对数标度：pH 5 的土壤酸度是 pH 6 的十倍。']],
@@ -248,7 +248,7 @@ const LESSONS = {
            '黏粒和有机质带负电荷，能吸附钾、钙、镁等带正电荷的养分。其量度称为阳离子交换量（CEC）。有机质少的砂质土 CEC 低，养分容易淋失。']],
   ] },
 
-  '3-1': { book: '1.1.2', title: ['Pemeriksaan di lapangan', 'Field checks', '田间检查'], body: [
+  '3-1': { title: ['Pemeriksaan di lapangan', 'Field checks', '田间检查'], body: [
     ['p', ['Sebelum menanam, berjalan di seluruh tapak dengan cangkul dan sebotol air. Lima pemerhatian ini mengambil masa kurang daripada sejam.',
            'Before planting, walk the whole site with a hoe and a bottle of water. These five observations take less than an hour.',
            '种植之前，带着锄头和一瓶水走遍整块地。以下五项观察不到一小时就能完成。']],
@@ -297,7 +297,7 @@ const LESSONS = {
     ['tool', 'tekstur'],
   ] },
 
-  '3-2': { book: '1.1.2', title: ['Persampelan dan laporan ujian tanah', 'Sampling and the soil test report', '取样与土壤检测报告'], body: [
+  '3-2': { title: ['Persampelan dan laporan ujian tanah', 'Sampling and the soil test report', '取样与土壤检测报告'], body: [
     ['p', ['Ujian makmal hanya sebaik sampel yang dihantar. Segenggam tanah perlu mewakili seluruh kawasan.',
            'A laboratory test is only as good as the sample sent. A handful of soil has to stand for the whole area.',
            '实验室检测的可靠程度取决于送检的样本。一小把土必须能代表整块地。']],
@@ -368,7 +368,7 @@ const LESSONS = {
     ['tool', 'baja'],
   ] },
 
-  '3-3': { book: '1.1.1', title: ['Tanah di Malaysia dan masalah lazimnya', 'Malaysian soils and their usual problems', '马来西亚的土壤及其常见问题'], body: [
+  '3-3': { title: ['Tanah di Malaysia dan masalah lazimnya', 'Malaysian soils and their usual problems', '马来西亚的土壤及其常见问题'], body: [
     ['table', { head: [['Tanah', 'Soil', '土壤'], ['Ciri', 'Features', '特征'], ['Tumpuan pengurusan', 'What to manage', '管理重点']],
       rows: [
         [['Tanah mineral tanah tinggi (Ultisol, Oksisol)', 'Upland mineral soils (Ultisols, Oxisols)', '高地矿质土（老成土、氧化土）'],
@@ -392,7 +392,7 @@ const LESSONS = {
               '在酸性硫酸盐土上，单靠石灰往往不足以控制酸度，水分管理才是主要措施。']],
   ] },
 
-  '4-1': { book: '1.2', title: ['Hakisan', 'Erosion', '土壤侵蚀'], body: [
+  '4-1': { title: ['Hakisan', 'Erosion', '土壤侵蚀'], body: [
     ['p', ['Di kawasan tropika yang lebat hujan, air ialah agen hakisan utama. Hakisan bermula kecil dan menjadi semakin teruk jika dibiarkan, jadi kenali peringkat awalnya.',
            'In the high-rainfall tropics, water is the main agent of erosion. It starts small and gets worse if left alone, so learn to spot the early stages.',
            '在多雨的热带地区，水是主要的侵蚀营力。侵蚀从小处开始，若置之不理便越来越严重，所以要学会识别早期阶段。']],
@@ -434,7 +434,7 @@ const LESSONS = {
       a: ['Panduan umum; tidak ditentukur untuk hujan tropika yang lebat.', 'General guidance; not calibrated for intense tropical rain.', '一般指引；未针对热带强降雨校准。'] }],
   ] },
 
-  '4-2': { book: '1.2', title: ['Amalan pemuliharaan', 'Conservation practices', '保育措施'], body: [
+  '4-2': { title: ['Amalan pemuliharaan', 'Conservation practices', '保育措施'], body: [
     ['p', ['Semua amalan pemuliharaan melakukan satu atau lebih daripada tiga perkara: menutup tanah, memperlahankan air, atau memendekkan cerun.',
            'Every conservation practice does one or more of three things: cover the soil, slow the water, or shorten the slope.',
            '所有保育措施都在做以下三件事中的一件或多件：覆盖土壤、减缓水流、缩短坡长。']],
@@ -480,7 +480,7 @@ const LESSONS = {
       a: ['Satu ladang kelapa sawit tanpa teres.', 'One non-terraced oil palm plantation.', '一个无梯田的油棕种植园。'] }],
   ] },
 
-  '5-1': { book: '1.2.3', title: ['Tanah berasid: pengapuran', 'Acidic soil: liming', '酸性土壤：施石灰'], body: [
+  '5-1': { title: ['Tanah berasid: pengapuran', 'Acidic soil: liming', '酸性土壤：施石灰'], body: [
     ['table', { head: [['Tanda', 'Signs', '迹象'], ['Punca', 'Cause', '原因']],
       rows: [[['pH rendah pada ujian; akar pendek dan gemuk; tanaman kurang bertindak balas terhadap baja', 'Low pH on a test; short, stubby roots; crops respond poorly to fertiliser', '检测 pH 低；根短而粗；作物对肥料反应差'],
               ['Hujan lebat melarut resap kalsium dan magnesium, meninggalkan aluminium', 'Heavy rain leaches calcium and magnesium, leaving aluminium behind', '大量降雨淋失钙和镁，留下铝']]] }],
@@ -515,7 +515,7 @@ const LESSONS = {
     ['tool', 'ph'],
   ] },
 
-  '5-2': { book: '1.2.3', title: ['Kurang bahan organik: kompos dan baja hijau', 'Low organic matter: compost and green manure', '有机质不足：堆肥与绿肥'], body: [
+  '5-2': { title: ['Kurang bahan organik: kompos dan baja hijau', 'Low organic matter: compost and green manure', '有机质不足：堆肥与绿肥'], body: [
     ['table', { head: [['Tanda', 'Signs', '迹象'], ['Punca', 'Cause', '原因']],
       rows: [[['Tanah pucat, keras apabila kering, berkerak selepas hujan, sedikit cacing', 'Pale soil, hard when dry, crusting after rain, few earthworms', '土色浅、干时坚硬、雨后结皮、蚯蚓少'],
               ['Sisa tanaman dibuang atau dibakar; tanah dibiarkan terdedah; pembajakan kerap', 'Residues removed or burnt; soil left bare; frequent tillage', '残茬被移走或焚烧；土壤裸露；频繁翻耕']]] }],
@@ -554,7 +554,7 @@ const LESSONS = {
            '绿肥是为了趁青割下并翻入土中而种植的作物，通常是豆科植物。豆科植物还能固定空气中的氮。']],
   ] },
 
-  '5-3': { book: '1.2.3', title: ['Masalah air dan pemadatan', 'Water and compaction problems', '水分与压实问题'], body: [
+  '5-3': { title: ['Masalah air dan pemadatan', 'Water and compaction problems', '水分与压实问题'], body: [
     ['table', { head: [['Masalah', 'Problem', '问题'], ['Tanda', 'Signs', '迹象'], ['Pembaikan', 'Fix', '改良办法']],
       rows: [
         [['Air bertakung', 'Waterlogging', '积水'],
@@ -578,7 +578,7 @@ const LESSONS = {
               '湿度判断：握一把土。如果黏糊并在手上留下水迹，说明太湿不宜耕作；如果轻压即散，则湿度合适。']],
   ] },
 
-  '6-1': { book: '1.3', title: ['Nutrien dan tanda kekurangan', 'Nutrients and deficiency signs', '养分与缺乏症状'], body: [
+  '6-1': { title: ['Nutrien dan tanda kekurangan', 'Nutrients and deficiency signs', '养分与缺乏症状'], body: [
     ['table', { head: [['Kumpulan', 'Group', '类别'], ['Nutrien', 'Nutrients', '养分'], ['Sumber', 'Source', '来源']],
       rows: [
         [['Daripada udara dan air', 'From air and water', '来自空气和水'], 'C, H, O', ['Karbon dioksida dan air', 'Carbon dioxide and water', '二氧化碳和水']],
@@ -603,7 +603,7 @@ const LESSONS = {
       ] }],
   ] },
 
-  '6-2': { book: '1.3.1', title: ['Jenis baja', 'Types of fertiliser', '肥料的种类'], body: [
+  '6-2': { title: ['Jenis baja', 'Types of fertiliser', '肥料的种类'], body: [
     ['h', ['Baja organik dan baja tak organik', 'Organic and inorganic fertilisers', '有机肥与无机肥']],
     ['table', { head: ['', ['Baja organik', 'Organic', '有机肥'], ['Baja tak organik (kimia)', 'Inorganic (chemical)', '无机肥（化肥）']],
       rows: [
@@ -642,7 +642,7 @@ const LESSONS = {
       a: ['Nilai lazim. Angka batuan fosfat ialah anggaran daripada angka percubaan MPOB, bukan spesifikasi produk.', 'Typical values. The rock phosphate figure is an estimate from MPOB trial figures, not a product specification.', '常见数值。磷矿粉的数字是根据 MPOB 试验数据估算的，并非产品规格。'] }],
   ] },
 
-  '6-3': { book: '1.3', title: ['Cara membaja', 'Applying fertiliser', '施肥方法'], body: [
+  '6-3': { title: ['Cara membaja', 'Applying fertiliser', '施肥方法'], body: [
     ['p', ['Empat perkara menentukan sama ada baja sampai kepada tanaman atau terbuang.', 'Four things decide whether fertiliser reaches the crop or is wasted.', '四个因素决定肥料是被作物吸收还是白白浪费。']],
     ['table', { head: [['Betul', 'Right', '正确的'], ['Soalan untuk ditanya', 'The question to ask', '要问的问题']],
       rows: [
@@ -669,7 +669,7 @@ const LESSONS = {
               '施肥过量既浪费金钱，又可能伤害根系，淋失的养分还会污染河流和地下水。']],
   ] },
 
-  '6-4': { book: '1.3.2', title: ['Pengiraan baja', 'Fertiliser calculations', '肥料用量计算'], body: [
+  '6-4': { title: ['Pengiraan baja', 'Fertiliser calculations', '肥料用量计算'], body: [
     ['h', ['Membaca gred baja', 'Reading a fertiliser grade', '读懂肥料配比']],
     ['p', ['Tiga nombor pada beg ialah peratus mengikut berat bagi nitrogen (N), fosfat (P₂O₅) dan kalium oksida (K₂O), dalam urutan itu. Beg 50 kg NPK 15-15-15 mengandungi 7.5 kg N, 7.5 kg P₂O₅ dan 7.5 kg K₂O.',
            'The three numbers on the bag are percentages by weight of nitrogen (N), phosphate (P₂O₅) and potash (K₂O), in that order. A 50 kg bag of NPK 15-15-15 holds 7.5 kg N, 7.5 kg P₂O₅ and 7.5 kg K₂O.',
@@ -964,22 +964,9 @@ const GLOSSARY = [
   [['Tekstur tanah', 'Soil texture', '土壤质地'], ['Nisbah pasir, kelodak dan liat.', 'The proportions of sand, silt and clay.', '砂粒、粉粒和黏粒的比例。']],
 ];
 
-/* ---------- Textbook cross-reference ---------- */
-const BOOK = [
-  { n: '1.1', t: ['Tanah', 'Soil', '土壤'], to: ['1-1', '1-2'] },
-  { n: '1.1.1', t: ['Jenis dan Sifat Tanah', 'Types and Properties of Soil', '土壤的类型与性质'], to: ['2-1', '3-3'] },
-  { n: '1.1.2', t: ['Tanah di Tapak Penanaman', 'Soil at the Planting Site', '种植地点的土壤'], to: ['3-1', '3-2'] },
-  { n: '1.2', t: ['Pemuliharaan Tanah', 'Soil Conservation', '土壤保育'], to: ['4-1', '4-2'] },
-  { n: '1.2.1', t: ['Struktur Tanah', 'Soil Structure', '土壤结构'], to: ['2-2'] },
-  { n: '1.2.2', t: ['pH Tanah', 'Soil pH', '土壤酸碱度'], to: ['2-4'] },
-  { n: '1.2.3', t: ['Kaedah Memperbaiki Tanah', 'Ways to Improve Soil', '改良土壤的方法'], to: ['5-1', '5-2', '5-3'] },
-  { n: '1.3', t: ['Baja dan Pembajaan', 'Fertilisers and Fertilising', '肥料与施肥'], to: ['6-1', '6-3'] },
-  { n: '1.3.1', t: ['Jenis Baja', 'Types of Fertiliser', '肥料的种类'], to: ['6-2'] },
-  { n: '1.3.2', t: ['Pengiraan Baja', 'Fertiliser Calculations', '肥料用量计算'], to: ['6-4'] },
-];
 
 /* ---------- Revised and added lessons ---------- */
-LESSONS['3-3'] = { book: '1.1.1', title: ['Mengenal tanah di Malaysia', 'Identifying Malaysian soils', '辨识马来西亚的土壤'], body: [
+LESSONS['3-3'] = { title: ['Mengenal tanah di Malaysia', 'Identifying Malaysian soils', '辨识马来西亚的土壤'], body: [
   ['p', ['Tekstur memberitahu campuran zarah. Kumpulan atau siri tanah memberitahu bagaimana tanah itu terbentuk dan masalah yang dijangka. Dua tanah dengan tekstur yang sama boleh tergolong dalam siri yang berbeza dan memerlukan pengurusan yang berbeza, jadi kenal pasti kedua-duanya.',
          'Texture tells you the mix of particles. A soil group or series tells you how the soil formed and which problems to expect. Two soils with the same texture can belong to different series and need different management, so identify both.',
          '质地说明颗粒的组成；土类或土系则说明土壤是如何形成的，以及可能出现哪些问题。质地相同的两种土壤可能属于不同的土系，需要不同的管理，因此两者都要辨识。']],
@@ -1016,7 +1003,7 @@ LESSONS['3-3'] = { book: '1.1.1', title: ['Mengenal tanah di Malaysia', 'Identif
   ['src', { s: 'Jabatan Pertanian Malaysia, GeoTanih', u: 'https://geotanih.doa.gov.my/', a: ['Semenanjung Malaysia sahaja.', 'Peninsular Malaysia only.', '仅限马来西亚半岛。'] }],
 ] };
 
-LESSONS['3-4'] = { book: '', title: ['Tanah gambut dan asid sulfat', 'Peat and acid sulfate soils', '泥炭土与酸性硫酸盐土'], body: [
+LESSONS['3-4'] = { title: ['Tanah gambut dan asid sulfat', 'Peat and acid sulfate soils', '泥炭土与酸性硫酸盐土'], body: [
   ['p', ['Pelajaran ini adalah tentang mengurus tanah pertanian yang sedia ada di tanah gambut dan tanah asid sulfat. Ia bukan panduan untuk membuka kawasan baharu.',
          'This lesson is about managing existing farmland on peat and acid sulfate soils. It is not a guide to opening new land.',
          '本课讲的是如何管理泥炭土和酸性硫酸盐土上的现有农地，并不是开发新土地的指南。']],
@@ -1057,7 +1044,7 @@ LESSONS['3-4'] = { book: '', title: ['Tanah gambut dan asid sulfat', 'Peat and a
 ] };
 UNITS.find(u => u.n === 3).lessons.push('3-4');
 
-LESSONS['5-4'] = { book: '', title: ['Masalah garam', 'Salt problems', '盐分问题'], body: [
+LESSONS['5-4'] = { title: ['Masalah garam', 'Salt problems', '盐分问题'], body: [
   ['table', { head: [['Tanda', 'Signs', '迹象'], ['Punca', 'Cause', '原因']],
     rows: [[['Pokok layu walaupun tanah lembap; percambahan lemah; pertumbuhan terbantut', 'Plants wilt although the soil is moist; poor germination; stunted growth', '土壤湿润而植株仍萎蔫；发芽差；生长受阻'],
             ['Air laut di tanah pantai; air pengairan yang masin; baja berlebihan, terutamanya dalam polibeg dan fertigasi', 'Seawater on coastal land; salty irrigation water; too much fertiliser, especially in polybags and fertigation', '沿海土地受海水影响；灌溉水含盐；施肥过量，尤其是育苗袋和灌溉施肥']]] }],
@@ -1103,7 +1090,7 @@ QUIZ[5].push(
     ['Garam menyukarkan akar menyerap air; menambah baja menambah garam lagi.', 'Salt makes it hard for roots to take up water; adding fertiliser adds more salt.', '盐分使根系难以吸水；再施肥只会增加盐分。']));
 
 /* ---------- Lessons added to cover the remaining syllabus topics, each from published sources ---------- */
-LESSONS['2-5'] = { book: '1.1.1', title: ['Lima jenis tanah yang biasa', 'Five common soil types', '五种常见的土壤'], body: [
+LESSONS['2-5'] = { title: ['Lima jenis tanah yang biasa', 'Five common soil types', '五种常见的土壤'], body: [
   ['p', ['Dalam percakapan harian dan dalam banyak buku teks, tanah dikumpulkan kepada lima jenis: pasir, kelodak, liat, lom dan tanah organik. Empat yang pertama ialah tekstur. Tanah organik, atau gambut, bukan kelas tekstur: ia dinamakan mengikut bahan organiknya.',
          'In everyday speech and in many textbooks, soils are grouped into five types: sand, silt, clay, loam and organic soil. The first four are textures. Organic soil, or peat, is not a texture class: it is named for its organic matter.',
          '在日常用语和许多课本中，土壤被分为五类：砂土、粉土、黏土、壤土和有机土。前四类属于质地。有机土（泥炭土）不是质地类别，而是因有机质而得名。']],
@@ -1142,7 +1129,7 @@ LESSONS['2-5'] = { book: '1.1.1', title: ['Lima jenis tanah yang biasa', 'Five c
 ] };
 UNITS.find(u => u.n === 2).lessons.push('2-5');
 
-LESSONS['5-5'] = { book: '1.2.3', title: ['Pembajakan dan pengairan', 'Tillage and irrigation', '耕作与灌溉'], body: [
+LESSONS['5-5'] = { title: ['Pembajakan dan pengairan', 'Tillage and irrigation', '耕作与灌溉'], body: [
   ['p', ['Lima kerja utama untuk memperbaiki keadaan tanah ialah pembajakan, pengapuran, pembajaan, pengairan dan penyaliran. Pengapuran, saliran dan pembajaan ada pelajaran sendiri; pelajaran ini meliputi dua yang selebihnya.',
          'The five main jobs for improving soil condition are tillage, liming, fertilising, irrigation and drainage. Liming, drainage and fertilising have their own lessons; this one covers the other two.',
          '改善土壤状况的五项主要工作是耕作、施石灰、施肥、灌溉和排水。施石灰、排水和施肥各有专门的课；本课讲其余两项。']],
@@ -1181,7 +1168,7 @@ LESSONS['5-5'] = { book: '1.2.3', title: ['Pembajakan dan pengairan', 'Tillage a
 ] };
 UNITS.find(u => u.n === 5).lessons.push('5-5');
 
-LESSONS['6-5'] = { book: '1.3.1', title: ['Baja organik cecair buatan sendiri', 'Home-made liquid organic fertilisers', '自制液体有机肥'], body: [
+LESSONS['6-5'] = { title: ['Baja organik cecair buatan sendiri', 'Home-made liquid organic fertilisers', '自制液体有机肥'], body: [
   ['p', ['FPJ, FFJ, FAA dan larutan kalsium ialah input daripada Pertanian Semula Jadi Korea. Semuanya dibuat dengan menapai atau melarutkan bahan tempatan, kemudian dicairkan dengan banyak air sebelum digunakan.',
          'FPJ, FFJ, FAA and calcium solutions are inputs from Korean Natural Farming. All are made by fermenting or dissolving local materials, then diluted heavily with water before use.',
          'FPJ、FFJ、FAA 和钙溶液是韩国自然农法的投入品。它们都是用本地材料发酵或溶解制成，使用前须大量加水稀释。']],
@@ -1248,9 +1235,6 @@ LESSONS['6-2'].body.push(
     a: ['Kesan umum; magnitudnya bergantung pada tanah, hujan dan kadar.', 'General effects; their size depends on soil, rainfall and rate.', '一般性影响；其程度取决于土壤、降雨和用量。'] }],
 );
 
-BOOK.find(b => b.n === '1.1.1').to.push('2-5');
-BOOK.find(b => b.n === '1.2.3').to.push('5-5');
-BOOK.find(b => b.n === '1.3.1').to.push('6-5');
 
 QUIZ[2].push(
   Q(['Tanah mengandungi 66% pasir, 20% kelodak dan 14% liat. Apakah kelas teksturnya?', 'A soil has 66% sand, 20% silt and 14% clay. What is its texture class?', '某土壤含 66% 砂粒、20% 粉粒和 14% 黏粒，属于哪一质地类别？'],
@@ -1269,7 +1253,7 @@ QUIZ[6].push(
     ['Pengkomposan yang betul memanaskan bahan dan memusnahkan patogen serta biji rumpai.', 'Proper composting heats the material and destroys pathogens and weed seeds.', '正确堆肥会使物料升温，杀死病原菌和杂草种子。']));
 
 /* ---------- Soil colour ---------- */
-LESSONS['2-6'] = { book: '1.1.2', title: ['Warna tanah', 'Soil colour', '土壤颜色'], body: [
+LESSONS['2-6'] = { title: ['Warna tanah', 'Soil colour', '土壤颜色'], body: [
   ['p', ['Warna ialah petunjuk pertama tentang sesuatu tanah, dan ia percuma. Ia menunjukkan bahan organik, keadaan besi dan saliran. Ia tidak mengukur kesuburan: gunakannya untuk memutuskan apa yang perlu diperiksa seterusnya.',
          'Colour is the first clue to a soil, and it costs nothing. It points to organic matter, the state of the iron and the drainage. It does not measure fertility: use it to decide what to check next.',
          '颜色是了解土壤的第一条线索，而且不花钱。它反映有机质、铁的状态和排水状况。它并不能衡量肥力，而是用来决定接下来该检查什么。']],
@@ -1312,7 +1296,6 @@ LESSONS['2-6'] = { book: '1.1.2', title: ['Warna tanah', 'Soil colour', '土壤�
 ] };
 UNITS.find(u => u.n === 2).lessons.push('2-6');
 UNITS.find(u => u.n === 2).blurb = ['Tekstur, struktur, air, pH dan warna: sifat yang menentukan cara tanah berkelakuan.', 'Texture, structure, water, pH and colour: the properties that decide how a soil behaves.', '质地、结构、水分、酸碱度和颜色：决定土壤表现的性质。'];
-BOOK.find(b => b.n === '1.1.2').to.push('2-6');
 
 QUIZ[2].push(
   Q(['Lapisan tanah berwarna kelabu kebiruan dengan bintik kuning. Apakah yang ditunjukkan?', 'A soil layer is bluish-grey with yellow mottles. What does that indicate?', '某土层呈蓝灰色并带黄色斑纹，这说明什么？'],
@@ -1323,7 +1306,7 @@ QUIZ[4].push(
     [['C dan P: litupan dan amalan pemuliharaan', 'C and P: cover and conservation practice', 'C 和 P：覆盖与保育措施'], ['R: hujan', 'R: rainfall', 'R：降雨'], ['K: jenis tanah', 'K: soil type', 'K：土壤类型'], ['Tiada satu pun', 'None of them', '都不能']],
     ['Hujan dan jenis tanah tidak boleh dipilih, tetapi litupan dan amalan boleh.', 'Rainfall and soil type cannot be chosen, but cover and practice can.', '降雨和土壤类型无法选择，但覆盖和措施可以。']));
 
-/* ---------- Textbook pages 43 to 60: effects of pH, measuring pH, implements, lime materials, drain layouts, fertiliser forms ---------- */
+/* ---------- effects of pH, measuring pH, implements, lime materials, drain layouts, fertiliser forms ---------- */
 const putBefore = (id, enHeading, ...blocks) => {
   const b = LESSONS[id].body;
   const i = b.findIndex(x => x[0] === 'h' && x[1][1] === enHeading);
@@ -1494,7 +1477,7 @@ SOURCES.push({ topic: ['Mengukur pH, alat pembajakan, bahan kapur dan bentuk baj
   ['MOSTI Malaysia – A revised standard for Malaysian Good Agricultural Practices (MyGAP)', 'https://www.mosti.gov.my/berita/6-december-2016-a-revised-standard-for-malaysian-good-agricultural-practices-mygap/'],
 ] });
 
-/* ---------- Textbook pages 65 to 82: pests in organic material, heavy metals, more straight fertilisers, EM, a costed programme ---------- */
+/* ---------- pests in organic material, heavy metals, more straight fertilisers, EM, a costed programme ---------- */
 putBefore('6-2', 'When chemical fertiliser is overused',
   ['h', ['Perosak yang membiak dalam bahan organik', 'Pests that breed in organic material', '在有机材料中繁殖的害虫']],
   ['p', ['Bahan organik yang sedang mereput ialah tempat pembiakan kumbang tanduk (Oryctes rhinoceros), perosak utama kelapa sawit dan kelapa muda. Tandan kosong, batang yang mereput, timbunan kompos dan habuk kayu semuanya boleh menjadi tempat larvanya hidup.',
@@ -1571,7 +1554,7 @@ GLOSSARY.push(
 );
 
 /* ---------- Field practice: measuring, mixing, storing, rain, leaf sampling, laboratories ---------- */
-LESSONS['6-6'] = { book: '', title: ['Menyukat, mencampur dan menyimpan baja', 'Measuring, mixing and storing fertiliser', '肥料的称量、混合与储存'], body: [
+LESSONS['6-6'] = { title: ['Menyukat, mencampur dan menyimpan baja', 'Measuring, mixing and storing fertiliser', '肥料的称量、混合与储存'], body: [
   ['h', ['Menyukat tanpa penimbang', 'Measuring without a scale', '没有秤时如何计量']],
   ['p', ['Di ladang, baja disukat dengan tin atau cawan, bukan ditimbang. Sukatan yang sama memegang berat yang berbeza bagi baja yang berbeza, jadi tentukur sukatan anda sekali bagi setiap baja.',
          'In the field, fertiliser is measured with a tin or cup, not weighed. The same measure holds a different weight of each fertiliser, so calibrate your measure once for each one.',

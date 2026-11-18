@@ -267,7 +267,6 @@
           <li><a class="extra" href="#/kuiz/${u.n}"><span class="tag">${esc(t('quiz'))}</span><span class="ltitle">${quizSize(u.n)} ${esc(t('questions'))}</span>${best[u.n] !== undefined ? `<span class="tick">${esc(t('best'))} ${esc(best[u.n])}/${quizSize(u.n)}</span>` : ''}</a></li>
         </ul>
       </div>`).join('')}
-      <p class="booklink"><a href="#/buku">${esc(t('bookIndex'))}</a></p>
     </section>`;
   }
 
@@ -284,7 +283,6 @@
     const isDone = done.includes(id);
     return `<article class="lesson">
       ${unitHead(u, tr(L.title))}
-      ${L.book ? `<p class="hint bookref">${esc(t('bookRef'))} ${L.book}</p>` : ''}
       ${L.body.map((b, i) => block(b, i)).join('')}
       <div class="lesson-end">
         <button type="button" class="btn ${isDone ? 'is-done' : ''}" data-done="${id}" aria-pressed="${isDone}">${isDone ? '✓ ' + esc(t('markedDone')) : esc(t('markDone'))}</button>
@@ -307,16 +305,6 @@
       <ol class="steps">${a.steps.map(s => `<li>${rich(s)}</li>`).join('')}</ol>
       <div class="lesson-end"><a class="btn ghost" href="#/kuiz/${u.n}">${esc(t('takeQuiz'))}</a></div>
     </article>`;
-  }
-
-  function pageBook() {
-    return `<section class="page">
-      <a class="back" href="#/">‹ ${esc(t('backToNotes'))}</a>
-      <h1>${esc(t('bookIndex'))}</h1>
-      <p class="lede">${esc(t('bookIntro'))}</p>
-      <div class="tablewrap"><table><tbody>${BOOK.map(b => `<tr><th scope="row">${b.n}<br><span class="plain">${esc(tr(b.t))}</span></th>
-        <td>${b.to.map(id => `<a href="#/nota/${id}">${esc(tr(LESSONS[id].title))}</a>`).join('<br>')}</td></tr>`).join('')}</tbody></table></div>
-    </section>`;
   }
 
   function glossaryRows() {
@@ -1095,7 +1083,6 @@
         r[0] === 'alat' ? pageTools(r[1]) :
         r[0] === 'rekod' ? (r[1] ? pagePlot(r[1]) : pageRecords()) :
         r[0] === 'istilah' ? (!keepScroll && r[1] !== undefined && (glossQuery = r[1].slice(0, 80)), pageGlossary()) :
-        r[0] === 'buku' ? pageBook() :
         r[0] === 'sumber' ? pageSources() : pageHome();
     };
     if (keepScroll) inPlace(draw); else draw();

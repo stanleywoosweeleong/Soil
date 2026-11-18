@@ -96,7 +96,7 @@ UNITS.push({ n: 7, chip: '#3f6e63', title: ['Kelapa sawit, pokok buah terpilih d
   blurb: ['Keperluan tanah dan contoh program pembajaan. Sayur-sayuran, nanas dan getah tidak diliputi.', 'Soil needs and example feeding programmes. Vegetables, pineapple and rubber are not covered.', '土壤要求与施肥计划示例。不包括蔬菜、黄梨和橡胶。'],
   lessons: ['7-1', '7-2', '7-3', '7-4'] });
 
-LESSONS['7-1'] = { book: '', title: ['Kelapa sawit', 'Oil palm', '油棕'], body: [
+LESSONS['7-1'] = { title: ['Kelapa sawit', 'Oil palm', '油棕'], body: [
   ['p', ['Kelapa sawit tahan tanah berasid dan mengambil banyak nutrien, terutamanya kalium. Nasihat untuk tanah mineral dan untuk tanah gambut berbeza, jadi kedua-duanya diasingkan di sini.',
          'Oil palm tolerates acidic soil and takes up a lot of nutrients, potassium above all. Advice for mineral soil and for peat differs, so the two are kept apart here.',
          '油棕耐酸性土壤，并吸收大量养分，尤其是钾。矿质土和泥炭土的建议不同，因此这里分开说明。']],
@@ -152,7 +152,7 @@ LESSONS['7-1'] = { book: '', title: ['Kelapa sawit', 'Oil palm', '油棕'], body
     a: ['Satu tapak percubaan; bukan kadar sungkupan yang disyorkan.', 'One trial site; not a recommended mulch rate.', '单一试验点；并非推荐的覆盖用量。'] }],
 ] };
 
-LESSONS['7-2'] = { book: '', title: ['Durian', 'Durian', '榴莲'], body: [
+LESSONS['7-2'] = { title: ['Durian', 'Durian', '榴莲'], body: [
   ['table', { head: [['Keperluan', 'Requirement', '要求'], ['Butiran', 'Detail', '说明']],
     rows: [
       [['pH', 'pH', 'pH'], '5.5 – 6.5'],
@@ -191,7 +191,7 @@ LESSONS['7-2'] = { book: '', title: ['Durian', 'Durian', '榴莲'], body: [
   ['tool', 'baja'],
 ] };
 
-LESSONS['7-3'] = { book: '', title: ['Rambutan dan mangga', 'Rambutan and mango', '红毛丹与芒果'], body: [
+LESSONS['7-3'] = { title: ['Rambutan dan mangga', 'Rambutan and mango', '红毛丹与芒果'], body: [
   ['h', ['Rambutan', 'Rambutan', '红毛丹']],
   ['p', ['Rambutan paling sesuai di tanah lom yang dalam dan bersaliran baik, di kawasan rata hingga beralun.',
          'Rambutan does best in deep, well-drained loam on flat to undulating land.',
@@ -234,7 +234,7 @@ LESSONS['7-3'] = { book: '', title: ['Rambutan dan mangga', 'Rambutan and mango'
   ['src', { s: 'International Tropical Fruits Network (TFNet), Mango: agronomy, fertiliser', u: 'http://www.itfnet.org/gfruit/Templates%20English/mango.agro.fert.htm', a: TFNET_APPLIES }],
 ] };
 
-LESSONS['7-4'] = { book: '', title: ['Padi', 'Paddy', '水稻'], body: [
+LESSONS['7-4'] = { title: ['Padi', 'Paddy', '水稻'], body: [
   ['p', ['Tanah sawah berkelakuan berbeza daripada tanah tanah tinggi kerana ia ditenggelami air. Nasihat “tanah bersaliran baik” untuk tanaman lain tidak boleh dipindahkan terus ke sawah.',
          'Paddy soil behaves differently from upland soil because it is flooded. The “well-drained soil” advice for other crops cannot simply be carried over to the rice field.',
          '稻田土壤因为被水淹没，表现与旱地土壤不同。适用于其他作物的“排水良好”的建议不能直接套用到稻田。']],

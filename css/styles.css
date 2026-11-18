@@ -303,9 +303,7 @@ h2.sec { margin-top: 2rem; font-size: 1.15rem; color: var(--muted); }
 .chip { min-width: 40px; }
 .lessonlist .extra { background: var(--wash); }
 .tag { flex: none; font-size: 0.8rem; font-weight: 600; color: var(--leaf); min-width: 4.2em; }
-.booklink { margin-top: 1.5rem; font-weight: 600; }
 .lesson-head .label { margin-bottom: 2px; }
-.bookref { margin-top: -10px; }
 .plain { font-weight: 400; color: var(--muted); }
 .searchbox input { display: block; width: 100%; min-height: 48px; margin-top: 6px; padding: 8px 14px; background: var(--surface); border: 1px solid var(--edge); border-radius: 8px; font-size: 1rem; }
 .gloss { margin: 16px 0 0; }

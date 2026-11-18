@@ -13,7 +13,7 @@ const calc = require('../js/calc.js');
 const store = require('../js/store.js');
 
 /* the content files are plain scripts that declare constants; load them together and hand the constants back */
-const names = ['LANGS', 'LANG_ORDER', 'UI', 'HORIZONS', 'UNITS', 'TASKS', 'LESSONS', 'ACTIVITIES', 'QUIZ', 'QUIZ_LESSON', 'DEFICIENCY', 'GLOSSARY', 'BOOK',
+const names = ['LANGS', 'LANG_ORDER', 'UI', 'HORIZONS', 'UNITS', 'TASKS', 'LESSONS', 'ACTIVITIES', 'QUIZ', 'QUIZ_LESSON', 'DEFICIENCY', 'GLOSSARY',
   'PRODUCTS', 'COMPOUND_PRESETS', 'ORGANIC_PRESETS', 'TEXTURE', 'TEXTURE_NOTE', 'TEXTURE_POLY', 'TEXTURE_GROUP', 'PH_BANDS', 'CROP_PH', 'SLOPE_PALM', 'SLOPE_DO', 'SOURCES', 'SEARCH_ALIASES', 'putBefore', 'ILLUS', 'ILLUS_AT'];
 const ctx = vm.createContext({});
 vm.runInContext(['content', 'units', 'crops', 'records', 'figures'].map(f => read(`js/${f}.js`)).join('\n') + `\n;globalThis.__c = { ${names.join(', ')} };`, ctx);
@@ -102,7 +102,6 @@ test('links inside the app point at things that exist', () => {
     const [kind, id] = t.href.split('/');
     assert.ok((kind === 'alat' && TOOLS.includes(id)) || (kind === 'nota' && C.LESSONS[id]), t.href);
   }
-  for (const b of C.BOOK) b.to.forEach(id => assert.ok(C.LESSONS[id], `textbook ${b.n} -> ${id}`));
 });
 
 test('glossary, deficiency key and sources are complete', () => {
