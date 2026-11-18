@@ -526,3 +526,6 @@ QUIZ[6].push(
   Q(['Bilakah masa yang paling sesuai untuk menabur urea?', 'When is the best time to spread urea?', '什么时候最适合撒施尿素？'],
     [['Pada tanah lembap apabila hujan ringan dijangka dalam sehari dua', 'On moist soil when light rain is expected within a day or two', '土壤湿润、一两天内预计有小雨时'], ['Pada tanah kering dalam musim kemarau', 'On dry soil in the dry season', '旱季的干土上'], ['Sejurus sebelum hujan lebat', 'Just before heavy rain', '大雨来临前'], ['Bersama kapur', 'Together with lime', '与石灰一起']],
     ['Urea di atas tanah kering hilang sebagai gas ammonia; hujan lebat menghanyutkannya; kapur mempercepat kehilangan itu.', 'Urea on dry soil is lost as ammonia gas; heavy rain washes it away; lime speeds up the loss.', '尿素在干土上会以氨气形式损失；大雨会把它冲走；石灰会加快损失。']));
+
+/* the picture shown with each practical activity */
+Object.entries({ 1: 'core', 2: 'jar', 3: 'zigzag', 4: 'erosion', 5: 'compost', 6: 'scoop', 7: 'baglabel' }).forEach(([n, id]) => { ACTIVITIES[n].fig = id; });

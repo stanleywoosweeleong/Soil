@@ -207,6 +207,8 @@
   }
   const FIGS = { profile: figProfile, composition: figComposition, structure: figStructure, phscale: figPhScale };
   const TOOLS = ['tekstur', 'ph', 'cerun', 'tanda', 'baja'];
+  /* the picture shown under each tool: how to take the measurement it asks for */
+  const TOOL_FIG = { tekstur: 'jar', ph: 'phmeter', cerun: 'slope', tanda: 'mobile', baja: 'scoop' };
   const TOOL_KEYS = { tekstur: 'tTexture', ph: 'tPh', cerun: 'tSlope', tanda: 'tDef', baja: 'tFert' };
 
   /* ---------- lesson blocks ---------- */
@@ -243,6 +245,7 @@
   function pageHome() {
     const pct = Math.round((done.length / ALL_LESSONS.length) * 100);
     return `<section class="hero">
+      ${ART.hero()}
       <h1>${esc(t('appName'))}</h1>
       <p class="lede">${esc(t('tagline'))}</p>
       <label class="searchbox">${esc(t('searchGuide'))}<input type="search" id="sq" value="${esc(searchQuery)}" autocomplete="off" placeholder="${esc(t('searchHint'))}"></label>
@@ -250,7 +253,7 @@
     </section>
     <section>
       <h2 class="sec">${esc(t('tasksTitle'))}</h2>
-      <ul class="tasks">${TASKS.map(k => `<li><a href="#/${k.href}">${esc(tr(k.t))}</a></li>`).join('')}</ul>
+      <ul class="tasks">${TASKS.map(k => `<li><a href="#/${k.href}">${ART.task[k.href] || ''}<span>${esc(tr(k.t))}</span></a></li>`).join('')}</ul>
     </section>
     <section>
       <h2 class="sec">${esc(t('unitsTitle'))}</h2>
@@ -259,8 +262,8 @@
         <span>${esc(t('progress'))}: ${done.length}/${ALL_LESSONS.length}</span>
       </div>
       ${UNITS.map(u => `<div class="chapter">
-        <header><span class="chip" style="background:${u.chip}">${u.n}</span>
-          <div><h3>${esc(tr(u.title))}</h3><p>${esc(tr(u.blurb))}</p></div></header>
+        <header><span class="chip emblem" style="background:${u.chip}">${ART.unit[u.n] || u.n}</span>
+          <div><h3><span class="unitno">${u.n}</span> ${esc(tr(u.title))}</h3><p>${esc(tr(u.blurb))}</p></div></header>
         <ul class="lessonlist">
           ${u.lessons.map(id => `<li><a href="#/nota/${id}"><span class="ltitle">${esc(tr(LESSONS[id].title))}</span>${done.includes(id) ? `<span class="tick" aria-label="${esc(t('done'))}">✓</span>` : ''}</a></li>`).join('')}
           <li><a class="extra" href="#/amali/${u.n}"><span class="tag">${esc(t('activity'))}</span><span class="ltitle">${esc(tr(ACTIVITIES[u.n].title))}</span></a></li>
@@ -303,6 +306,7 @@
       ${unitHead(u, tr(a.title))}
       <p class="note"><b>${esc(t('youNeed'))}:</b> ${esc(tr(a.need))}</p>
       <ol class="steps">${a.steps.map(s => `<li>${rich(s)}</li>`).join('')}</ol>
+      ${a.fig ? illus(a.fig) : ''}
       <div class="lesson-end"><a class="btn ghost" href="#/kuiz/${u.n}">${esc(t('takeQuiz'))}</a></div>
     </article>`;
   }
@@ -335,6 +339,7 @@
       <p class="lede">${esc(t('toolsIntro'))}</p>
       <div class="seg">${TOOLS.map(k => `<a href="#/alat/${k}" ${k === cur ? 'aria-current="page"' : ''}>${esc(t(TOOL_KEYS[k]))}</a>`).join('')}</div>
       <div class="tool" id="tool">${body}</div>
+      ${illus(TOOL_FIG[cur])}
     </section>`;
   }
 
@@ -711,7 +716,7 @@
       ${rec.plots.length ? `<ul class="quizlist">${rec.plots.map(p => {
         const n = entriesOf(p.id).length, phE = latestOf(p.id, 'ph');
         return `<li><a href="#/rekod/${esc(p.id)}"><span class="ltitle"><b>${esc(p.name)}</b><small>${[p.crop, p.area ? `${p.area} ${t(p.unit)}` : '', `${n} ${t('entries')}`, phE ? `pH ${Number(phE.data.ph).toFixed(1)}` : ''].filter(Boolean).map(esc).join(' · ')}</small></span></a></li>`;
-      }).join('')}</ul>` : `<p class="empty">${esc(t('noPlots'))}</p>`}
+      }).join('')}</ul>` : `<div class="emptybox">${ART.empty()}<p class="empty">${esc(t('noPlots'))}</p></div>`}
       <form class="tool recform" id="plotform" novalidate>
         <h2 class="first">${esc(t('addPlot'))}</h2>
         <label>${esc(t('plotName'))}<input type="text" name="name" maxlength="60" required></label>
@@ -888,6 +893,7 @@
     }
     if (quiz.i >= quiz.qs.length) {
       return `<section class="page quiz">${head}
+        ${ART.plant(size ? quiz.score / size : 0)}
         <p class="label">${esc(t('score'))}</p>
         <p class="score">${quiz.score}<span>/${size}</span></p>
         <div class="lesson-end">

@@ -14,7 +14,7 @@ const store = require('../js/store.js');
 
 /* the content files are plain scripts that declare constants; load them together and hand the constants back */
 const names = ['LANGS', 'LANG_ORDER', 'UI', 'HORIZONS', 'UNITS', 'TASKS', 'LESSONS', 'ACTIVITIES', 'QUIZ', 'QUIZ_LESSON', 'DEFICIENCY', 'GLOSSARY',
-  'PRODUCTS', 'COMPOUND_PRESETS', 'ORGANIC_PRESETS', 'TEXTURE', 'TEXTURE_NOTE', 'TEXTURE_POLY', 'TEXTURE_GROUP', 'PH_BANDS', 'CROP_PH', 'SLOPE_PALM', 'SLOPE_DO', 'SOURCES', 'SEARCH_ALIASES', 'putBefore', 'ILLUS', 'ILLUS_AT'];
+  'PRODUCTS', 'COMPOUND_PRESETS', 'ORGANIC_PRESETS', 'TEXTURE', 'TEXTURE_NOTE', 'TEXTURE_POLY', 'TEXTURE_GROUP', 'PH_BANDS', 'CROP_PH', 'SLOPE_PALM', 'SLOPE_DO', 'SOURCES', 'SEARCH_ALIASES', 'putBefore', 'ILLUS', 'ILLUS_AT', 'ART'];
 const ctx = vm.createContext({});
 vm.runInContext(['content', 'units', 'crops', 'records', 'figures'].map(f => read(`js/${f}.js`)).join('\n') + `\n;globalThis.__c = { ${names.join(', ')} };`, ctx);
 const C = ctx.__c;
@@ -324,6 +324,15 @@ test('a dose is counted in the grower\'s own measure, and a relong is an area', 
   assert.strictEqual(calc.measures(640, ''), null); assert.strictEqual(calc.measures(640, 0), null); assert.strictEqual(calc.measures(0, 320), null);
   assert.ok(Math.abs(calc.areaHa({ area: 10, unit: 'relong' }) - 2.877) < 1e-9);
   assert.strictEqual(clean({ plots: [{ id: 'a1', name: 'Sawah', area: 5, unit: 'relong' }], entries: [] }).plots[0].unit, 'relong');
+});
+
+test('every task, unit, tool and activity has its picture', () => {
+  for (const k of C.TASKS) assert.ok(C.ART.task[k.href], `no pictogram for task ${k.href}`);
+  for (const u of C.UNITS) { assert.ok(C.ART.unit[u.n], `no emblem for unit ${u.n}`); assert.ok(C.ILLUS[C.ACTIVITIES[u.n].fig], `no picture for activity ${u.n}`); }
+  const figs = read('js/app.js').match(/const TOOL_FIG = \{([^}]+)\}/)[1];
+  for (const t of TOOLS) { const m = figs.match(new RegExp(t + ": '([a-z]+)'")); assert.ok(m && C.ILLUS[m[1]], `no picture for tool ${t}`); }
+  for (const f of [0, 0.5, 1]) assert.ok(C.ART.plant(f).includes('<svg'));
+  assert.ok(C.ART.hero().includes('<svg') && C.ART.empty().includes('<svg'));
 });
 
 test('long text is cut to its limit', () => {

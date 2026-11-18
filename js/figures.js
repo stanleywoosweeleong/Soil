@@ -2,6 +2,9 @@
    A drawing carries numbers only; the words are in the key underneath, so every language fits and a
    screen reader gets the same information. Colours for ink, paper and leaf follow the theme. */
 const ILLUS = {};
+/* Decoration: the home banner, small pictograms and the quiz plant. These carry no information of
+   their own, so they are hidden from screen readers. */
+const ART = {};
 (() => {
   const C = { water: '#3f7fa6', sand: '#d9b77a', silt: '#b08a5a', clay: '#a65530', top: '#4b3525', sub: '#8a5a33', deep: '#b98558', rock: '#8c8f8a',
     leaf: 'var(--leaf)', ink: 'var(--ink)', mute: 'var(--muted)', paper: 'var(--surface)', wash: 'var(--wash)', ochre: 'var(--ochre)', bad: '#c0392b', yellow: '#e5c53a', grey: '#9aa3a0' };
@@ -647,6 +650,51 @@ const ILLUS = {};
   ], () => { const half = x => `<rect x="${x}" y="70" width="140" height="24" fill="${C.water}" opacity="0.6"/><rect x="${x}" y="94" width="140" height="8" fill="${C.sub}"/><rect x="${x}" y="102" width="140" height="68" fill="#7d8a86"/><path d="M${x + 70} 102V40M${x + 70} 70q-12-16-16-30M${x + 70} 66q12-16 16-28" fill="none" stroke="${C.leaf}" stroke-width="3" stroke-linecap="round"/><path d="M${x + 70} 102q-10 20-18 30M${x + 70} 102q10 20 18 30M${x + 70} 102v36" fill="none" stroke="${C.paper}" stroke-width="1.5"/>`;
     return half(10) + half(170) + grains([[34, 80], [50, 84], [110, 80], [126, 84]], '#fff', 4) + `<path d="M40 66q6-10 0-20t0-18M118 66q6-10 0-20t0-18" fill="none" stroke="${C.mute}" stroke-width="2.5" stroke-dasharray="4 4" marker-end="url(#ah)"/>` +
       grains([[214, 130], [266, 130]], '#fff', 5) + arr(220, 126, 234, 116, C.leaf) + arr(260, 126, 246, 116, C.leaf) + call(26, 150, 1) + call(186, 150, 2); });
+
+  /* ---------- decoration ---------- */
+  const pic = inner => `<svg viewBox="0 0 48 48" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${inner}</svg>`;
+  const P = {
+    grains: '<circle cx="16" cy="28" r="10"/><circle cx="33" cy="31" r="6"/><circle cx="39" cy="17" r="3"/>',
+    bag: '<path d="M14 12h20l3 7v19a3 3 0 0 1-3 3H14a3 3 0 0 1-3-3V19z"/><path d="M17 26h14M17 33h9"/>',
+    drop: '<path d="M24 7c8 10 11 16 11 21a11 11 0 0 1-22 0c0-5 3-11 11-21z"/><path d="M19 30h10"/>',
+    leaf: '<path d="M9 39C9 21 21 9 40 9c0 19-11 30-29 30z"/><path d="M11 37L31 17"/>',
+    rain: '<path d="M6 40L42 28"/><path d="M14 8l-3 9M24 8l-3 9M34 8l-3 9"/>',
+    slope: '<path d="M6 40h36V16z"/><path d="M33 40v-7h9"/>',
+    palm: '<path d="M24 43V22"/><path d="M24 22q-10-9-18-1M24 22q10-9 18-1M24 22q-4-12-13-12M24 22q4-12 13-12"/>',
+    sack: '<path d="M13 7h22l3 6v25l-3 4H13l-3-4V13z"/><path d="M17 21h14M19 29h10"/>',
+    layers: '<path d="M7 14q8-5 17 0t17 0M7 25q8-5 17 0t17 0M7 36q8-5 17 0t17 0"/>',
+    lens: '<circle cx="21" cy="21" r="12"/><path d="M30 30l11 11"/>',
+    steps: '<path d="M5 15h13v10h12v10h13"/>',
+    spade: '<path d="M24 6v20M19 6h10"/><path d="M16 26h16v6q-8 14-16 0z"/>',
+    sprout: '<path d="M24 43V22"/><path d="M24 27q-13-2-15-15q13 0 15 15zM24 22q13-2 15-15q-13 0-15 15z"/>',
+  };
+  ART.task = { 'alat/tekstur': pic(P.grains), 'nota/3-2': pic(P.bag), 'alat/ph': pic(P.drop), 'alat/tanda': pic(P.leaf), 'nota/4-2': pic(P.rain), 'alat/cerun': pic(P.slope), 'nota/7-1': pic(P.palm), 'alat/baja': pic(P.sack) };
+  ART.unit = { 1: pic(P.layers), 2: pic(P.grains), 3: pic(P.lens), 4: pic(P.steps), 5: pic(P.spade), 6: pic(P.sprout), 7: pic(P.palm) };
+
+  /* the home banner: a farm above ground and the soil that carries it below */
+  ART.hero = () => `<svg class="heroart" viewBox="0 0 640 170" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <rect width="640" height="100" fill="${C.wash}"/><circle cx="560" cy="34" r="20" fill="${C.yellow}"/>
+    <path d="M0 100Q90 40 190 84T400 70T640 90V100z" fill="${C.leaf}" opacity="0.22"/>
+    <rect y="96" width="640" height="24" fill="${C.top}"/><rect y="120" width="640" height="28" fill="${C.sub}"/><rect y="148" width="640" height="22" fill="${C.deep}"/>
+    <path d="M0 96h640" stroke="${C.leaf}" stroke-width="6"/>
+    ${palm(92, 96, 1.5)}${palm(150, 96, 1.2)}
+    <rect x="296" y="56" width="8" height="40" fill="${C.sub}"/><circle cx="300" cy="44" r="30" fill="${C.leaf}"/><circle cx="288" cy="52" r="5" fill="${C.ochre}"/><circle cx="312" cy="40" r="5" fill="${C.ochre}"/><circle cx="302" cy="62" r="5" fill="${C.ochre}"/>
+    <rect x="430" y="88" width="180" height="8" fill="${C.water}" opacity="0.7"/>${[446, 470, 494, 518, 542, 566, 590].map(x => `<path d="M${x} 94v-18M${x} 86q-6-6-8-14M${x} 84q6-6 8-12" fill="none" stroke="${C.leaf}" stroke-width="2.5" stroke-linecap="round"/>`).join('')}
+    ${sprout(214, 96, 18)}${sprout(238, 96, 22)}${sprout(376, 96, 16)}
+    <path d="M300 96q-18 20-40 28M300 96q16 24 42 30M300 96v44M92 96q-10 16-22 24M92 96q10 18 24 22M150 96q0 14-6 26" fill="none" stroke="${C.paper}" stroke-width="2" opacity="0.8"/>
+    <path d="M184 134q10-10 20 0t20 0" fill="none" stroke="#d98b8b" stroke-width="5" stroke-linecap="round"/>
+    ${[[400, 132, 7], [420, 138, 5], [520, 156, 8], [60, 158, 6], [250, 158, 7], [612, 130, 5]].map(c => `<circle cx="${c[0]}" cy="${c[1]}" r="${c[2]}" fill="${C.rock}" opacity="0.7"/>`).join('')}
+  </svg>`;
+
+  /* a plant that has grown as far as the quiz score: a seedling, a young plant, or a tree in fruit */
+  ART.plant = frac => { const g = `<path d="M10 150h140" stroke="${C.sub}" stroke-width="8" stroke-linecap="round"/>`;
+    const body = frac < 0.4 ? sprout(80, 146, 34) : frac < 0.8 ? sprout(80, 146, 70) + `<path d="M80 110q-16-4-20-18q16 0 20 18zM80 118q16-4 20-18q-16 0-20 18z" fill="${C.leaf}"/>`
+      : `<rect x="75" y="84" width="10" height="62" fill="${C.sub}"/><circle cx="80" cy="60" r="44" fill="${C.leaf}"/>` + [[62, 52], [96, 44], [84, 78], [58, 76], [104, 70]].map(d => `<circle cx="${d[0]}" cy="${d[1]}" r="7" fill="${C.ochre}"/>`).join('');
+    return `<svg class="quizart" viewBox="0 0 160 160" width="150" height="150" aria-hidden="true">${g}${body}</svg>`; };
+
+  /* an empty plot waiting for its first record */
+  ART.empty = () => `<svg class="emptyart" viewBox="0 0 200 110" width="200" height="110" aria-hidden="true"><path d="M10 90h180" stroke="${C.sub}" stroke-width="8" stroke-linecap="round"/>
+    <rect x="28" y="58" width="144" height="30" rx="4" fill="${C.wash}" stroke="${C.mute}" stroke-dasharray="6 5" stroke-width="2"/><rect x="92" y="20" width="5" height="68" fill="${C.sub}"/><rect x="97" y="22" width="44" height="26" rx="3" fill="${C.paper}" stroke="${C.mute}" stroke-width="2"/><path d="M104 32h30M104 40h18" stroke="${C.mute}" stroke-width="2.5" stroke-linecap="round"/>${sprout(52, 88, 16)}</svg>`;
 })();
 
 /* Where each illustration appears: [lesson, the English heading it follows (null = near the top), id].
@@ -684,4 +732,4 @@ if (typeof LESSONS !== 'undefined') {
     body.splice(i + 1, 0, ['fig', id]);
   }
 }
-if (typeof module !== 'undefined' && module.exports) module.exports = { ILLUS };
+if (typeof module !== 'undefined' && module.exports) module.exports = { ILLUS, ART };
