@@ -1669,18 +1669,11 @@ LESSONS['6-3'].body.push(
     ['Baja N dan K biasanya dibahagikan kepada 2 hingga 3 kali setahun; kieserit dan batuan fosfat sekali setahun. Pokok muda dan tanah ringan memerlukan pemberian yang lebih kerap.', 'N and K fertilisers are usually split into 2 to 3 applications a year; kieserite and rock phosphate once a year. Young palms and light soils need more frequent applications.', '氮肥和钾肥通常每年分 2 至 3 次施用；硫镁矾和磷矿粉每年一次。幼树和轻质土需要更频繁地施用。'],
     ['MPOB mendapati urea butir yang ditabur di seluruh kawasan, bukan di dalam bulatan pangkal, hampir sama berkesan dengan ammonium sulfat.', 'MPOB found that granular urea broadcast over the whole area, not inside the weeded circle, worked about as well as ammonium sulphate.', 'MPOB 发现，把颗粒尿素撒遍整个区域而不是撒在树盘内，效果与硫酸铵相近。'],
   ]],
-  ['table', { head: [['Kawasan', 'Region', '地区'], ['Paling basah', 'Wettest', '最湿'], ['Paling kering', 'Driest', '最干']],
-    rows: [
-      [['Pantai timur Semenanjung', 'East coast of the Peninsula', '半岛东海岸'], ['November hingga Januari', 'November to January', '11 月至 1 月'], ['Jun dan Julai', 'June and July', '6 月和 7 月']],
-      [['Pantai barat dan pedalaman Semenanjung', 'West coast and interior of the Peninsula', '半岛西海岸和内陆'], ['Dua puncak: April hingga Mei dan Oktober hingga November', 'Two peaks: April to May and October to November', '两个高峰：4 至 5 月和 10 至 11 月'], ''],
-      [['Pantai Sarawak', 'Coastal Sarawak', '砂拉越沿海'], ['Januari', 'January', '1 月'], ['Jun atau Julai', 'June or July', '6 月或 7 月']],
-      [['Timur laut Sabah', 'North-east Sabah', '沙巴东北部'], ['Januari', 'January', '1 月'], ['April', 'April', '4 月']],
-    ] }],
-  ['note', ['Had hujan di atas datang daripada kajian kelapa sawit. Tiada panduan Malaysia yang mengaitkan pembajaan pokok buah dengan hujan ditemui, jadi gunakannya sebagai panduan terdekat. Bulan basah berubah dari tahun ke tahun: semak ramalan MetMalaysia.',
-            'The rainfall limits above come from oil palm work. No Malaysian guidance linking fruit tree fertilising to rainfall was found, so use them as the nearest guide. Wet months shift from year to year: check the MetMalaysia forecast.',
-            '上述雨量界限来自油棕研究。未找到把果树施肥与降雨挂钩的马来西亚指引，可把它作为最接近的参考。多雨月份每年不同：请查看马来西亚气象局的预报。']],
-  ['src', { s: 'Goh, Härdter & Fairhurst (2003), Fertilizing for maximum return, in Oil Palm: Management for Large and Sustainable Yields; MPOB TT No. 348 (2007); MetMalaysia, Malaysia’s Climate', u: 'https://tot.mpob.gov.my/files/2020/02/TT-348.pdf',
-    a: ['Kelapa sawit di Malaysia. Jadual musim ialah gambaran am iklim.', 'Oil palm in Malaysia. The table of seasons is a general picture of the climate.', '马来西亚的油棕。季节表是气候的一般概况。'] }],
+  ['note', ['Had hujan di atas datang daripada kajian kelapa sawit. Tiada panduan Malaysia yang mengaitkan pembajaan pokok buah dengan hujan ditemui, jadi gunakannya sebagai panduan terdekat.',
+            'The rainfall limits above come from oil palm work. No Malaysian guidance linking fruit tree fertilising to rainfall was found, so use them as the nearest guide.',
+            '上述雨量界限来自油棕研究。未找到把果树施肥与降雨挂钩的马来西亚指引，可把它作为最接近的参考。']],
+  ['src', { s: 'Goh, Härdter & Fairhurst (2003), Fertilizing for maximum return, in Oil Palm: Management for Large and Sustainable Yields; MPOB TT No. 348 (2007)', u: 'https://tot.mpob.gov.my/files/2020/02/TT-348.pdf',
+    a: ['Kelapa sawit di Malaysia.', 'Oil palm in Malaysia.', '马来西亚的油棕。'] }],
 );
 
 putBefore('3-2', 'Reading the report',
