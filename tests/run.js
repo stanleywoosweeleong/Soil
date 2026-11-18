@@ -282,6 +282,20 @@ test('invalid readings are dropped or stripped', () => {
   assert.strictEqual(out.plots[0].unit, 'ha'); assert.strictEqual(out.plots[0].trees, '');
 });
 
+test('a backup with repeated ids or junk values is tidied, not trusted', () => {
+  const entry = (id, data, kind = 'fert', date = '2026-01-01') => ({ id, plot: 'a1', date, kind, data });
+  const out = clean({ plots: [{ id: 'a1', name: 'One' }, { id: 'a1', name: 'Two' }, { id: 'b1', name: { toString: 1 } }], entries: [
+    entry('e1', { what: 'x', kg: 5 }), entry('e1', { what: 'y', kg: 6 }),
+    entry('e2', { what: 'hex', kg: '0x10' }), entry('e3', { what: 'huge', kg: 5, cost: 1e300 }),
+    entry('e4', { sand: true, clay: [5] }, 'texture'), entry('e5', { what: 'z', kg: 1 }, 'fert', '2025-13-45'),
+  ] });
+  assert.deepStrictEqual(out.plots.map(p => p.name), ['One']);
+  assert.strictEqual(new Set(out.entries.map(e => e.id)).size, out.entries.length, 'entry ids are unique');
+  assert.deepStrictEqual(out.entries.map(e => e.data.what), ['x', 'y', 'huge', 'z']);
+  assert.strictEqual(out.entries[2].data.cost, null);
+  assert.notStrictEqual(out.entries[3].date, '2025-13-45');
+});
+
 test('long text is cut to its limit', () => {
   const out = clean({ plots: [{ id: 'p1', name: 'N'.repeat(200) }], entries: [{ id: 'e1', plot: 'p1', date: '2026-01-01', kind: 'note', data: { text: 'T'.repeat(900) } }] });
   assert.strictEqual(out.plots[0].name.length, 60); assert.strictEqual(out.entries[0].data.text.length, 500);
@@ -294,12 +308,13 @@ const app = read('js/app.js'), sw = read('sw.js'), html = read('index.html');
 function swHarness() {
   const stores = new Map(), listeners = {}, posted = [];
   const cacheOf = name => { if (!stores.has(name)) stores.set(name, new Map()); const m = stores.get(name);
-    return { put: async (k, r) => { m.set(String(k.url || k), r.clone()); }, match: async k => { const r = m.get(String(k.url || k)); return r ? r.clone() : undefined; } }; };
+    const key = k => { const u = String(k.url || k); return u.startsWith('https://x.test/Soil/') ? './' + u.slice(20) : u; };
+    return { put: async (k, r) => { m.set(key(k), r.clone()); }, match: async k => { const r = m.get(key(k)); return r ? r.clone() : undefined; } }; };
   const net = { files: {}, fail: new Set() };
   const ctx = {
     caches: { open: async n => cacheOf(n), has: async n => stores.has(n), delete: async n => stores.delete(n), keys: async () => [...stores.keys()] },
-    fetch: async url => { const u = String(url.url || url); if (net.fail.has(u) || !(u in net.files)) throw new Error('offline'); return new Response(net.files[u]); },
-    Response, Headers, URL, Uint8Array, Promise, Error, Date, Object, String,
+    fetch: async url => { const u = String(url.url || url); if (net.hang) await new Promise(() => {}); if (net.fail.has(u) || !(u in net.files)) throw new Error('offline'); return new Response(net.files[u]); },
+    Response, Headers, URL, Uint8Array, Promise, Error, Date, Object, String, AbortController, setTimeout, clearTimeout,
     self: { addEventListener: (k, fn) => { listeners[k] = fn; }, skipWaiting: async () => {}, location: { origin: 'https://x.test', href: 'https://x.test/Soil/sw.js' },
       clients: { claim: async () => {}, matchAll: async () => [{ postMessage: m => posted.push(m) }] } },
   };
@@ -308,7 +323,8 @@ function swHarness() {
   const release = tag => { for (const f of shell) net.files[f] = tag + ':' + f; };
   const fire = async (kind, data) => { let p; listeners[kind]({ data, waitUntil: x => { p = x; } }); await p; };
   const saved = async f => { const m = stores.get('soil-shell'); const r = m && m.get(f); return r ? r.clone().text() : null; };
-  return { net, shell, release, fire, saved, posted, stores };
+  const open = path => new Promise(done => listeners.fetch({ request: { method: 'GET', url: 'https://x.test/Soil/' + path, mode: 'no-cors' }, respondWith: p => done(p) })).then(r => r && r.text());
+  return { net, shell, release, fire, saved, posted, stores, open };
 }
 const pending = [];
 const testAsync = (name, fn) => pending.push(fn().then(() => { passed++; }, e => { failures.push(`${name}\n    ${String(e.message).split('\n')[0]}`); }));
@@ -332,6 +348,14 @@ testAsync('a complete update replaces every file and is announced once', async (
   h.release('v2'); await h.fire('message', 'check');
   for (const f of h.shell) assert.strictEqual(await h.saved(f), 'v2:' + f);
   assert.deepStrictEqual(h.posted, ['updated']);
+});
+
+testAsync('a stalled update check does not hold up pages opening from the cache', async () => {
+  const h = swHarness();
+  h.release('v1'); await h.fire('install');
+  h.net.hang = true; h.fire('message', 'check');           // never finishes
+  const got = await Promise.race([h.open('js/app.js'), new Promise(r => setTimeout(() => r('timed out'), 500))]);
+  assert.strictEqual(got, 'v1:./js/app.js');
 });
 
 testAsync('a swap cut short is finished when the worker next starts', async () => {

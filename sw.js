@@ -26,6 +26,9 @@ const SHELL = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
+  './icons/favicon-48.png',
+  './icons/icon-maskable-512.png',
+  './icons/icon-maskable.svg',
   './manifest.webmanifest',
 ];
 
@@ -69,13 +72,23 @@ function promote() {
 let settled = promote();
 const whenSettled = () => settled.then(() => null, () => null);
 
-/* Downloads a full release and swaps it in. Resolves true only when a release was already saved
-   and the new one differs. Any error or non-200 response leaves the saved release untouched. */
-function fetchRelease() {
-  return Promise.all(SHELL.map(url => fetch(url, { cache: 'no-cache' }).then(res => {
-    if (!res || !res.ok) throw new Error('could not fetch ' + url);
-    return res.clone().arrayBuffer().then(bytes => ({ url, res, bytes }));
-  }))).then(files => caches.open(CACHE).then(live =>
+/* Downloads every shell file past the HTTP cache. Rejects if any file fails or takes too long.
+   This runs outside the queue above: a slow network must never hold up pages opening from the cache. */
+const FETCH_TIMEOUT = 30000;
+function download() {
+  return Promise.all(SHELL.map(url => {
+    const stop = new AbortController();
+    const timer = setTimeout(() => stop.abort(), FETCH_TIMEOUT);
+    return fetch(url, { cache: 'no-cache', signal: stop.signal }).then(res => {
+      if (!res || !res.ok) throw new Error('could not fetch ' + url);
+      return res.clone().arrayBuffer().then(bytes => ({ url, res, bytes }));
+    }).finally(() => clearTimeout(timer));
+  }));
+}
+
+/* Swaps a downloaded release in. Resolves true only when a release was already saved and the new one differs. */
+function swapIn(files) {
+  return caches.open(CACHE).then(live =>
     Promise.all(files.map(f => live.match(f.url).then(old => (old ? old.arrayBuffer() : null)))).then(olds => {
       const had = olds.filter(Boolean).length;
       const same = had === files.length && files.every((f, i) => sameBytes(olds[i], f.bytes));
@@ -85,14 +98,17 @@ function fetchRelease() {
           .then(() => stage.put(COMPLETE, new Response('ok')))
       ).then(promote).then(done => done && had > 0);
     })
-  )).catch(() => false);
+  ).catch(() => false);
 }
 
-/* one update at a time, each after the previous has settled */
+/* Any download error leaves the saved release untouched. Only the local swap joins the queue,
+   one at a time, each after the previous has settled. */
 function refreshShell() {
-  const run = whenSettled().then(fetchRelease);
-  settled = run;
-  return run;
+  return download().then(files => {
+    const run = whenSettled().then(() => swapIn(files));
+    settled = run;
+    return run;
+  }, () => false);
 }
 
 /* install: save the shell, then take over at once. Safe because the cache name is stable,

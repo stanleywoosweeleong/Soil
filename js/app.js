@@ -57,7 +57,8 @@
 
   /* ---------- state ---------- */
   const ALL_LESSONS = UNITS.flatMap(u => u.lessons);
-  let done = store.get('done', []).filter(id => ALL_LESSONS.includes(id));
+  let done = store.get('done', []);
+  done = (Array.isArray(done) ? done : []).filter(id => ALL_LESSONS.includes(id));
   let best = store.get('best2', {});
   if (!best || typeof best !== 'object' || Array.isArray(best)) best = {};
   for (const k of Object.keys(best)) if (!Number.isInteger(best[k]) || best[k] < 0) delete best[k];
@@ -296,8 +297,8 @@
       <div><p class="label">${esc(t('unit'))} ${u.n}: ${esc(tr(u.title))}</p><h1>${esc(title)}</h1></div></header>`;
 
   function pageLesson(id) {
+    if (!ALL_LESSONS.includes(id)) return pageHome();
     const L = LESSONS[id];
-    if (!L) return pageHome();
     const u = unitOf(id);
     const i = ALL_LESSONS.indexOf(id);
     const prev = ALL_LESSONS[i - 1], next = ALL_LESSONS[i + 1];
@@ -548,8 +549,7 @@
     }
     if (fert.mode === 'plant') {
       return `<div class="row2">${numIn(esc(t('perPlantNeed')), 'need')}${numIn(esc(t('pct')), 'pct', 'max="100"')}</div>
-        <div class="row2"><label>${esc(t('nutrientSel'))}<select data-f="pnut">${[['', '—'], ['n', 'N'], ['p', 'P₂O₅'], ['k', 'K₂O']].map(o => `<option value="${o[0]}" ${fert.pnut === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></label>
-        ${numIn(esc(t('plants')), 'plants', '', true)}</div>`;
+        ${numIn(esc(t('plants')), 'plants', '', true)}`;
     }
     if (fert.mode === 'tree') {
       return `<div class="row2">${numIn(esc(t('treeRate')), 'trate')}${numIn(esc(t('apps')), 'tapps', '', true)}</div>
@@ -661,7 +661,7 @@
   /* an entry's detail, rendered in the current language from the stored numbers */
   function entryText(e) {
     const d = e.data || {};
-    if (e.kind === 'texture') return `${tr(TEXTURE[classify(d.sand, d.clay)])}: ${t('sand')} ${d.sand}% · ${t('silt')} ${100 - d.sand - d.clay}% · ${t('clay')} ${d.clay}%`;
+    if (e.kind === 'texture') return `${tr(TEXTURE[classify(d.sand, d.clay)])}: ${t('sand')} ${num(d.sand)}% · ${t('silt')} ${num(100 - d.sand - d.clay)}% · ${t('clay')} ${num(d.clay)}%`;
     if (e.kind === 'ph') return `pH ${Number(d.ph).toFixed(1)} · ${tr(PH_BANDS.find(x => d.ph < x.max).name)}`;
     if (e.kind === 'slope') { const v = SoilCalc.slopeOf(d.rise, d.run); return v ? `${num(v.pct)}% · ${num(v.deg)}°` : ''; }
     if (e.kind === 'fert') return `${d.what}: ${kg(Number(d.kg))}` + (d.grade ? ` · ${d.grade.join('-')}` : '') + (d.organic ? ` · ${t('organicTag')}` : '') + (d.cost !== null && d.cost !== undefined ? ` · RM ${fmt(d.cost)}` : '');
@@ -890,7 +890,7 @@
       const n = pick([100, 200, 400]);
       const x = each * g / 100;
       const ans = each * n / 1000;
-      out.push(numericQ(fill('gq3', { p: tr(prod(id).name), g, s, x: num(x), n }), ans, [x * n / 1000, ans * 10, x * g / 100 * n / 1000], 'kg', `${num(x)} ÷ ${(g / 100).toFixed(2)} = ${num(each)} g; ${num(each)} × ${n} = ${num(ans)} kg`));
+      out.push(numericQ(fill('gq3', { p: tr(prod(id).name), g, s, x: num(x, 2), n }), ans, [x * n / 1000, ans * 10, x * g / 100 * n / 1000], 'kg', `${num(x, 2)} ÷ ${(g / 100).toFixed(2)} = ${num(each)} g; ${num(each)} × ${n} = ${num(ans)} kg`));
     }
     return out;
   }
@@ -1058,7 +1058,10 @@
   }
 
   /* ---------- router ---------- */
-  const parse = () => location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
+  const parse = () => {
+    try { return location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent); }
+    catch (e) { return []; }   // a malformed link opens the home page
+  };
   function render(keepScroll) {
     const r = parse();
     if (r[0] === 'kuiz' && quiz && quiz.n !== Number(r[1])) quiz = null;   // an open quiz survives a visit to the lesson
@@ -1069,7 +1072,7 @@
       r[0] === 'kuiz' ? pageQuiz(r[1]) :
       r[0] === 'alat' ? pageTools(r[1]) :
       r[0] === 'rekod' ? (r[1] ? pagePlot(r[1]) : pageRecords()) :
-      r[0] === 'istilah' ? (r[1] !== undefined && (glossQuery = r[1].slice(0, 80)), pageGlossary()) :
+      r[0] === 'istilah' ? (!keepScroll && r[1] !== undefined && (glossQuery = r[1].slice(0, 80)), pageGlossary()) :
       r[0] === 'buku' ? pageBook() :
       r[0] === 'sumber' ? pageSources() : pageHome();
     if (!keepScroll) window.scrollTo(0, 0);
@@ -1224,7 +1227,7 @@
     e.target.value = '';
   });
 
-  rec = cleanBackup(rec) || { plots: [], entries: [] };
+  try { rec = cleanBackup(rec) || { plots: [], entries: [] }; } catch (e) { rec = { plots: [], entries: [] }; }
   store.set('probe', 1);
   render(false);
   /* first launch: choose a language before anything else is usable */
