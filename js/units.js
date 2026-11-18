@@ -1492,3 +1492,77 @@ SOURCES.push({ topic: ['Mengukur pH, alat pembajakan, bahan kapur dan bentuk baj
   ['MPOB – Efficient Use of Inorganic and Organic Fertilisers for Oil Palm', 'https://opb.mpob.gov.my/efficient-use-of-inorganic-and-organic-fertilisers-for-oil-palm/'],
   ['MOSTI Malaysia – A revised standard for Malaysian Good Agricultural Practices (MyGAP)', 'https://www.mosti.gov.my/berita/6-december-2016-a-revised-standard-for-malaysian-good-agricultural-practices-mygap/'],
 ] });
+
+/* ---------- Textbook pages 65 to 82: pests in organic material, heavy metals, more straight fertilisers, EM, a costed programme ---------- */
+putBefore('6-2', 'When chemical fertiliser is overused',
+  ['h', ['Perosak yang membiak dalam bahan organik', 'Pests that breed in organic material', '在有机材料中繁殖的害虫']],
+  ['p', ['Bahan organik yang sedang mereput ialah tempat pembiakan kumbang tanduk (Oryctes rhinoceros), perosak utama kelapa sawit dan kelapa muda. Tandan kosong, batang yang mereput, timbunan kompos dan habuk kayu semuanya boleh menjadi tempat larvanya hidup.',
+         'Decaying organic material is a breeding site for the rhinoceros beetle (Oryctes rhinoceros), a major pest of young oil palm and coconut. Empty fruit bunches, rotting trunks, compost heaps and sawdust can all house its larvae.',
+         '正在腐烂的有机材料是犀角金龟（Oryctes rhinoceros）的繁殖场所，它是幼龄油棕和椰子的主要害虫。空果串、腐烂的树干、堆肥堆和锯末都可能藏有其幼虫。']],
+  ['ul', [
+    ['Kompos bahan organik dahulu sebelum ditabur di ladang sawit.', 'Compost organic material before spreading it on palm land.', '有机材料先堆肥，再施到油棕园。'],
+    ['Tabur tandan kosong selapis sahaja, bukan bertimbun, supaya ia cepat mereput.', 'Spread empty fruit bunches in a single layer, not in heaps, so they break down fast.', '空果串只铺一层，不要成堆，使其快速分解。'],
+    ['Periksa timbunan apabila kerosakan kumbang kelihatan, dan musnahkan larva yang dijumpai.', 'Check the heaps when beetle damage appears, and destroy any larvae found.', '发现甲虫危害时检查堆料，并消灭找到的幼虫。'],
+  ]],
+  ['src', { s: 'Palm Oil Research Institute of Malaysia (1997), Status of rhinoceros beetle as a pest of young oil palm in Malaysia; Jurnal Proteksi Tanaman (2023)', u: 'https://agris.fao.org/search/en/records/64722aadf762bd4124ec91e2',
+    a: ['Kelapa sawit di Malaysia dan Indonesia. Nasihat selapis ialah amalan ladang yang biasa.', 'Oil palm in Malaysia and Indonesia. The single-layer advice is common estate practice.', '马来西亚和印度尼西亚的油棕。单层铺放是种植园的通行做法。'] }],
+);
+
+LESSONS['6-2'].body.push(
+  ['h', ['Logam berat dalam baja fosfat', 'Heavy metals in phosphate fertilisers', '磷肥中的重金属']],
+  ['p', ['Batuan fosfat secara semula jadi mengandungi sedikit kadmium dan uranium, dan kedua-duanya terbawa ke dalam baja yang dibuat daripadanya. Penggunaan selama bertahun-tahun boleh mengumpulkannya dalam tanah atas. Satu kajian di Switzerland mendapati kadmium dan uranium memang masuk ke tanah melalui baja fosfat, tetapi tidak menemui bukti yang sama bagi arsenik dan plumbum, dan menyimpulkan bahawa kesihatan tidak terancam secara mendadak. Jangan guna fosfat melebihi keperluan.',
+         'Phosphate rock naturally contains small amounts of cadmium and uranium, and both carry over into the fertilisers made from it. Years of use can build them up in the topsoil. A Swiss study found that cadmium and uranium do enter soil through phosphate fertiliser, found no such evidence for arsenic and lead, and concluded that health is not acutely at risk. Do not apply more phosphate than is needed.',
+         '磷矿石天然含有少量镉和铀，两者都会带入以其制成的肥料。多年施用可使它们在表土中积累。瑞士的一项研究发现，镉和铀确实随磷肥进入土壤，但未发现砷和铅有同样的证据，并认为健康并未受到急性威胁。磷肥不要超量施用。']],
+  ['src', { s: 'University of Bern, study of cadmium and uranium inputs from mineral fertiliser; Rothamsted long-term experiments on uranium', u: 'https://organisator.ch/en/?p=9925',
+    a: ['Tanah pertanian di Eropah; kandungan logam bergantung pada asal batuan fosfat.', 'European arable soils; metal content depends on where the phosphate rock comes from.', '欧洲耕地；金属含量取决于磷矿石的产地。'] }],
+);
+
+{ /* more straight fertilisers in the table of common fertilisers */
+  const t = LESSONS['6-2'].body.find(b => b[0] === 'table' && b[1].rows.some(r => Array.isArray(r[0]) && r[0][1] === 'Urea'));
+  const at = t[1].rows.findIndex(r => r[0][1] === 'Kieserite');
+  t[1].rows.splice(at, 0,
+    [['Ammonium nitrat', 'Ammonium nitrate', '硝酸铵'], '34', '0', '0', ''],
+    [['Kalsium nitrat', 'Calcium nitrate', '硝酸钙'], '15', '0', '0', '19–21% Ca'],
+    [['Kalium nitrat', 'Potassium nitrate', '硝酸钾'], '13', '0', '44–46', ''],
+    [['Kalium sulfat (SOP)', 'Sulphate of potash (SOP)', '硫酸钾 (SOP)'], '0', '0', '50', ['Mengandungi sulfur; tiada klorida', 'Contains sulphur; no chloride', '含硫；不含氯']]);
+  const i = LESSONS['6-2'].body.indexOf(t);
+  const s = LESSONS['6-2'].body.findIndex((b, n) => n > i && b[0] === 'src');
+  LESSONS['6-2'].body.splice(s + 1, 0,
+    ['note', ['Batuan fosfat Pulau Christmas (CIRP) dalam sumber lama ialah kira-kira 34 hingga 35% P₂O₅, tetapi MPOB mencatat bahawa kualitinya berubah-ubah. Gunakan angka pada beg.',
+              'Christmas Island rock phosphate (CIRP) in older sources is about 34 to 35% P₂O₅, but MPOB notes that its quality varies. Use the figure on the bag.',
+              '较早的资料显示，圣诞岛磷矿粉（CIRP）约含 34% 至 35% P₂O₅，但 MPOB 指出其质量不稳定。请以包装上的数字为准。']],
+    ['src', { s: 'UMass Extension, Fertilizer materials (nitrates, SOP); IPNI Nutrient Source Specifics No. 11 (potassium nitrate); MPOB TT 256 and US Minerals Yearbook 1983 (CIRP)', u: 'https://www.umass.edu/agriculture-food-environment/sites/ag.umass.edu/files/fact-sheets/pdf/fertilizer_materials_nutrient_amendment.pdf',
+      a: ['Nilai lazim. Angka CIRP dikira daripada 15% P dan gred lombong tahun 1983.', 'Typical values. The CIRP figure is worked out from 15% P and the 1983 mine grade.', '常见数值。CIRP 的数字由 15% P 和 1983 年的矿山品位推算。'] }]);
+}
+
+LESSONS['6-5'].body.push(
+  ['h', ['Mikroorganisma berkesan (EM)', 'Effective Microorganisms (EM)', '有效微生物 (EM)']],
+  ['p', ['EM ialah kultur campuran mikrob yang dijual sebagai penggalak tanah dan tanaman. Buktinya bercampur. Satu percubaan ladang selama empat tahun di Zürich mendapati mikrob EM itu sendiri tidak memberi kesan pada hasil atau mikrobiologi tanah; kesan yang dilihat datang daripada bahan pembawa yang kaya nutrien. Satu analisis terhadap 39 kajian mendapati kesan purata yang kecil dan positif, tetapi sangat berbeza mengikut tanaman dan kadangkala negatif. Cuba pada satu petak kecil dahulu dan bandingkan dengan petak tanpa EM.',
+         'EM is a mixed culture of microbes sold as a soil and crop booster. The evidence is mixed. A four-year field trial in Zürich found that the EM microbes themselves had no effect on yield or soil microbiology; the effects seen came from the nutrient-rich carrier. An analysis of 39 studies found a small positive average effect that varied strongly between crops and was sometimes negative. Try it on one small plot first and compare with a plot without EM.',
+         'EM 是作为土壤和作物促进剂出售的混合微生物培养物。证据并不一致。苏黎世一项为期四年的田间试验发现，EM 微生物本身对产量和土壤微生物没有影响；所见效果来自富含养分的载体。一项对 39 项研究的分析发现平均效果小而为正，但因作物而异，有时为负。应先在一小块地上试用，并与不用 EM 的地块比较。']],
+  ['src', { s: 'Mayer et al. (2010), field study of Effective Microorganisms in Zürich, Applied Soil Ecology; Megali et al. (2015), meta-analysis', u: 'https://doc.rero.ch/record/331657',
+    a: ['Percubaan di kawasan beriklim sederhana; tiada percubaan Malaysia yang setara ditemui.', 'Trials in a temperate climate; no equivalent Malaysian trial was found.', '温带地区的试验；未找到马来西亚的同类试验。'] }],
+);
+
+putBefore('6-4', 'Converting oxides to elements',
+  ['ex', { title: ['Contoh 5: tiga baja tunggal untuk satu program', 'Example 5: three straight fertilisers for one programme', '例五：用三种单质肥料完成一个施肥计划'], steps: [
+    ['Tanaman memerlukan 125 kg N, 175 kg P₂O₅ dan 180 kg K₂O sehektar.', 'The crop needs 125 kg N, 175 kg P₂O₅ and 180 kg K₂O per hectare.', '作物每公顷需要 125 公斤 N、175 公斤 P₂O₅ 和 180 公斤 K₂O。'],
+    ['Urea (46% N): 125 ÷ 0.46 ≈ 271.7 kg.', 'Urea (46% N): 125 ÷ 0.46 ≈ 271.7 kg.', '尿素（含 N 46%）：125 ÷ 0.46 ≈ 271.7 公斤。'],
+    ['Batuan fosfat (35% P₂O₅): 175 ÷ 0.35 = 500 kg.', 'Rock phosphate (35% P₂O₅): 175 ÷ 0.35 = 500 kg.', '磷矿粉（含 P₂O₅ 35%）：175 ÷ 0.35 = 500 公斤。'],
+    ['MOP (60% K₂O): 180 ÷ 0.60 = 300 kg.', 'MOP (60% K₂O): 180 ÷ 0.60 = 300 kg.', '氯化钾（含 K₂O 60%）：180 ÷ 0.60 = 300 公斤。'],
+    ['Dengan harga contoh RM 55, RM 45 dan RM 70 bagi beg 50 kg: 271.74 × 55 ÷ 50 = RM 298.91; 500 × 45 ÷ 50 = RM 450; 300 × 70 ÷ 50 = RM 420.', 'At example prices of RM 55, RM 45 and RM 70 per 50 kg bag: 271.74 × 55 ÷ 50 = RM 298.91; 500 × 45 ÷ 50 = RM 450; 300 × 70 ÷ 50 = RM 420.', '按每包 50 公斤 RM 55、RM 45 和 RM 70 的示例价格：271.74 × 55 ÷ 50 = RM 298.91；500 × 45 ÷ 50 = RM 450；300 × 70 ÷ 50 = RM 420。'],
+    ['Jumlah: RM 1,168.91 sehektar. Untuk 25 hektar: 1,168.91 × 25 = RM 29,222.75.', 'Total: RM 1,168.91 per hectare. For 25 hectares: 1,168.91 × 25 = RM 29,222.75.', '合计：每公顷 RM 1,168.91。25 公顷：1,168.91 × 25 = RM 29,222.75。'],
+  ] }],
+  ['note', ['Angka dan harga dalam contoh ini daripada buku teks, untuk latihan mengira sahaja. Ia bukan syor baja dan bukan harga semasa.',
+            'The figures and prices in this example are from the textbook, for practising the arithmetic only. They are not a fertiliser recommendation or current prices.',
+            '本例的数字和价格取自课本，仅供练习计算，并非施肥建议，也不是现行价格。']],
+);
+
+GLOSSARY.push(
+  [['Patogen', 'Pathogen', '病原体'], ['Organisma yang menyebabkan penyakit, seperti bakteria, kulat dan virus.', 'An organism that causes disease, such as a bacterium, fungus or virus.', '引起病害的生物，如细菌、真菌和病毒。']],
+  [['Vektor', 'Vector', '媒介'], ['Organisma yang membawa patogen dari satu tumbuhan ke tumbuhan lain.', 'An organism that carries a pathogen from one plant to another.', '把病原体从一株植物带到另一株的生物。']],
+  [['Saprofit', 'Saprophyte', '腐生生物'], ['Organisma yang mendapat makanan daripada bahan yang mati dan mereput.', 'An organism that feeds on dead, decaying material.', '以死亡腐烂的物质为食的生物。']],
+  [['Parasit', 'Parasite', '寄生生物'], ['Organisma yang mendapat makanan daripada perumah yang hidup.', 'An organism that takes its food from a living host.', '从活寄主身上获取养料的生物。']],
+  [['Nematod', 'Nematode', '线虫'], ['Cacing halus dalam tanah; sesetengahnya menyerang akar dan menyebabkan bonggol.', 'Tiny soil worms; some attack roots and cause galls.', '土壤中的微小线形虫；有些侵害根系并形成根结。']],
+  [['Mikroorganisma berkesan (EM)', 'Effective Microorganisms (EM)', '有效微生物 (EM)'], ['Kultur campuran mikrob yang dijual sebagai penggalak tanah; buktinya bercampur.', 'A mixed microbial culture sold as a soil booster; the evidence is mixed.', '作为土壤促进剂出售的混合微生物培养物；证据不一。']],
+);
