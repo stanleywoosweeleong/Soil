@@ -1322,3 +1322,173 @@ QUIZ[4].push(
   Q(['Dalam persamaan A = R × K × LS × C × P, faktor manakah yang paling mudah diubah oleh petani?', 'In the equation A = R × K × LS × C × P, which factors can a grower change most easily?', '在方程 A = R × K × LS × C × P 中，种植者最容易改变哪些因子？'],
     [['C dan P: litupan dan amalan pemuliharaan', 'C and P: cover and conservation practice', 'C 和 P：覆盖与保育措施'], ['R: hujan', 'R: rainfall', 'R：降雨'], ['K: jenis tanah', 'K: soil type', 'K：土壤类型'], ['Tiada satu pun', 'None of them', '都不能']],
     ['Hujan dan jenis tanah tidak boleh dipilih, tetapi litupan dan amalan boleh.', 'Rainfall and soil type cannot be chosen, but cover and practice can.', '降雨和土壤类型无法选择，但覆盖和措施可以。']));
+
+/* ---------- Textbook pages 43 to 60: effects of pH, measuring pH, implements, lime materials, drain layouts, fertiliser forms ---------- */
+const putBefore = (id, enHeading, ...blocks) => {
+  const b = LESSONS[id].body;
+  const i = b.findIndex(x => x[0] === 'h' && x[1][1] === enHeading);
+  b.splice(i < 0 ? b.length : i, 0, ...blocks);
+};
+
+putBefore('2-4', 'What makes soil acidic',
+  ['h', ['Kesan pH dengan lebih terperinci', 'The effects of pH in more detail', '酸碱度的影响详解']],
+  ['table', { head: [['Perkara', 'What', '方面'], ['Apa yang berlaku', 'What happens', '发生的情况']],
+    rows: [
+      [['Nutrien dalam tanah berasid', 'Nutrients in acidic soil', '酸性土壤中的养分'], ['Di bawah pH 6.0, nitrogen, fosforus dan kalium kurang tersedia, dan kalsium serta magnesium sering berkurangan. Aluminium, mangan dan besi boleh terbebas pada paras yang memudaratkan.', 'Below pH 6.0, nitrogen, phosphorus and potassium become less available, and calcium and magnesium often decline. Aluminium, manganese and iron can be released in harmful amounts.', 'pH 低于 6.0 时，氮、磷、钾的有效性下降，钙和镁往往减少。铝、锰和铁可能释放到有害的水平。']],
+      [['Nutrien dalam tanah beralkali', 'Nutrients in alkaline soil', '碱性土壤中的养分'], ['Di atas pH 7.5, nutrien mikro seperti besi, kuprum, mangan, zink dan boron boleh menjadi tidak tersedia.', 'Above pH 7.5, micronutrients such as iron, copper, manganese, zinc and boron may become unavailable.', 'pH 高于 7.5 时，铁、铜、锰、锌、硼等微量元素可能变得无效。']],
+      [['Mikrob tanah', 'Soil microbes', '土壤微生物'], ['Di bawah pH 5.5, kegiatan mikrob menjadi perlahan: bahan organik lambat terurai, dan penukaran ammonium kepada nitrat (penitratan) berkurangan. Bakteria lebih banyak pada pH tinggi dan kulat pada pH rendah.', 'Below pH 5.5, microbial activity slows: organic matter breaks down more slowly, and the conversion of ammonium to nitrate (nitrification) decreases. Bacteria are more common at higher pH and fungi at lower pH.', 'pH 低于 5.5 时，微生物活动减慢：有机质分解变慢，铵转化为硝酸盐（硝化作用）减弱。pH 较高时细菌较多，pH 较低时真菌较多。']],
+      [['Penyakit tumbuhan', 'Plant disease', '植物病害'], ['Bergantung pada penyakitnya. Akar gada pada kubis dan sawi lebih teruk dalam tanah berasid dan berkurangan pada pH 7.0 hingga 7.3; kudis ubi kentang pula berkurangan pada pH 5.0 hingga 5.2.', 'It depends on the disease. Clubroot of cabbages and mustards is worse in acidic soil and decreases at pH 7.0 to 7.3; potato scab, on the other hand, is reduced at pH 5.0 to 5.2.', '视病害而定。十字花科的根肿病在酸性土壤中较严重，pH 7.0 至 7.3 时减轻；马铃薯疮痂病则在 pH 5.0 至 5.2 时减轻。']],
+    ] }],
+  ['note', ['Tiada satu pH yang menghalang semua penyakit. Pilih pH yang sesuai untuk tanaman dahulu.',
+            'No single pH keeps every disease away. Choose the pH that suits the crop first.',
+            '没有哪一个 pH 能防住所有病害。应先选择适合作物的酸碱度。']],
+  ['src', { s: 'University of New Hampshire Extension, Soil pH and Plant Growth; Montana State University Extension, Soil pH and Organic Matter', u: 'https://extension.unh.edu/blog/2025/08/soil-ph-plant-growth',
+    a: ['Had pH ialah panduan umum; tanaman dan tanah berbeza.', 'The pH limits are general guides; crops and soils differ.', '这些 pH 界限是一般性参考；作物和土壤各有不同。'] }],
+);
+
+putBefore('2-4', 'The ability to hold nutrients',
+  ['h', ['Meter pH, langkah demi langkah', 'The pH meter, step by step', 'pH 计的操作步骤']],
+  ['steps', [
+    ['Tentukur meter dengan larutan penimbal pH 7 dan pH 4 sebelum digunakan.', 'Calibrate the meter with pH 7 and pH 4 buffer solutions before use.', '使用前用 pH 7 和 pH 4 的缓冲液校准仪器。'],
+    ['Keringkan tanah di udara, hancurkan dan buang batu serta akar.', 'Air-dry the soil, crush it and remove stones and roots.', '把土风干、捣碎，除去石块和根。'],
+    ['Campurkan tanah dan air suling pada nisbah 1:1, contohnya 10 g tanah dengan 10 ml air.', 'Mix soil and distilled water at 1:1, for example 10 g of soil with 10 ml of water.', '把土和蒸馏水按 1:1 混合，例如 10 克土加 10 毫升水。'],
+    ['Kacau dengan kuat, kemudian biarkan kira-kira 30 minit.', 'Stir vigorously, then let it stand for about 30 minutes.', '用力搅拌，然后静置约 30 分钟。'],
+    ['Kacau semula, celup hujung elektrod ke dalam campuran tanah itu, bukan air jernih di atasnya, dan baca.', 'Stir again, put the electrode tip into the slurry itself, not the clear water above it, and read.', '再次搅拌，把电极头插入泥浆中，而不是上层清液，然后读数。'],
+    ['Bilas elektrod dengan air suling sebelum sampel seterusnya.', 'Rinse the electrode with distilled water before the next sample.', '测下一个样本前，用蒸馏水冲洗电极。'],
+  ]],
+  ['note', ['Makmal menggunakan nisbah dan masa menunggu yang berbeza, contohnya 1:1, 1:2 atau 1:5, dan 10 hingga 30 minit. Bacaan berubah mengikut kaedah, jadi catat kaedah yang digunakan dan jangan tukar di antara sampel.',
+            'Laboratories use different ratios and standing times, for example 1:1, 1:2 or 1:5, and 10 to 30 minutes. The reading shifts with the method, so write down the one used and do not change it between samples.',
+            '各实验室采用的比例和静置时间不同，例如 1:1、1:2 或 1:5，以及 10 至 30 分钟。读数会随方法而变，因此要记下所用方法，样本之间不要更换。']],
+  ['src', { s: 'Recommended Soil Testing Procedures for the Northeastern United States (Cooperative Bulletin 493), Chapter 3; Bureau of Soils and Water Management, Philippines, TM 4.01', u: 'https://www.udel.edu/content/dam/udelImages/canr/pdfs/extension/factsheets/soiltest-recs/CHAP3.pdf',
+    a: ['Kaedah makmal 1:1 dalam air; buku teks menggunakan nisbah yang sama dengan masa menunggu 20 minit.', 'The 1:1 laboratory method in water; the textbook uses the same ratio with a 20 minute wait.', '1:1 水浸提实验室方法；课本采用相同比例，静置 20 分钟。'] }],
+  ['h', ['Penunjuk warna dengan barium sulfat', 'Colour indicator with barium sulfate', '指示剂加硫酸钡法']],
+  ['p', ['Kit lapangan menggunakan cecair penunjuk yang berubah warna mengikut pH, dan serbuk putih barium sulfat. Dalam kaedah tabung uji, serbuk itu membuat zarah tanah mendap supaya cecair di atasnya jernih dan warnanya dapat dibaca.',
+         'Field kits use an indicator liquid that changes colour with pH, and white barium sulfate powder. In the test-tube method the powder makes the soil particles settle, so the liquid above clears and its colour can be read.',
+         '田间试剂盒使用随 pH 变色的指示液和白色的硫酸钡粉末。在试管法中，这种粉末使土粒沉降，上层液体变清，便可读取颜色。']],
+  ['steps', [
+    ['Masukkan barium sulfat dan tanah ke dalam tabung uji; buku teks menggunakan 2.5 cm barium sulfat dan tanah hingga 5 cm.', 'Put barium sulfate and soil into a test tube; the textbook uses 2.5 cm of barium sulfate and soil up to 5 cm.', '把硫酸钡和土放入试管；课本用 2.5 厘米高的硫酸钡，再加土至 5 厘米。'],
+    ['Tambah air suling dan beberapa titis penunjuk.', 'Add distilled water and a few drops of indicator.', '加入蒸馏水和几滴指示剂。'],
+    ['Tutup dengan penyumbat, bukan ibu jari, dan goncang hingga sebati.', 'Close it with a stopper, not your thumb, and shake until mixed.', '用塞子而不是拇指封口，摇匀。'],
+    ['Biarkan sehingga cecair di atas jernih.', 'Leave it until the liquid above is clear.', '静置到上层液体变清。'],
+    ['Padankan warna cecair dengan carta pH.', 'Match the colour of the liquid to the pH chart.', '把液体颜色与 pH 色卡对照。'],
+  ]],
+  ['note', ['Jangan sedut debu barium sulfat. Kaedah warna cukup baik untuk kerja lapangan tetapi kurang tepat daripada meter.',
+            'Do not breathe in barium sulfate dust. The colour method is good enough for field work but less exact than a meter.',
+            '不要吸入硫酸钡粉尘。比色法足以应付田间工作，但不如 pH 计精确。']],
+  ['src', { s: 'Soil Chemical Methods – Australasia, Method 4G1: Field determination of pH (after Raupach and Tucker, 1959); test-kit instructions for the tube version', u: 'https://raw.githack.com/ANZSoilData/def-au-scma/master/html/04-pH/04G1.html',
+    a: ['Kaedah rasmi Australia menggunakan pes di atas jubin putih; versi tabung uji datang daripada arahan kit dan buku teks.', 'The official Australian method uses a paste on a white tile; the test-tube version comes from kit instructions and the textbook.', '澳大利亚的正式方法是在白瓷板上调成糊状；试管做法来自试剂盒说明和课本。'] }],
+);
+
+putBefore('5-5', 'Irrigation',
+  ['h', ['Alat pembajakan', 'Tillage implements', '耕作机具']],
+  ['table', { head: [['Alat', 'Implement', '机具'], ['Peringkat', 'Stage', '阶段'], ['Kerja', 'What it does', '作用']],
+    rows: [
+      [['Bajak piring', 'Disc plough', '圆盘犁'], ['Utama', 'Primary', '初耕'], ['Piring cekung memotong dan membalikkan tanah. Sesuai untuk tanah yang keras dan kering, melekit, berbatu atau banyak rumpai.', 'Concave discs cut and turn the soil. Suits hard dry, sticky, stony or weedy land.', '凹面圆盘切土并翻土。适用于干硬、黏重、多石或杂草多的土地。']],
+      [['Bajak sepak', 'Mouldboard plough', '铧式犁'], ['Utama', 'Primary', '初耕'], ['Memotong kepingan tanah dan membalikkannya ke satu sisi; digunakan apabila tanah perlu dibalikkan.', 'Cuts a furrow slice and inverts it to one side; used where the soil has to be turned over.', '切出垡片并翻向一侧；用于需要翻转土壤的场合。']],
+      [['Bajak pahat', 'Chisel plough', '凿式犁'], ['Utama', 'Primary', '初耕'], ['Memecahkan lapisan keras dan membajak dalam tanpa banyak mengganggu lapisan atas.', 'Breaks hard pans and works deep with little disturbance to the top layers.', '打破硬土层并进行深耕，对上层土壤扰动小。']],
+      [['Bajak putar', 'Rotary tiller', '旋耕机'], ['Kedua', 'Secondary', '次耕'], ['Bilah berputar memotong dan menghancurkan tanah, biasanya sedalam 12 hingga 15 cm. Ada sumber yang mengelaskannya sebagai alat utama.', 'Rotating blades cut and pulverise the soil, usually 12 to 15 cm deep. Some sources class it as a primary implement.', '旋转刀片切碎土壤，耕深通常为 12 至 15 厘米。有些资料把它归为初耕机具。']],
+      [['Bajak sikat', 'Disc harrow', '圆盘耙'], ['Kedua', 'Secondary', '次耕'], ['Kerja cetek: piring memotong tanah dan menghancurkan gumpalan.', 'Shallow work: the discs cut through the soil and break up the clods.', '浅层作业：圆盘切土并打碎土块。']],
+      [['Bajak pembatas', 'Ridger', '起垄犁'], ['Kedua', 'Secondary', '次耕'], ['Dua sayap membahagi tanah kepada batas dan alur, dan membumbun tanaman.', 'Two mouldboards split the field into ridges and furrows, and earth up crops.', '双壁把田地分成垄和沟，并用于培土。']],
+      [['Bajak sisir', 'Tine harrow', '钉齿耙'], ['Kedua', 'Secondary', '次耕'], ['Menghaluskan batas semaian, mencabut rumpai kecil dan menimbus benih selepas ditabur.', 'Refines the seedbed, pulls out small weeds and covers seed after sowing.', '整细苗床、拔除小杂草，并在播种后覆土。']],
+    ] }],
+  ['src', { s: 'Tamil Nadu Agricultural University, Agritech Portal: Tillage implements; Wikipedia, Harrow (tine harrow)', u: 'https://agritech.tnau.ac.in/agriculture/agri_tillage_tillageimplements.html',
+    a: ['Penerangan umum; nama Melayu mengikut buku teks.', 'General descriptions; the Malay names follow the textbook.', '一般性说明；马来文名称依照课本。'] }],
+);
+
+putBefore('5-1', 'A lime formula as a worked example only',
+  ['h', ['Jenis bahan kapur', 'Kinds of liming material', '石灰材料的种类']],
+  ['table', { head: [['Bahan', 'Material', '材料'], ['Formula', 'Formula', '化学式'], ['Nilai peneutralan', 'Neutralising value', '中和值'], ['Catatan', 'Notes', '说明']],
+    rows: [
+      [['Batu kapur kalsit', 'Calcitic limestone', '方解石质石灰石'], 'CaCO₃', '100', ['Membekalkan kalsium sahaja', 'Supplies calcium only', '只提供钙']],
+      [['Batu kapur dolomit (GML)', 'Dolomitic limestone (GML)', '白云石质石灰石 (GML)'], 'CaMg(CO₃)₂', '109', ['Membekalkan kalsium dan magnesium; pilih apabila magnesium tanah rendah', 'Supplies calcium and magnesium; choose it when soil magnesium is low', '提供钙和镁；土壤缺镁时选用']],
+      [['Kapur mati (kapur terhidrat)', 'Slaked (hydrated) lime', '熟石灰'], 'Ca(OH)₂', '136', ['Bertindak cepat; sangat kaustik dan berdebu', 'Reacts quickly; highly caustic and dusty', '反应快；腐蚀性强、粉尘多']],
+      [['Kapur tohor', 'Quicklime (burnt lime)', '生石灰'], 'CaO', '179', ['Sangat reaktif dan kaustik; sukar dikendalikan', 'Highly reactive and caustic; difficult to handle', '反应剧烈、腐蚀性强；难以操作']],
+    ] }],
+  ['formula', ['CaCO₃ + H₂O → Ca²⁺ + HCO₃⁻ + OH⁻', 'CaCO₃ + H₂O → Ca²⁺ + HCO₃⁻ + OH⁻', 'CaCO₃ + H₂O → Ca²⁺ + HCO₃⁻ + OH⁻']],
+  ['ul', [
+    ['Nilai peneutralan membandingkan bahan dengan kalsium karbonat tulen (100). Angka di atas adalah untuk bahan tulen; produk di pasaran lebih rendah, jadi baca label.', 'The neutralising value compares a material with pure calcium carbonate (100). The figures above are for pure materials; commercial products are lower, so read the label.', '中和值是与纯碳酸钙（100）相比较。上表为纯品数值；市售产品较低，请查看标签。'],
+    ['Zarah yang lebih halus bertindak lebih cepat.', 'Finer particles react faster.', '颗粒越细，反应越快。'],
+    ['Kapur yang digaul ke dalam tanah bertindak lebih cepat daripada kapur yang ditabur di permukaan.', 'Lime mixed into the soil works faster than lime left on the surface.', '混入土中的石灰比撒在表面的起效更快。'],
+    ['Batu kapur mengambil masa beberapa bulan untuk mengubah pH sepenuhnya, jadi kapur lebih awal sebelum menanam. Buku teks menyatakan sekurang-kurangnya 2 minggu, semasa membajak.', 'Limestone takes several months to change pH fully, so lime well before planting. The textbook gives at least 2 weeks, at ploughing.', '石灰石要数个月才能充分改变 pH，因此应在种植前及早施用。课本的说法是至少提前 2 周，在翻耕时施用。'],
+    ['Pakai sarung tangan, cermin mata dan topeng apabila mengendalikan kapur tohor atau kapur mati.', 'Wear gloves, goggles and a mask when handling quicklime or slaked lime.', '处理生石灰或熟石灰时，要戴手套、护目镜和口罩。'],
+  ]],
+  ['src', { s: 'University of Delaware Cooperative Extension, Liming Materials and Management', u: 'https://www.udel.edu/academics/colleges/canr/cooperative-extension/fact-sheets/liming-materials-and-management/',
+    a: ['Nilai untuk bahan tulen. Nasihat pakaian pelindung ialah amalan keselamatan am untuk bahan kaustik.', 'Values for pure materials. The protective clothing advice is general safety practice for caustic materials.', '纯品数值。防护装备的建议属于处理腐蚀性物质的一般安全做法。'] }],
+);
+
+LESSONS['5-3'].body.push(
+  ['h', ['Susun atur parit', 'Drain layouts', '排水沟的布局']],
+  ['table', { head: [['Susun atur', 'Layout', '布局'], ['Rupa', 'What it looks like', '形式'], ['Paling sesuai', 'Suits best', '最适用']],
+    rows: [
+      [['Rawak', 'Random', '随机式'], ['Parit mengikut aliran semula jadi dan menghubungkan lekuk yang paling basah', 'Drains follow the natural drainage and link the wettest hollows', '排水沟顺着自然水路，连接最潮湿的洼地'], ['Tanah beralun yang bahagian tingginya sudah bersaliran baik. Lebih murah, tetapi saliran mungkin tidak sekata.', 'Undulating land where the higher ground already drains well. Cheaper, but drainage may be uneven.', '高处已排水良好的起伏地。成本较低，但排水可能不均匀。']],
+      [['Selari', 'Parallel', '平行式'], ['Parit ladang yang sama jarak dan selari, mengalir ke parit pengumpul', 'Evenly spaced parallel field drains running to a collector drain', '等距平行的田间沟，汇入集水沟'], ['Tanah yang cerunnya sekata; saliran lebih seragam tetapi kos lebih tinggi', 'Evenly sloping land; more uniform drainage but higher cost', '坡度均匀的土地；排水较均匀，但成本较高']],
+      [['Tulang hering', 'Herringbone', '鱼骨式'], ['Parit sisi masuk dari kedua-dua belah ke parit utama pada suatu sudut, seperti tulang ikan', 'Side drains join a main drain at an angle from both sides, like a fish bone', '支沟从两侧斜向汇入主沟，形如鱼骨'], ['Lekuk panjang dengan parit utama di sepanjang bahagian paling rendah', 'A long hollow with the main drain along its lowest line', '狭长洼地，主沟沿最低处布设']],
+    ] }],
+  ['src', { s: 'Cornell University, Northeast Region Certified Crop Adviser study resources: Drainage layouts; FAO Irrigation and Drainage Paper 62', u: 'https://nrcca.cals.cornell.edu/soil/CA3/CA0318.3-4.php',
+    a: ['Susun atur am; corak selari dan tulang hering digunakan pada cerun kurang daripada kira-kira 5 hingga 8%.', 'General layouts; the parallel and herringbone patterns are used on slopes under about 5 to 8%.', '一般性布局；平行式和鱼骨式用于坡度约 5% 至 8% 以下的土地。'] }],
+);
+
+putBefore('6-2', 'Commonly used fertilisers',
+  ['p', ['**Baja lengkap** ialah baja, sama ada sebatian atau campuran, yang mengandungi ketiga-tiga nutrien utama: nitrogen, fosforus dan kalium. Nama itu mengelirukan, kerana tanaman memerlukan lebih banyak nutrien daripada tiga itu.',
+         'A **complete fertiliser** is one, compound or blended, that contains all three primary nutrients: nitrogen, phosphorus and potassium. The name is misleading, because crops need more nutrients than those three.',
+         '**完全肥料**指同时含有氮、磷、钾三种大量元素的肥料，可以是复合肥，也可以是掺混肥。这个名称容易引起误解，因为作物需要的养分不止这三种。']],
+  ['h', ['Bentuk baja', 'Forms of fertiliser', '肥料的形态']],
+  ['table', { head: [['Bentuk', 'Form', '形态'], ['Ciri', 'What it is', '特点']],
+    rows: [
+      [['Butir', 'Granules', '颗粒'], ['Zarah yang lebih kurang bulat, kira-kira 1 hingga 4 mm; mudah ditabur dengan sekata', 'Roughly round particles about 1 to 4 mm across; easy to spread evenly', '近似圆形的颗粒，直径约 1 至 4 毫米；便于均匀撒施']],
+      [['Pril', 'Prills', '造粒珠'], ['Butir yang hampir sfera, terbentuk apabila titisan membeku semasa jatuh; urea biasanya begini', 'Nearly spherical granules formed as droplets solidify while falling; urea usually comes this way', '液滴下落时凝固而成的近球形颗粒；尿素通常是这种形态']],
+      [['Serbuk atau debu', 'Powder', '粉末'], ['Zarah yang sangat halus; mudah diterbangkan angin', 'Very fine particles; easily blown by the wind', '非常细的颗粒；容易被风吹散']],
+      [['Pelet', 'Pellets', '颗粒条（丸粒）'], ['Bahan yang dimampatkan menjadi ketulan kecil; biasa untuk baja organik yang diproses', 'Material pressed into small pieces; common for processed organic fertilisers', '压制成的小块；常见于加工有机肥']],
+      [['Cecair', 'Liquid', '液体'], ['Nutrien terlarut sepenuhnya dalam air; disembur pada daun atau disalurkan melalui air pengairan', 'Nutrients fully dissolved in water; sprayed on leaves or fed through irrigation water', '养分完全溶于水；可叶面喷施或随灌溉水施用']],
+    ] }],
+  ['src', { s: 'New Mexico State University, Guide A-134: Selecting Synthetic Fertilizers; Mississippi State University Extension, Inorganic Fertilizers for Crop Production', u: 'https://pubs.nmsu.edu/_a/A134/index.html',
+    a: ['Takrif umum. Penerangan pelet mengikut penggunaan biasa di Malaysia dan buku teks.', 'General definitions. The description of pellets follows common Malaysian usage and the textbook.', '一般性定义。丸粒的说明依照马来西亚的通常用法和课本。'] }],
+  ['h', ['Dari mana baja organik datang', 'Where organic fertilisers come from', '有机肥的来源']],
+  ['ul', [
+    ['**Tinja ternakan yang diproses**: baja kandang lembu atau kambing yang dikompos sebelum digunakan.', '**Processed livestock manure**: cattle or goat manure composted before use.', '**加工过的牲畜粪便**：牛粪或羊粪，先经堆肥再使用。'],
+    ['**Sisa kilang pertanian**: kilang minyak sawit menghasilkan tandan kosong, hampas isirong, kek dekanter, sabut mesokarpa dan abu dandang. Kek dekanter dan abu dandang boleh menggantikan sebahagian baja kimia, terutamanya kalium.', '**Mill by-products**: palm oil mills give empty fruit bunches, palm kernel cake, decanter cake, mesocarp fibre and boiler ash. Decanter cake and boiler ash can replace part of the chemical fertiliser, especially potassium.', '**农产品加工厂的副产品**：棕油厂产出空果串、棕榈仁粕、离心渣饼、中果皮纤维和锅炉灰。离心渣饼和锅炉灰可替代部分化肥，尤其是钾肥。'],
+    ['**Sisa ladang**: batang jagung, sayur yang rosak, rumput yang dipotong dan sisa tanaman lain.', '**Farm residues**: maize stalks, spoiled vegetables, cut grass and other crop remains.', '**农田残余物**：玉米秆、损坏的蔬菜、割下的草和其他作物残体。'],
+  ]],
+  ['note', ['Kajian MPOB mendapati baja organik sahaja tidak dapat memberi hasil kelapa sawit yang tinggi, kerana kandungan nutriennya rendah dan tidak tetap. Gunakan bersama baja tak organik.',
+            'MPOB work found that organic fertiliser alone could not give high oil palm yields, because its nutrient content is low and inconsistent. Use it together with inorganic fertiliser.',
+            'MPOB 的研究发现，单靠有机肥无法使油棕高产，因为其养分含量低且不稳定。应与无机肥配合施用。']],
+  ['src', { s: 'MPOB, Oil Palm Bulletin: Efficient Use of Inorganic and Organic Fertilisers for Oil Palm', u: 'https://opb.mpob.gov.my/efficient-use-of-inorganic-and-organic-fertilisers-for-oil-palm/',
+    a: ['Kelapa sawit di Malaysia.', 'Oil palm in Malaysia.', '马来西亚的油棕。'] }],
+);
+
+LESSONS['6-3'].body.push(
+  ['h', ['Amalan Pertanian Baik (myGAP)', 'Good Agricultural Practice (myGAP)', '良好农业规范 (myGAP)']],
+  ['p', ['myGAP ialah skim pensijilan Malaysia untuk ladang yang mengeluarkan hasil yang selamat dan berkualiti dengan cara yang menjaga alam sekitar dan pekerja. Ia dilancarkan pada 28 Ogos 2013 dan menggantikan skim terdahulu, termasuk SALM untuk tanaman. Bagi tanaman, ia berdasarkan piawaian MS 1784. Rekod baja yang disimpan bagi setiap plot ialah sebahagian daripada amalan ini.',
+         'myGAP is the Malaysian certification scheme for farms that produce safe, good-quality produce in a way that looks after the environment and the workers. It was launched on 28 August 2013 and replaced earlier schemes, including SALM for crops. For crops it is based on the standard MS 1784. Keeping fertiliser records for each plot is part of the practice.',
+         'myGAP 是马来西亚的认证计划，认证以保护环境和工人的方式生产安全、优质农产品的农场。它于 2013 年 8 月 28 日推出，取代了先前的计划，包括针对作物的 SALM。作物方面以 MS 1784 标准为依据。为每块地保存施肥记录是其中一项要求。']],
+  ['src', { s: 'Ministry of Science, Technology and Innovation Malaysia: A revised standard for Malaysian Good Agricultural Practices (MyGAP); Department of Standards Malaysia, MS 1784', u: 'https://www.mosti.gov.my/berita/6-december-2016-a-revised-standard-for-malaysian-good-agricultural-practices-mygap/',
+    a: ['Malaysia. Semak keperluan semasa dengan Jabatan Pertanian.', 'Malaysia. Check the current requirements with the Department of Agriculture.', '马来西亚。现行要求请向农业局查询。'] }],
+);
+
+QUIZ[2].push(
+  Q(['Sebelum mengukur pH tanah dengan meter, apakah yang mesti dilakukan dahulu?', 'Before measuring soil pH with a meter, what must be done first?', '用 pH 计测土壤酸碱度之前，必须先做什么？'],
+    [['Tentukur meter dengan larutan penimbal', 'Calibrate the meter with buffer solutions', '用缓冲液校准仪器'], ['Panaskan tanah', 'Heat the soil', '把土加热'], ['Tambah kapur pada sampel', 'Add lime to the sample', '在样本中加石灰'], ['Gunakan air paip', 'Use tap water', '使用自来水']],
+    ['Meter yang tidak ditentukur memberi bacaan yang salah; air suling digunakan supaya air itu sendiri tidak mengubah bacaan.', 'An uncalibrated meter gives wrong readings; distilled water is used so that the water itself does not change the reading.', '未经校准的仪器读数不准；使用蒸馏水是为了避免水本身影响读数。']));
+QUIZ[5].push(
+  Q(['Bahan kapur yang manakah membekalkan kalsium dan magnesium?', 'Which liming material supplies both calcium and magnesium?', '哪一种石灰材料同时提供钙和镁？'],
+    [['Batu kapur dolomit (GML)', 'Dolomitic limestone (GML)', '白云石质石灰石 (GML)'], ['Batu kapur kalsit', 'Calcitic limestone', '方解石质石灰石'], ['Kapur tohor', 'Quicklime', '生石灰'], ['Kapur mati', 'Slaked lime', '熟石灰']],
+    ['Dolomit ialah kalsium magnesium karbonat; tiga yang lain hanya membekalkan kalsium.', 'Dolomite is calcium magnesium carbonate; the other three supply calcium only.', '白云石是碳酸钙镁；其余三种只提供钙。']),
+  Q(['Alat yang manakah digunakan untuk memecahkan lapisan keras di bawah tanah?', 'Which implement is used to break a hard pan below the surface?', '哪一种机具用来打破地表下的硬土层？'],
+    [['Bajak pahat', 'Chisel plough', '凿式犁'], ['Bajak sisir', 'Tine harrow', '钉齿耙'], ['Bajak pembatas', 'Ridger', '起垄犁'], ['Bajak sikat', 'Disc harrow', '圆盘耙']],
+    ['Bajak pahat bekerja dalam dan meretakkan lapisan keras; tiga yang lain ialah alat cetek untuk peringkat kedua.', 'A chisel plough works deep and fractures the pan; the other three are shallow, secondary implements.', '凿式犁作业深，能松动硬土层；其余三种是浅层的次耕机具。']));
+QUIZ[6].push(
+  Q(['Apakah maksud "baja lengkap"?', 'What does "complete fertiliser" mean?', '“完全肥料”是什么意思？'],
+    [['Mengandungi nitrogen, fosforus dan kalium', 'It contains nitrogen, phosphorus and potassium', '含有氮、磷、钾'], ['Mengandungi semua nutrien yang diperlukan tanaman', 'It contains every nutrient a crop needs', '含有作物所需的全部养分'], ['Tidak perlu ditambah baja lain selama setahun', 'No other fertiliser is needed for a year', '一年内无需再施其他肥料'], ['Baja organik yang dikompos sepenuhnya', 'A fully composted organic fertiliser', '完全腐熟的有机肥']],
+    ['Istilah itu hanya merujuk kepada tiga nutrien utama; nutrien lain mungkin masih perlu ditambah.', 'The term refers only to the three primary nutrients; others may still have to be added.', '该术语只指三种大量元素；其他养分可能仍需补充。']));
+
+SOURCES.push({ topic: ['Mengukur pH, alat pembajakan, bahan kapur dan bentuk baja', 'Measuring pH, tillage implements, liming materials and fertiliser forms', '酸碱度测量、耕作机具、石灰材料与肥料形态'], items: [
+  ['University of New Hampshire Extension – Soil pH and Plant Growth', 'https://extension.unh.edu/blog/2025/08/soil-ph-plant-growth'],
+  ['Cooperative Bulletin 493 – Recommended Soil Testing Procedures for the Northeastern United States, Chapter 3', 'https://www.udel.edu/content/dam/udelImages/canr/pdfs/extension/factsheets/soiltest-recs/CHAP3.pdf'],
+  ['Soil Chemical Methods – Australasia, Method 4G1: Field determination of pH', 'https://raw.githack.com/ANZSoilData/def-au-scma/master/html/04-pH/04G1.html'],
+  ['Tamil Nadu Agricultural University – Tillage implements', 'https://agritech.tnau.ac.in/agriculture/agri_tillage_tillageimplements.html'],
+  ['University of Delaware Cooperative Extension – Liming Materials and Management', 'https://www.udel.edu/academics/colleges/canr/cooperative-extension/fact-sheets/liming-materials-and-management/'],
+  ['Cornell University, NRCCA – Drainage layouts', 'https://nrcca.cals.cornell.edu/soil/CA3/CA0318.3-4.php'],
+  ['New Mexico State University – Guide A-134: Selecting Synthetic Fertilizers', 'https://pubs.nmsu.edu/_a/A134/index.html'],
+  ['MPOB – Efficient Use of Inorganic and Organic Fertilisers for Oil Palm', 'https://opb.mpob.gov.my/efficient-use-of-inorganic-and-organic-fertilisers-for-oil-palm/'],
+  ['MOSTI Malaysia – A revised standard for Malaysian Good Agricultural Practices (MyGAP)', 'https://www.mosti.gov.my/berita/6-december-2016-a-revised-standard-for-malaysian-good-agricultural-practices-mygap/'],
+] });

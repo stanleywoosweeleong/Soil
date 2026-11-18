@@ -74,7 +74,11 @@ Object.assign(UI, {
 const SEARCH_ALIASES = [
   ['gambut', 'peat', '泥炭土', '泥炭'],
   ['asid sulfat', 'acid sulfate', 'acid sulphate', '酸性硫酸盐土', '酸性硫酸盐', 'pirit', 'pyrite', '黄铁矿'],
-  ['kapur', 'pengapuran', 'lime', 'liming', 'gml', 'dolomit', 'dolomite', '石灰', '白云石'],
+  ['kapur', 'pengapuran', 'lime', 'liming', 'gml', 'dolomit', 'dolomite', 'kalsit', 'calcite', 'kapur tohor', 'quicklime', 'kapur mati', 'slaked lime', '石灰', '白云石', '生石灰', '熟石灰'],
+  ['bajak', 'pembajakan', 'pemugaran', 'plough', 'plow', 'tillage', 'harrow', '犁', '耙', '耕作'],
+  ['parit', 'tulang hering', 'herringbone', 'ditch', '排水沟', '鱼骨'],
+  ['barium sulfat', 'barium sulfate', 'barium sulphate', 'kuhn', '硫酸钡'],
+  ['mygap', 'gap', 'amalan pertanian baik', 'good agricultural practice', '良好农业规范'],
   ['baja', 'pembajaan', 'fertiliser', 'fertilizer', 'fertilising', 'fertilizing', '肥料', '施肥'],
   ['kelapa sawit', 'sawit', 'oil palm', 'palm oil', '油棕'],
   ['padi', 'sawah', 'paddy', 'rice', '水稻', '稻田'],
@@ -176,10 +180,10 @@ Object.assign(UI, {
 /* the lesson each quiz question draws on, in question order */
 const QUIZ_LESSON = {
   1: ['1-1', '1-2', '1-1', '1-2', '1-1'],
-  2: ['2-1', '2-1', '2-2', '2-3', '2-4', '2-4', '2-1', '2-6'],
+  2: ['2-1', '2-1', '2-2', '2-3', '2-4', '2-4', '2-1', '2-6', '2-4'],
   3: ['3-2', '3-2', '3-1', '3-2', '3-4', '3-4'],
   4: ['4-1', '4-1', '4-2', '4-2', '4-2', '4-1'],
-  5: ['5-1', '5-1', '5-2', '5-2', '5-3', '5-4', '5-5'],
-  6: ['6-1', '6-1', '6-4', '6-2', '6-3', '6-5', '6-2'],
+  5: ['5-1', '5-1', '5-2', '5-2', '5-3', '5-4', '5-5', '5-1', '5-5'],
+  6: ['6-1', '6-1', '6-4', '6-2', '6-3', '6-5', '6-2', '6-2'],
   7: ['7-1', '7-1', '7-2', '7-3', '7-4', '7-2'],
 };
