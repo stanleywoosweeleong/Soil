@@ -20,7 +20,10 @@
   /* a plain decimal number: a finite number, or a string of digits. Booleans, arrays and "0x10" are refused. */
   const fin = v => (typeof v === 'number' && Number.isFinite(v)) || (typeof v === 'string' && /^\s*-?(\d+\.?\d*|\.\d+)\s*$/.test(v));
   /* upper limits, far beyond any real farm, so a wild figure in a backup cannot break the page */
-  const MAX_KG = 1e7, MAX_COST = 1e9, MAX_AREA = 1e6, MAX_LENGTH = 1e6;
+  const MAX_KG = 1e7, MAX_COST = 1e9, MAX_AREA_HA = 1e5, MAX_LENGTH = 1e6;
+  const LIMITS = { kg: MAX_KG, cost: MAX_COST, areaHa: MAX_AREA_HA, length: MAX_LENGTH };
+  /* the limit on a plot's size is in hectares, whatever unit it was typed in */
+  const areaOk = (area, unit) => fin(area) && Number(area) > 0 && Number(area) * (calc.HA[unit] || 1) <= MAX_AREA_HA;
 
   /* one entry's data, forced into shape, or null when it cannot be trusted */
   function cleanData(kind, d) {
@@ -55,7 +58,7 @@
       id: p.id,
       name: str(p.name, 60),
       crop: str(p.crop, 60),
-      area: fin(p.area) && Number(p.area) > 0 && Number(p.area) <= MAX_AREA ? Number(p.area) : '',
+      area: areaOk(p.area, UNITS_OF_AREA.includes(p.unit) ? p.unit : 'ha') ? Number(p.area) : '',
       unit: UNITS_OF_AREA.includes(p.unit) ? p.unit : 'ha',
       trees: fin(p.trees) && calc.isCount(p.trees) ? Number(p.trees) : '',
     }));
@@ -66,7 +69,8 @@
         const data = cleanData(e.kind, e.data);
         if (!data) return null;
         /* an entry id is used once; a repeat gets a new one so that deleting one entry never removes another */
-        const id = okId(e.id) && !seenEntry.has(e.id) ? e.id : make.newId();
+        let id = okId(e.id) && !seenEntry.has(e.id) ? e.id : make.newId();
+        for (let n = 0; seenEntry.has(id); n++) id = make.newId() + (n > 5 ? String(n) : '');
         seenEntry.add(id);
         return { id, plot: e.plot, date: okDate(e.date) ? e.date : make.today(), kind: e.kind, data };
       })
@@ -74,7 +78,7 @@
     return { plots, entries };
   }
 
-  const api = { KINDS, okId, okDate, cleanData, cleanRecords };
+  const api = { KINDS, LIMITS, okId, okDate, areaOk, cleanData, cleanRecords };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.SoilStore = api;
 })(typeof self !== 'undefined' ? self : globalThis);

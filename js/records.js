@@ -145,6 +145,9 @@ const SEARCH_ALIASES = [
 
 /* ---------- Nutrient and cost summary, field readiness, quiz review ---------- */
 Object.assign(UI, {
+  skip: ['Langkau ke kandungan', 'Skip to content', '跳到正文'],
+  calcMode: ['Jenis pengiraan', 'Type of calculation', '计算类型'],
+  outOfRange: ['Tidak disimpan. Satu angka terlalu besar untuk direkodkan; semak unitnya.', 'Not saved. One of the figures is too large to record; check its unit.', '未保存。其中一个数字过大，无法记录；请检查单位。'],
   gradeAll: ['Isi ketiga-tiga nombor gred, dengan 0 jika baja itu tiada nutrien tersebut, atau kosongkan semuanya.', 'Fill in all three grade numbers, using 0 where the product has none of that nutrient, or leave them all blank.', '请填写全部三个配比数字（不含该养分的填 0），或全部留空。'],
   gradeAllHint: ['Salin ketiga-tiga nombor dari beg. Tanpa gred, rekod ini tidak dikira dalam jumlah nutrien.', 'Copy all three numbers from the bag. Without a grade, this record is not counted in the nutrient totals.', '请照包装抄下全部三个数字。没有配比的记录不会计入养分总量。'],
   gradeOpt: ['Gred N-P₂O₅-K₂O (%), jika diketahui', 'Grade N-P₂O₅-K₂O (%), if known', '养分配比 N-P₂O₅-K₂O（%），如已知'],

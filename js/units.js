@@ -18,7 +18,7 @@ const UNITS = [
   { n: 5, chip: '#a65530', title: ['Memperbaiki tanah', 'Improving soil', '改良土壤'],
     blurb: ['Disusun mengikut masalah: keasidan, kurang bahan organik, air dan pemadatan.', 'Organised by problem: acidity, low organic matter, water and compaction.', '按问题编排：酸性、有机质不足、水分和压实。'],
     lessons: ['5-1', '5-2', '5-3'] },
-  { n: 6, chip: '#c6861a', title: ['Membaja tanaman', 'Feeding crops', '给作物施肥'],
+  { n: 6, chip: '#96650a', title: ['Membaja tanaman', 'Feeding crops', '给作物施肥'],
     blurb: ['Nutrien, tanda kekurangan, jenis baja, cara membaja dan pengiraan.', 'Nutrients, deficiency signs, fertiliser types, application and calculations.', '养分、缺乏症状、肥料种类、施肥方法和用量计算。'],
     lessons: ['6-1', '6-2', '6-3', '6-4'] },
 ];
@@ -1327,7 +1327,8 @@ QUIZ[4].push(
 const putBefore = (id, enHeading, ...blocks) => {
   const b = LESSONS[id].body;
   const i = b.findIndex(x => x[0] === 'h' && x[1][1] === enHeading);
-  b.splice(i < 0 ? b.length : i, 0, ...blocks);
+  if (i < 0) throw new Error(`putBefore: lesson ${id} has no heading "${enHeading}"`);
+  b.splice(i, 0, ...blocks);
 };
 
 putBefore('2-4', 'What makes soil acidic',
@@ -1520,6 +1521,7 @@ LESSONS['6-2'].body.push(
 { /* more straight fertilisers in the table of common fertilisers */
   const t = LESSONS['6-2'].body.find(b => b[0] === 'table' && b[1].rows.some(r => Array.isArray(r[0]) && r[0][1] === 'Urea'));
   const at = t[1].rows.findIndex(r => r[0][1] === 'Kieserite');
+  if (at < 0) throw new Error('the fertiliser table has no Kieserite row');
   t[1].rows.splice(at, 0,
     [['Ammonium nitrat', 'Ammonium nitrate', '硝酸铵'], '34', '0', '0', ''],
     [['Kalsium nitrat', 'Calcium nitrate', '硝酸钙'], '15', '0', '0', '19–21% Ca'],
@@ -1527,6 +1529,7 @@ LESSONS['6-2'].body.push(
     [['Kalium sulfat (SOP)', 'Sulphate of potash (SOP)', '硫酸钾 (SOP)'], '0', '0', '50', ['Mengandungi sulfur; tiada klorida', 'Contains sulphur; no chloride', '含硫；不含氯']]);
   const i = LESSONS['6-2'].body.indexOf(t);
   const s = LESSONS['6-2'].body.findIndex((b, n) => n > i && b[0] === 'src');
+  if (s < 0) throw new Error('the fertiliser table has no source line after it');
   LESSONS['6-2'].body.splice(s + 1, 0,
     ['note', ['Batuan fosfat Pulau Christmas (CIRP) dalam sumber lama ialah kira-kira 34 hingga 35% P₂O₅, tetapi MPOB mencatat bahawa kualitinya berubah-ubah. Gunakan angka pada beg.',
               'Christmas Island rock phosphate (CIRP) in older sources is about 34 to 35% P₂O₅, but MPOB notes that its quality varies. Use the figure on the bag.',

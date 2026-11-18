@@ -70,6 +70,8 @@
   const saveRec = () => store.set('rec', rec);
   /* change the records, and undo the change if the browser cannot store it */
   function commitRec(mutate) {
+    /* another tab or the installed app may have saved since this page loaded: start from what is stored */
+    try { const fresh = cleanBackup(store.get('rec', null)); if (fresh) rec = fresh; } catch (e) { /* keep what is in memory */ }
     const before = JSON.stringify(rec);
     mutate();
     if (saveRec()) { store.set('lastChange', new Date().toISOString()); return true; }
@@ -118,6 +120,7 @@
   function renderChrome(route) {
     document.documentElement.lang = LANGS.find(l => l.code === lang).html;
     document.title = t('appName');
+    document.querySelector('.skip').textContent = t('skip');
     document.getElementById('brand').innerHTML =
       `<img src="icon.svg" width="28" height="28" alt=""><span>${esc(t('appName'))}</span>`;
     const tabs = [['', 'navHome', 'guide'], ['alat', 'navTools', 'tools'], ['rekod', 'navRecords', 'records'], ['istilah', 'navGlossary', 'glossary'], ['sumber', 'navSources', 'sources']];
@@ -366,7 +369,7 @@
     return `<section class="page">
       <h1>${esc(t('navTools'))}</h1>
       <p class="lede">${esc(t('toolsIntro'))}</p>
-      <div class="seg" role="tablist">${TOOLS.map(k => `<a role="tab" href="#/alat/${k}" aria-selected="${k === cur}">${esc(t(TOOL_KEYS[k]))}</a>`).join('')}</div>
+      <div class="seg">${TOOLS.map(k => `<a href="#/alat/${k}" ${k === cur ? 'aria-current="page"' : ''}>${esc(t(TOOL_KEYS[k]))}</a>`).join('')}</div>
       <div class="tool" id="tool">${body}</div>
     </section>`;
   }
@@ -409,8 +412,8 @@
     return `<p class="tool-desc">${esc(t('tTextureDesc'))}</p>
       <div id="texout" aria-live="polite">${textureResult()}</div>
       <div class="sliders">
-        <label>${esc(t('sand'))} <output id="o-sand">${tex.sand}%</output><input type="range" id="r-sand" min="0" max="100" value="${tex.sand}"></label>
-        <label>${esc(t('clay'))} <output id="o-clay">${tex.clay}%</output><input type="range" id="r-clay" min="0" max="100" value="${tex.clay}"></label>
+        <label for="r-sand">${esc(t('sand'))} <output id="o-sand">${tex.sand}%</output><input type="range" id="r-sand" min="0" max="100" value="${tex.sand}"></label>
+        <label for="r-clay">${esc(t('clay'))} <output id="o-clay">${tex.clay}%</output><input type="range" id="r-clay" min="0" max="100" value="${tex.clay}"></label>
         <p class="hint">${esc(t('siltAuto'))}</p>
       </div>
       ${saveBar('texture')}
@@ -486,7 +489,7 @@
         <li><span>${esc(t('slopeDo'))}</span><b>${esc(tr(SoilCalc.classOf(SLOPE_DO, pct).text))}</b></li>
         <li><span>${esc(t('slopePalm'))}</span><b>${esc(tr(SoilCalc.classOf(SLOPE_PALM, deg, true).name))}</b></li>
       </ul>
-      <details open><summary>${esc(t('working'))}</summary><p class="work">${num(rise, 2)} ÷ ${num(run, 2)} × 100 = ${num(pct)}%</p></details>
+      <details open><summary>${esc(t('working'))}</summary><p class="work">${fmt(rise)} ÷ ${fmt(run)} × 100 ${eq(pct, rise, run)} ${fmt(pct)}%</p></details>
       <p class="hint">${esc(t('slopeNote'))}</p>`;
   }
   function toolSlope() {
@@ -564,6 +567,7 @@
     const empty = `<p class="empty">${esc(t('enterRate'))}</p>`;
     const problem = fertProblem();
     if (problem) return `<p class="err" role="alert">${esc(t(problem))}</p>`;
+    if ((fert.mode === 'straight' || fert.mode === 'compound') && !(a > 0 && a <= SoilStore.LIMITS.areaHa)) return empty;
     const syms = ['N', 'P₂O₅', 'K₂O'];
     const work = lines => `<details open><summary>${esc(t('working'))}</summary><ol class="work">${lines.map(l => `<li>${l}</li>`).join('')}</ol></details>`;
     const bags = v => `${num(v / 50, 1)} ${esc(t('bags50'))}`;
@@ -644,8 +648,8 @@
   }
   function toolFert() {
     return `<p class="tool-desc">${esc(t('tFertDesc'))}</p>
-      <div class="seg small" role="tablist">${[['straight', 'modeStraight'], ['compound', 'modeCompound'], ['plant', 'modePlant'], ['tree', 'modeTree'], ['bag', 'modeBag']].map(m =>
-        `<button type="button" role="tab" data-mode="${m[0]}" aria-selected="${fert.mode === m[0]}">${esc(t(m[1]))}</button>`).join('')}</div>
+      <div class="seg small" role="group" aria-label="${esc(t('calcMode'))}">${[['straight', 'modeStraight'], ['compound', 'modeCompound'], ['plant', 'modePlant'], ['tree', 'modeTree'], ['bag', 'modeBag']].map(m =>
+        `<button type="button" data-mode="${m[0]}" aria-pressed="${fert.mode === m[0]}">${esc(t(m[1]))}</button>`).join('')}</div>
       <form class="fert" id="fert" onsubmit="return false">${fertInputs()}</form>
       <div class="fert-out" id="fertout" aria-live="polite">${fertResult()}</div>
       ${fert.mode === 'bag' ? '' : saveBar('fert')}`;
@@ -669,7 +673,8 @@
   }
   const makeEntry = (plot, date, kind, data) => ({ id: newId(), plot, date: /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : today(), kind, data });
   /* returns false if the entries could not be stored */
-  const addEntries = list => commitRec(() => { rec.entries.push(...list); });
+  const inRange = list => list.every(e => SoilStore.cleanData(e.kind, e.data));
+  const addEntries = list => inRange(list) && commitRec(() => { rec.entries.push(...list); });
   /* the lines the fertiliser calculator would apply right now, named in the language on screen */
   function fertLines(material) {
     const fallback = material.trim() || t('product');
@@ -725,7 +730,7 @@
     if (stored) store.set('lastPlot', plot.id);
     msg.className = 'savemsg ' + (stored ? 'ok' : 'err');
     msg.innerHTML = stored ? `${esc(fill('savedTo', { p: plot.name }))} <a href="#/rekod/${esc(plot.id)}">${esc(t('navRecords'))}</a>`
-      : esc(t(list.length ? 'saveFailed' : (kind === 'fert' && fertProblem()) || 'nothingToSave'));
+      : esc(t(list.length ? (inRange(list) ? 'saveFailed' : 'outOfRange') : (kind === 'fert' && fertProblem()) || 'nothingToSave'));
   }
 
   function latestOf(id, kind) { return entriesOf(id).find(e => e.kind === kind); }
@@ -839,7 +844,7 @@
   }
   function plotCsv(id) {
     const p = plotById(id);
-    const cell = v => { let s = String(v); if (/^[=+\-@]/.test(s)) s = "'" + s; return `"${s.replace(/"/g, '""')}"`; };  // quote, and stop spreadsheet formulas
+    const cell = v => { let s = String(v); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return `"${s.replace(/"/g, '""')}"`; };  // quote, and stop spreadsheet formulas
     const blankIfNull = v => (v === null || v === undefined ? '' : v);
     const fertCols = e => { const d = e.data; return e.kind === 'fert' ? [d.what, d.kg, ...(d.grade || ['', '', '']), d.organic ? 1 : 0, blankIfNull(d.avail), blankIfNull(d.cost)] : ['', '', '', '', '', '', '', '']; };
     const rows = [[t('date'), t('plotName'), t('csvType'), t('csvDetail'), t('what'), 'kg', 'N %', 'P2O5 %', 'K2O %', t('organicTag'), t('csvAvail'), 'RM'].map(cell).join(',')]
@@ -1068,40 +1073,78 @@
      redraw in place (language, theme, a save elsewhere on the page) would otherwise wipe them. */
   const formKey = el => `${el.form.id || el.form.dataset.save || ''}|${el.name}`;
   const typedFields = () => [...main.querySelectorAll('form [name]')].filter(el => el.form && el.type !== 'file');
-  function render(keepScroll) {
-    const r = parse();
+  /* a selector that finds the same control again after the page has been rebuilt */
+  function sameControl(el) {
+    if (!el || el === document.body || !document.body.contains(el)) return null;
+    if (el.id) return '#' + CSS.escape(el.id);
+    const tag = el.tagName.toLowerCase();
+    for (const k of Object.keys(el.dataset)) {
+      const attr = 'data-' + k.replace(/[A-Z]/g, c => '-' + c.toLowerCase());
+      let sel = `${tag}[${attr}="${CSS.escape(el.dataset[k])}"]`;
+      if (el.dataset.i !== undefined && k !== 'i') sel += `[data-i="${CSS.escape(el.dataset.i)}"]`;
+      return sel;
+    }
+    if (el.form && el.name) { const f = el.form.id ? '#' + CSS.escape(el.form.id) : el.form.dataset.save ? `form[data-save="${CSS.escape(el.form.dataset.save)}"]` : 'form'; return `${f} [name="${CSS.escape(el.name)}"]`; }
+    if (tag === 'a' && el.getAttribute('href')) return `a[href="${CSS.escape(el.getAttribute('href'))}"]`;
+    return null;
+  }
+  /* Rebuild part of the page in place without losing what was typed or where the keyboard was. */
+  function inPlace(redraw) {
     const typed = new Map();
-    if (keepScroll) for (const el of typedFields()) typed.set(formKey(el), el.type === 'checkbox' ? el.checked : el.value);
-    if (r[0] === 'kuiz' && quiz && quiz.n !== Number(r[1])) quiz = null;   // an open quiz survives a visit to the lesson
-    renderChrome(r);
-    main.innerHTML =
-      r[0] === 'nota' ? pageLesson(r[1]) :
-      r[0] === 'amali' ? pageActivity(r[1]) :
-      r[0] === 'kuiz' ? pageQuiz(r[1]) :
-      r[0] === 'alat' ? pageTools(r[1]) :
-      r[0] === 'rekod' ? (r[1] ? pagePlot(r[1]) : pageRecords()) :
-      r[0] === 'istilah' ? (!keepScroll && r[1] !== undefined && (glossQuery = r[1].slice(0, 80)), pageGlossary()) :
-      r[0] === 'buku' ? pageBook() :
-      r[0] === 'sumber' ? pageSources() : pageHome();
+    for (const el of typedFields()) typed.set(formKey(el), el.type === 'checkbox' ? el.checked : el.value);
+    const focused = sameControl(document.activeElement);
+    redraw();
     for (const el of typedFields()) {
       if (!typed.has(formKey(el))) continue;
       const v = typed.get(formKey(el));
       if (el.type === 'checkbox') el.checked = v === true; else el.value = v;
     }
+    if (focused && document.activeElement === document.body) { const again = document.querySelector(focused); if (again) again.focus({ preventScroll: true }); }
+  }
+  let firstRender = true;
+  function render(keepScroll) {
+    const r = parse();
+    if (r[0] === 'kuiz' && quiz && quiz.n !== Number(r[1])) quiz = null;   // an open quiz survives a visit to the lesson
+    const draw = () => {
+      renderChrome(r);
+      main.innerHTML =
+        r[0] === 'nota' ? pageLesson(r[1]) :
+        r[0] === 'amali' ? pageActivity(r[1]) :
+        r[0] === 'kuiz' ? pageQuiz(r[1]) :
+        r[0] === 'alat' ? pageTools(r[1]) :
+        r[0] === 'rekod' ? (r[1] ? pagePlot(r[1]) : pageRecords()) :
+        r[0] === 'istilah' ? (!keepScroll && r[1] !== undefined && (glossQuery = r[1].slice(0, 80)), pageGlossary()) :
+        r[0] === 'buku' ? pageBook() :
+        r[0] === 'sumber' ? pageSources() : pageHome();
+    };
+    if (keepScroll) inPlace(draw); else draw();
+    /* the browser tab and a screen reader's page list name the page, not only the app */
+    const h1 = main.querySelector('h1');
+    if (h1 && r[0]) document.title = `${h1.textContent.trim()} · ${t('appName')}`;
     if (!keepScroll) window.scrollTo(0, 0);
     if (!r[0]) checkOffline();
-    if (!keepScroll && r[0] === 'nota' && /^s\d+$/.test(r[2] || '')) {
-      const target = document.getElementById(r[2]);
+    if (!keepScroll) {
+      /* after moving to another page the keyboard starts at its content, and a screen reader hears it */
+      const target = r[0] === 'nota' && /^s\d+$/.test(r[2] || '') ? document.getElementById(r[2]) : null;
       if (target) { target.scrollIntoView(); target.focus({ preventScroll: true }); }
+      else if (!firstRender) main.focus({ preventScroll: true });
     }
+    firstRender = false;
   }
   window.addEventListener('hashchange', () => render(false));
+  /* records saved in another tab, or in the installed app, appear here without a reload */
+  window.addEventListener('storage', e => {
+    if (e.key !== 'soil.rec') return;
+    try { rec = cleanBackup(store.get('rec', null)) || { plots: [], entries: [] }; } catch (err) { return; }
+    if (['rekod', 'alat', ''].includes(parse()[0] || '')) render(true);
+  });
 
   /* ---------- events ---------- */
-  const redrawTool = fn => { document.getElementById('tool').innerHTML = fn(); };
+  const redrawTool = fn => inPlace(() => { document.getElementById('tool').innerHTML = fn(); });
   document.addEventListener('click', e => {
     const el = e.target.closest('button, a');
     if (!el) return;
+    if (el.classList.contains('skip')) { e.preventDefault(); main.focus(); main.scrollIntoView(); return; }
     const d = el.dataset;
     if (d.langpick) { if (setLang(d.langpick)) { showLangPick(false); render(false); } return; }
     if (d.lang) { if (setLang(d.lang)) render(true); return; }
@@ -1187,9 +1230,11 @@
       const f = new FormData(form), err = form.querySelector('.err');
       const text = k => String(f.get(k) || '').trim();
       const needed = { plotform: 'nameNeeded', appform: 'appNeeded', noteform: 'noteNeeded' }[form.id];
-      let valid = false, stored = false;
+      let valid = false, stored = false, tooBig = false;
       const treesOk = text('trees') === '' || isCount(text('trees'));
-      if (form.id === 'plotform' && text('name') && treesOk) {
+      if (form.id === 'plotform' && text('name') && treesOk && text('area') !== '' && Number(f.get('area')) > 0 && !SoilStore.areaOk(f.get('area'), f.get('unit'))) {
+        valid = true; tooBig = true;
+      } else if (form.id === 'plotform' && text('name') && treesOk) {
         valid = true;
         const id = newId();
         stored = commitRec(() => { rec.plots.push({ id, name: text('name').slice(0, 60), crop: text('crop').slice(0, 60), area: Number(f.get('area')) > 0 ? Number(f.get('area')) : '', unit: HA[f.get('unit')] ? f.get('unit') : 'ha', trees: isCount(text('trees')) ? Number(text('trees')) : '' }); });
@@ -1199,14 +1244,16 @@
         const problem = extra.error || (av !== '' && !SoilCalc.pctOk(av) ? 'pctBad' : null);
         if (problem) { err.textContent = t(problem); err.hidden = false; return; }
         valid = true;
-        stored = addEntries([makeEntry(form.dataset.plot, f.get('date'), 'fert',
-          { what: text('what').slice(0, 60), kg: Number(f.get('kg')), grade: extra.grade, cost: extra.cost, organic, avail: organic && av !== '' ? Number(av) : null })]);
+        const one = [makeEntry(form.dataset.plot, f.get('date'), 'fert',
+          { what: text('what').slice(0, 60), kg: Number(f.get('kg')), grade: extra.grade, cost: extra.cost, organic, avail: organic && av !== '' ? Number(av) : null })];
+        tooBig = !inRange(one) || (extra.cost !== null && extra.cost > SoilStore.LIMITS.cost);
+        stored = !tooBig && addEntries(one);
       } else if (form.id === 'noteform' && plotById(form.dataset.plot) && text('text')) {
         valid = true;
         stored = addEntries([makeEntry(form.dataset.plot, f.get('date'), 'note', { text: text('text').slice(0, 500) })]);
       }
       if (stored) { form.reset(); render(true); }   // the saved form starts empty; anything typed in the others is kept
-      else { err.textContent = t(valid ? 'saveFailed' : (form.id === 'plotform' && text('name') && !treesOk) ? 'countBad' : needed); err.hidden = false; }
+      else { err.textContent = t(tooBig ? 'outOfRange' : valid ? 'saveFailed' : (form.id === 'plotform' && text('name') && !treesOk) ? 'countBad' : needed); err.hidden = false; }
       return;
     }
     if (e.target.id !== 'jar') return;
@@ -1247,7 +1294,7 @@
   function showLangPick(on) {
     document.getElementById('langpick').hidden = !on;
     document.body.classList.toggle('picking', on);
-    for (const n of [document.querySelector('header'), main, document.getElementById('foot')]) n.inert = on;
+    for (const n of [document.querySelector('.skip'), document.querySelector('header'), main, document.getElementById('foot')]) n.inert = on;
   }
   if (FIRST_LAUNCH) { showLangPick(true); document.getElementById('langpick').focus(); }
 
@@ -1260,7 +1307,13 @@
       if (navigator.onLine === false) return;
       navigator.serviceWorker.ready.then(reg => { if (reg.active) reg.active.postMessage('check'); }).catch(() => {});
     };
-    navigator.serviceWorker.addEventListener('message', e => { if (e.data === 'updated') { toast.hidden = false; checkOffline(); } });
+    navigator.serviceWorker.addEventListener('message', e => { if (e.data === 'updated') {
+      /* the words are put in after the box appears, so that a screen reader announces them */
+      const msg = document.getElementById('toastmsg');
+      msg.textContent = ''; toast.hidden = false;
+      setTimeout(() => { msg.textContent = t('toastMsg'); }, 100);
+      checkOffline();
+    } });
     navigator.serviceWorker.addEventListener('controllerchange', () => setTimeout(checkOffline, 800));
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('./sw.js').then(askForUpdate).then(() => setTimeout(checkOffline, 800)).catch(() => {});

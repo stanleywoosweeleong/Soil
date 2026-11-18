@@ -77,6 +77,16 @@ const locks = self.navigator && self.navigator.locks;
 const exclusive = fn => (locks ? locks.request(LOCK, fn) : fn());
 const shared = fn => (locks ? locks.request(LOCK, { mode: 'shared' }, fn) : fn());
 
+/* The release to read from. A complete staged release is the current one from the moment its
+   marker is written, even if copying it into the live cache has not finished or has failed
+   (a full disk, for example): reading it whole is what keeps two releases from being mixed. */
+function current() {
+  return caches.has(STAGING).then(has => {
+    if (!has) return caches.open(CACHE);
+    return caches.open(STAGING).then(stage => stage.match(COMPLETE).then(done => (done ? stage : caches.open(CACHE))));
+  });
+}
+
 /* everything that reads or replaces the live cache queues behind this, so a page never loads half a copy */
 let settled = exclusive(promote);
 const whenSettled = () => settled.then(() => null, () => null);
@@ -97,15 +107,15 @@ function download() {
 
 /* Swaps a downloaded release in. Resolves true only when a release was already saved and the new one differs. */
 function swapIn(files) {
-  return caches.open(CACHE).then(live =>
-    Promise.all(files.map(f => live.match(f.url).then(old => (old ? old.arrayBuffer() : null)))).then(olds => {
+  return current().then(now =>
+    Promise.all(files.map(f => now.match(f.url).then(old => (old ? old.arrayBuffer() : null)))).then(olds => {
       const had = olds.filter(Boolean).length;
       const same = had === files.length && files.every((f, i) => sameBytes(olds[i], f.bytes));
-      if (same) return false;
+      if (same) return promote().then(() => false);   // nothing new; finish any copy that is still owed
       return caches.delete(STAGING).then(() => caches.open(STAGING)).then(stage =>
         Promise.all(files.map(f => stage.put(f.url, f.res)))
           .then(() => stage.put(COMPLETE, new Response('ok')))
-      ).then(promote).then(done => done && had > 0);
+      ).then(promote).then(() => had > 0);   // staged whole, so it is the release now, copied across or not
     })
   ).catch(() => false);
 }
@@ -143,7 +153,10 @@ self.addEventListener('activate', e => {
 
 /* A saved file is handed to the page marked "no-cache". Without that, the browser may keep reusing the copy it
    already holds in memory for as long as the host's max-age allows, and a refresh would show the old app. */
-const fromShell = request => whenSettled().then(() => shared(() => caches.open(CACHE).then(c => c.match(request, { ignoreSearch: true })))).then(hit => {
+const fromShell = request => whenSettled().then(() => shared(() =>
+  current().then(c => c.match(request, { ignoreSearch: true }))
+    .then(hit => hit || caches.open(CACHE).then(c => c.match(request, { ignoreSearch: true })))   // files outside the release live only here
+)).catch(() => undefined).then(hit => {
   if (!hit) return hit;
   const headers = new Headers(hit.headers);
   headers.set('cache-control', 'no-cache');
@@ -169,8 +182,12 @@ self.addEventListener('fetch', e => {
     return res;
   };
   if (req.mode === 'navigate') {
-    e.respondWith(fromShell(INDEX).then(hit => hit || fetch(req)));
-    return;
+    /* only the app's own address is answered with the app; any other page under it is fetched as itself */
+    const scope = new URL('./', self.location.href).pathname;
+    if (url.pathname === scope || url.pathname === scope + 'index.html') {
+      e.respondWith(fromShell(INDEX).then(hit => hit || fetch(req)));
+      return;
+    }
   }
   e.respondWith(fromShell(req).then(hit => hit || fetch(req).then(res => save(req, res))));
 });
@@ -190,7 +207,7 @@ self.addEventListener('message', e => {
      "updated" is the newest Last-Modified among the saved files: when the content was last published. */
   if (e.data && e.data.type === 'soil-status' && e.ports && e.ports[0]) {
     e.waitUntil(
-      whenSettled().then(() => caches.open(CACHE)).then(async c => {
+      whenSettled().then(current).then(async c => {
         let cached = 0, newest = 0;
         for (const f of SHELL) {
           const hit = await c.match(f);

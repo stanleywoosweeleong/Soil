@@ -8,6 +8,8 @@
   --leaf: #2e6b3f;
   --leaf-ink: #ffffff;
   --ochre: #c6861a;
+  --ochre-ink: #8a5a00;   /* ochre dark enough for text and the focus ring on a light page */
+  --edge: #74827a;        /* the outline of a form control: 3:1 against its background */
   --wash: #e1e9e1;
   --ok: #1f6b3a;
   --bad: #a3321f;
@@ -27,6 +29,8 @@
     --leaf: #6fbf85;
     --leaf-ink: #0e1a12;
     --ochre: #e0a63a;
+    --ochre-ink: #e0a63a;
+    --edge: #74827a;
     --wash: #233029;
     --ok: #7fd49a;
     --bad: #f0907d;
@@ -48,7 +52,7 @@ h3 { font-size: 1.05rem; font-weight: 700; }
 p { margin: 0.75rem 0; }
 a { color: var(--leaf); }
 button, input, select { font: inherit; color: inherit; }
-:focus-visible { outline: 3px solid var(--ochre); outline-offset: 2px; border-radius: 4px; }
+:focus-visible { outline: 3px solid var(--ochre-ink); outline-offset: 2px; border-radius: 4px; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 .skip { position: absolute; left: -999px; top: 0; background: var(--ink); color: var(--bg); padding: 8px 12px; z-index: 20; }
 .skip:focus { left: 8px; top: 8px; }
@@ -205,7 +209,7 @@ tbody th { font-weight: 600; }
   border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
   color: var(--ink); text-decoration: none; font-weight: 600; cursor: pointer; font-size: 0.95rem;
 }
-.seg [aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.seg [aria-current="page"], .seg [aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 .tool { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; }
 .tool-desc { margin-top: 0; color: var(--muted); }
 .tool h2 { font-size: 1.1rem; margin-top: 1.5rem; }
@@ -224,7 +228,7 @@ output { float: right; font-variant-numeric: tabular-nums; }
 input[type="range"] { width: 100%; height: 32px; accent-color: var(--leaf); margin: 4px 0 0; }
 input[type="number"], select {
   display: block; width: 100%; min-height: 46px; margin-top: 6px; padding: 8px 12px;
-  background: var(--bg); border: 1px solid var(--line); border-radius: 8px; font-size: 1rem;
+  background: var(--bg); border: 1px solid var(--edge); border-radius: 8px; font-size: 1rem;
 }
 .row2, .row3 { display: grid; gap: 0 12px; }
 .row2 { grid-template-columns: 1fr 1fr; align-items: end; }
@@ -238,7 +242,7 @@ input[type="number"], select {
 .phslider input::-moz-range-thumb { width: 16px; height: 28px; border-radius: 8px; background: var(--surface); border: 3px solid var(--ink); cursor: pointer; }
 .risk { font-weight: 700; }
 .risk.riskHigh { color: var(--bad); }
-.risk.riskSome { color: var(--ochre); }
+.risk.riskSome { color: var(--ochre-ink); }
 .risk.riskLow { color: var(--ok); }
 .bars li { display: grid; grid-template-columns: 2.4em 7.5em 1fr; gap: 8px; align-items: center; padding: 5px 0; font-size: 0.95rem; }
 .bars .sym { font-weight: 700; }
@@ -303,7 +307,7 @@ h2.sec { margin-top: 2rem; font-size: 1.15rem; color: var(--muted); }
 .lesson-head .label { margin-bottom: 2px; }
 .bookref { margin-top: -10px; }
 .plain { font-weight: 400; color: var(--muted); }
-.searchbox input { display: block; width: 100%; min-height: 48px; margin-top: 6px; padding: 8px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; font-size: 1rem; }
+.searchbox input { display: block; width: 100%; min-height: 48px; margin-top: 6px; padding: 8px 14px; background: var(--surface); border: 1px solid var(--edge); border-radius: 8px; font-size: 1rem; }
 .gloss { margin: 16px 0 0; }
 .gloss > div { padding: 12px 0; border-bottom: 1px solid var(--line); }
 .gloss dt { font: 700 1.05rem var(--display); }
@@ -326,7 +330,7 @@ p.savebar { padding-top: 14px; }
 .savemsg.err { color: var(--bad); }
 input[type="text"], input[type="date"], textarea {
   display: block; width: 100%; min-height: 46px; margin-top: 6px; padding: 8px 12px;
-  background: var(--bg); border: 1px solid var(--line); border-radius: 8px; font: inherit; color: inherit;
+  background: var(--bg); border: 1px solid var(--edge); border-radius: 8px; font: inherit; color: inherit;
 }
 .recform { margin-top: 20px; }
 .plot-title { font-size: clamp(1.6rem, 5vw, 2.4rem); overflow-wrap: anywhere; }
@@ -337,7 +341,7 @@ input[type="text"], input[type="date"], textarea {
 .delbtn { flex: none; min-height: 40px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--bad); cursor: pointer; font-weight: 600; font-size: 0.9rem; }
 .btn.danger { border-color: var(--bad); color: var(--bad); }
 .filebtn { cursor: pointer; margin: 0; font-size: 1rem; }
-.filebtn:focus-within { outline: 3px solid var(--ochre); outline-offset: 2px; }
+.filebtn:focus-within { outline: 3px solid var(--ochre-ink); outline-offset: 2px; }
 .latest b { font-size: 1rem; text-align: right; overflow-wrap: anywhere; }
 .latest small { display: block; font-weight: 400; color: var(--muted); }
 .tabs a { min-width: 0; }

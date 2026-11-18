@@ -14,7 +14,7 @@ const store = require('../js/store.js');
 
 /* the content files are plain scripts that declare constants; load them together and hand the constants back */
 const names = ['LANGS', 'LANG_ORDER', 'UI', 'HORIZONS', 'UNITS', 'TASKS', 'LESSONS', 'ACTIVITIES', 'QUIZ', 'QUIZ_LESSON', 'DEFICIENCY', 'GLOSSARY', 'BOOK',
-  'PRODUCTS', 'COMPOUND_PRESETS', 'ORGANIC_PRESETS', 'TEXTURE', 'TEXTURE_NOTE', 'TEXTURE_POLY', 'TEXTURE_GROUP', 'PH_BANDS', 'CROP_PH', 'SLOPE_PALM', 'SLOPE_DO', 'SOURCES', 'SEARCH_ALIASES'];
+  'PRODUCTS', 'COMPOUND_PRESETS', 'ORGANIC_PRESETS', 'TEXTURE', 'TEXTURE_NOTE', 'TEXTURE_POLY', 'TEXTURE_GROUP', 'PH_BANDS', 'CROP_PH', 'SLOPE_PALM', 'SLOPE_DO', 'SOURCES', 'SEARCH_ALIASES', 'putBefore'];
 const ctx = vm.createContext({});
 vm.runInContext(['content', 'units', 'crops', 'records'].map(f => read(`js/${f}.js`)).join('\n') + `\n;globalThis.__c = { ${names.join(', ')} };`, ctx);
 const C = ctx.__c;
@@ -296,6 +296,16 @@ test('a backup with repeated ids or junk values is tidied, not trusted', () => {
   assert.notStrictEqual(out.entries[3].date, '2025-13-45');
 });
 
+test('limits are the same in the forms and on reload', () => {
+  assert.ok(store.areaOk(1500000, 'm2') && !store.areaOk(1500000, 'ha') && !store.areaOk('', 'ha'));
+  assert.strictEqual(clean({ plots: [{ id: 'a1', name: 'Big', area: 1500000, unit: 'm2' }], entries: [] }).plots[0].area, 1500000);
+  assert.strictEqual(store.cleanData('fert', { what: 'x', kg: 2e7 }), null);
+});
+
+test('a content patch aimed at a missing heading fails loudly', () => {
+  assert.throws(() => C.putBefore('5-5', 'No such heading', ['p', ['a', 'b', 'c']]), /no heading/);
+});
+
 test('long text is cut to its limit', () => {
   const out = clean({ plots: [{ id: 'p1', name: 'N'.repeat(200) }], entries: [{ id: 'e1', plot: 'p1', date: '2026-01-01', kind: 'note', data: { text: 'T'.repeat(900) } }] });
   assert.strictEqual(out.plots[0].name.length, 60); assert.strictEqual(out.entries[0].data.text.length, 500);
@@ -309,7 +319,7 @@ function swHarness() {
   const stores = new Map(), listeners = {}, posted = [];
   const cacheOf = name => { if (!stores.has(name)) stores.set(name, new Map()); const m = stores.get(name);
     const key = k => { const u = String(k.url || k); return u.startsWith('https://x.test/Soil/') ? './' + u.slice(20) : u; };
-    return { put: async (k, r) => { m.set(key(k), r.clone()); }, match: async k => { const r = m.get(key(k)); return r ? r.clone() : undefined; } }; };
+    return { put: async (k, r) => { if (net.full && name === 'soil-shell' && net.full(key(k))) throw new Error('quota'); m.set(key(k), r.clone()); }, match: async k => { const r = m.get(key(k)); return r ? r.clone() : undefined; } }; };
   const net = { files: {}, fail: new Set() };
   const ctx = {
     caches: { open: async n => cacheOf(n), has: async n => stores.has(n), delete: async n => stores.delete(n), keys: async () => [...stores.keys()] },
@@ -356,6 +366,19 @@ testAsync('a stalled update check does not hold up pages opening from the cache'
   h.net.hang = true; h.fire('message', 'check');           // never finishes
   const got = await Promise.race([h.open('js/app.js'), new Promise(r => setTimeout(() => r('timed out'), 500))]);
   assert.strictEqual(got, 'v1:./js/app.js');
+});
+
+testAsync('a full disk during the swap never serves a mixed release', async () => {
+  const h = swHarness();
+  h.release('v1'); await h.fire('install');
+  h.release('v2'); let n = 0; h.net.full = () => ++n > 5;      // the live cache takes five files, then refuses
+  await h.fire('message', 'check');
+  for (const f of h.shell) assert.strictEqual(await h.open(f.slice(2)), 'v2:' + f, `${f} came from the wrong release`);
+  assert.deepStrictEqual(h.posted, ['updated']);
+  await h.fire('message', 'check');
+  assert.deepStrictEqual(h.posted, ['updated'], 'the same release is not announced twice');
+  h.net.full = null; h.release('v3'); await h.fire('message', 'check');
+  for (const f of h.shell) assert.strictEqual(await h.saved(f), 'v3:' + f);
 });
 
 testAsync('a swap cut short is finished when the worker next starts', async () => {
