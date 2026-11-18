@@ -1,8 +1,8 @@
 /* Self-updating service worker. There is no version number to bump.
 
    The app opens instantly from the cache. The page then sends "check": every shell file is
-   fetched again, the cache is refreshed, and if any file came back different every open
-   window is sent "updated" so it can offer a refresh.
+   fetched again, and if any file came back different the whole release is swapped in together
+   and every open window is sent "updated" so it can offer a refresh.
 
    This app keeps its content in several script files, so a change to any shell file counts
    as a new version, not only a change to index.html. */
@@ -36,24 +36,64 @@ function sameBytes(a, b) {
   return true;
 }
 
-/* Fetch one file past the HTTP cache and store it. Resolves true only when a copy was already
-   cached and the new one differs. Errors and non-200 responses leave the cache alone, so a
-   404 or 503 can never replace the app. */
-function refresh(url) {
-  return fetch(url, { cache: 'no-cache' }).then(res => {
-    if (!res || !res.ok) return false;
-    return caches.open(CACHE).then(c =>
-      c.match(url).then(old =>
-        Promise.all([old ? old.arrayBuffer() : null, res.clone().arrayBuffer()]).then(b => {
-          const changed = !!b[0] && !sameBytes(b[0], b[1]);
-          return c.put(url, res).then(() => changed);
-        })
-      )
-    );
+/* A release is the whole SHELL together. Files from two releases must never be mixed, because
+   the scripts depend on each other. So an update is downloaded into a separate staging cache
+   and the live cache is only touched once every file has arrived:
+
+     1. fetch every shell file past the HTTP cache; any failure abandons the update
+     2. write them all to the staging cache, then a marker that says "complete"
+     3. copy staging into the live cache, then delete staging
+
+   If the worker is stopped during step 3, the complete staging cache is still there and the copy
+   is finished the next time the worker starts. Requests wait for a copy in progress. */
+const STAGING = 'soil-staging';
+const COMPLETE = './__release-complete';
+
+/* Copies a complete staging cache into the live cache. Does nothing if staging is absent or unfinished. */
+function promote() {
+  return caches.has(STAGING).then(has => {
+    if (!has) return false;
+    return caches.open(STAGING).then(stage => stage.match(COMPLETE).then(done => {
+      if (!done) return caches.delete(STAGING).then(() => false);
+      return caches.open(CACHE).then(live =>
+        Promise.all(SHELL.map(url => stage.match(url).then(res => {
+          if (!res) throw new Error('staging lost ' + url);
+          return live.put(url, res);
+        })))
+      ).then(() => caches.delete(STAGING)).then(() => true);
+    }));
   }).catch(() => false);
 }
 
-const refreshShell = () => Promise.all(SHELL.map(refresh)).then(changed => changed.some(Boolean));
+/* everything that reads or replaces the live cache queues behind this, so a page never loads half a copy */
+let settled = promote();
+const whenSettled = () => settled.then(() => null, () => null);
+
+/* Downloads a full release and swaps it in. Resolves true only when a release was already saved
+   and the new one differs. Any error or non-200 response leaves the saved release untouched. */
+function fetchRelease() {
+  return Promise.all(SHELL.map(url => fetch(url, { cache: 'no-cache' }).then(res => {
+    if (!res || !res.ok) throw new Error('could not fetch ' + url);
+    return res.clone().arrayBuffer().then(bytes => ({ url, res, bytes }));
+  }))).then(files => caches.open(CACHE).then(live =>
+    Promise.all(files.map(f => live.match(f.url).then(old => (old ? old.arrayBuffer() : null)))).then(olds => {
+      const had = olds.filter(Boolean).length;
+      const same = had === files.length && files.every((f, i) => sameBytes(olds[i], f.bytes));
+      if (same) return false;
+      return caches.delete(STAGING).then(() => caches.open(STAGING)).then(stage =>
+        Promise.all(files.map(f => stage.put(f.url, f.res)))
+          .then(() => stage.put(COMPLETE, new Response('ok')))
+      ).then(promote).then(done => done && had > 0);
+    })
+  )).catch(() => false);
+}
+
+/* one update at a time, each after the previous has settled */
+function refreshShell() {
+  const run = whenSettled().then(fetchRelease);
+  settled = run;
+  return run;
+}
 
 /* install: save the shell, then take over at once. Safe because the cache name is stable,
    so a new worker never strands an open page on a deleted cache. */
@@ -67,14 +107,14 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.map(k => (k.indexOf(CACHE_PREFIX) === 0 && k !== CACHE ? caches.delete(k) : null))))
+      .then(keys => Promise.all(keys.map(k => (k.indexOf(CACHE_PREFIX) === 0 && k !== CACHE && k !== STAGING ? caches.delete(k) : null))))
       .then(() => self.clients.claim())
   );
 });
 
 /* A saved file is handed to the page marked "no-cache". Without that, the browser may keep reusing the copy it
    already holds in memory for as long as the host's max-age allows, and a refresh would show the old app. */
-const fromShell = request => caches.open(CACHE).then(c => c.match(request, { ignoreSearch: true })).then(hit => {
+const fromShell = request => whenSettled().then(() => caches.open(CACHE)).then(c => c.match(request, { ignoreSearch: true })).then(hit => {
   if (!hit) return hit;
   const headers = new Headers(hit.headers);
   headers.set('cache-control', 'no-cache');
@@ -83,7 +123,8 @@ const fromShell = request => caches.open(CACHE).then(c => c.match(request, { ign
 
 /* fetch:
    - navigations  -> the saved app, instantly; the network only if nothing is saved
-   - same-origin  -> this app's cache first, then the network, saving what comes back
+   - same-origin  -> this app's cache first, then the network. Shell files are saved only as a
+                     whole release (see above); other files are saved as they come back
    - cross-origin -> left alone
    Freshness is handled by the "check" message, not here. */
 self.addEventListener('fetch', e => {
@@ -93,12 +134,13 @@ self.addEventListener('fetch', e => {
   try { url = new URL(req.url); } catch (err) { return; }
   if (url.origin !== self.location.origin) return;
 
+  const inShell = SHELL.some(f => new URL(f, self.location.href).pathname === url.pathname);
   const save = (key, res) => {
-    if (res && res.ok && res.type === 'basic') { const copy = res.clone(); caches.open(CACHE).then(c => c.put(key, copy)); }
+    if (!inShell && res && res.ok && res.type === 'basic') { const copy = res.clone(); caches.open(CACHE).then(c => c.put(key, copy)); }
     return res;
   };
   if (req.mode === 'navigate') {
-    e.respondWith(fromShell(INDEX).then(hit => hit || fetch(req).then(res => save(INDEX, res))));
+    e.respondWith(fromShell(INDEX).then(hit => hit || fetch(req)));
     return;
   }
   e.respondWith(fromShell(req).then(hit => hit || fetch(req).then(res => save(req, res))));
@@ -119,7 +161,7 @@ self.addEventListener('message', e => {
      "updated" is the newest Last-Modified among the saved files: when the content was last published. */
   if (e.data && e.data.type === 'soil-status' && e.ports && e.ports[0]) {
     e.waitUntil(
-      caches.open(CACHE).then(async c => {
+      whenSettled().then(() => caches.open(CACHE)).then(async c => {
         let cached = 0, newest = 0;
         for (const f of SHELL) {
           const hit = await c.match(f);

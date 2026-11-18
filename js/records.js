@@ -145,6 +145,8 @@ const SEARCH_ALIASES = [
 
 /* ---------- Nutrient and cost summary, field readiness, quiz review ---------- */
 Object.assign(UI, {
+  gradeAll: ['Isi ketiga-tiga nombor gred, dengan 0 jika baja itu tiada nutrien tersebut, atau kosongkan semuanya.', 'Fill in all three grade numbers, using 0 where the product has none of that nutrient, or leave them all blank.', '请填写全部三个配比数字（不含该养分的填 0），或全部留空。'],
+  gradeAllHint: ['Salin ketiga-tiga nombor dari beg. Tanpa gred, rekod ini tidak dikira dalam jumlah nutrien.', 'Copy all three numbers from the bag. Without a grade, this record is not counted in the nutrient totals.', '请照包装抄下全部三个数字。没有配比的记录不会计入养分总量。'],
   gradeOpt: ['Gred N-P₂O₅-K₂O (%), jika diketahui', 'Grade N-P₂O₅-K₂O (%), if known', '养分配比 N-P₂O₅-K₂O（%），如已知'],
   costRM: ['Kos pemberian ini (RM), pilihan', 'Cost of this application (RM), optional', '本次施用费用（RM），可不填'],
   costBad: ['Kos mestilah 0 atau lebih.', 'Cost must be 0 or more.', '费用必须为 0 或以上。'],

@@ -676,16 +676,13 @@
     return SoilCalc.fertLines(fert, PRODUCTS).map(l => ({ what: l.product ? tr(prod(l.product).name) : (l.label || fallback), kg: l.kg, grade: l.grade }));
   }
   const gradeInputs = () => `<fieldset class="grade"><legend>${esc(t('gradeOpt'))}</legend><div class="row3">${['N', 'P₂O₅', 'K₂O'].map((sym, i) =>
-    `<label>${sym}<input type="number" inputmode="decimal" min="0" max="100" step="any" name="g${i}"></label>`).join('')}</div></fieldset>`;
+    `<label>${sym}<input type="number" inputmode="decimal" min="0" max="100" step="any" name="g${i}"></label>`).join('')}</div><p class="hint">${esc(t('gradeAllHint'))}</p></fieldset>`;
   const costInput = () => `<label>${esc(t('costRM'))}<input type="number" inputmode="decimal" min="0" step="any" name="cost"></label>`;
   /* reads the optional grade and cost from a form: { grade, cost } or { error: messageKey } */
   function readGradeCost(f) {
-    const raw = [0, 1, 2].map(i => String(f.get('g' + i) == null ? '' : f.get('g' + i)).trim());
-    let grade = null;
-    if (raw.some(x => x !== '')) {
-      grade = raw.map(x => (x === '' ? 0 : Number(x)));
-      if (!SoilCalc.gradeOk(grade)) return { error: 'pctBad' };
-    }
+    const g = SoilCalc.parseGrade([0, 1, 2].map(i => f.get('g' + i)));
+    if (g.error) return { error: g.error };
+    const grade = g.grade;
     const c = String(f.get('cost') == null ? '' : f.get('cost')).trim();
     if (c !== '' && !(Number.isFinite(Number(c)) && Number(c) >= 0)) return { error: 'costBad' };
     return { grade, cost: c === '' ? null : Number(c) };
@@ -700,7 +697,7 @@
         <label>${esc(t('date'))}<input type="date" name="date" value="${today()}"></label>
       </div>
       ${needsName ? `<label>${esc(t('what'))}<input type="text" name="what" maxlength="60"></label>` : ''}
-      ${kind === 'fert' && (fert.mode === 'tree' || (fert.mode === 'plant' && !fert.pnut)) ? gradeInputs() : ''}
+      ${kind === 'fert' && needsName ? gradeInputs() : ''}
       ${kind === 'fert' ? costInput() : ''}
       <button class="btn" type="submit">${esc(t('saveToRec'))}</button>
       <p class="savemsg" role="status"></p>

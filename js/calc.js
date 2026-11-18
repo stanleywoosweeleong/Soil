@@ -84,10 +84,9 @@
     if (f.mode === 'plant') {
       const need = Number(f.need) || 0, pct = Number(f.pct) || 0;
       if (!(need > 0) || !(pct > 0) || !isCount(f.plants)) return [];
-      const grade = [0, 0, 0];
-      const known = Object.prototype.hasOwnProperty.call(NUTRIENT_INDEX, f.pnut);
-      if (known) grade[NUTRIENT_INDEX[f.pnut]] = pct;
-      return [{ kg: need / (pct / 100) * Number(f.plants) / 1000, grade: known ? grade : null }];
+      /* The percentage is for one nutrient only. The rest of the product's analysis is unknown,
+         not zero, so no grade is inferred; the save form asks for the full grade instead. */
+      return [{ kg: need / (pct / 100) * Number(f.plants) / 1000, grade: null }];
     }
     if (f.mode === 'tree') {
       const rate = Number(f.trate) || 0;
@@ -95,6 +94,16 @@
       return [{ kg: rate / Number(f.tapps) * Number(f.ttrees), grade: null }];
     }
     return [];
+  }
+
+  /* An optional grade typed as three fields. All blank means the grade is unknown (null). A
+     partly filled grade is refused: a blank is not a zero, and guessing would understate totals. */
+  function parseGrade(raw) {
+    const v = raw.map(x => String(x == null ? '' : x).trim());
+    if (v.every(x => x === '')) return { grade: null };
+    if (v.some(x => x === '')) return { error: 'gradeAll' };
+    const grade = v.map(Number);
+    return gradeOk(grade) ? { grade } : { error: 'pctBad' };
   }
 
   /* ---------- nutrients and cost applied ---------- */
@@ -124,7 +133,7 @@
     return out;
   }
 
-  const api = { classify, shownAs, isExact, eq, massParts, blank, isCount, pctOk, gradeOk, slopeOf, classOf, HA, areaHa, fertProblem, fertLines, appliedOf, summarise };
+  const api = { classify, shownAs, isExact, eq, massParts, blank, isCount, pctOk, gradeOk, slopeOf, classOf, HA, areaHa, fertProblem, fertLines, parseGrade, appliedOf, summarise };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.SoilCalc = api;
 })(typeof self !== 'undefined' ? self : globalThis);

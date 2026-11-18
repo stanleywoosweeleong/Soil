@@ -204,9 +204,19 @@ test('rounded figures are marked as approximate', () => {
 
 test('the calculator records the grade of what it applies', () => {
   assert.deepStrictEqual(calc.fertLines(base, C.PRODUCTS).map(l => l.grade), [[46, 0, 0], [0, 46, 0], [0, 0, 60]]);
-  assert.deepStrictEqual(calc.fertLines(with_({ mode: 'plant' }), C.PRODUCTS)[0].grade, [0, 0, 60]);
+  /* one known percentage is not a grade: 100 g of 15-15-15 chosen by its N must not record 15-0-0 */
+  assert.strictEqual(calc.fertLines(with_({ mode: 'plant' }), C.PRODUCTS)[0].grade, null);
+  assert.strictEqual(calc.fertLines(with_({ mode: 'plant', pnut: 'n', pct: 15 }), C.PRODUCTS)[0].grade, null);
   assert.strictEqual(calc.fertLines(with_({ mode: 'plant', pnut: '' }), C.PRODUCTS)[0].grade, null);
   assert.strictEqual(calc.fertLines(with_({ mode: 'tree' }), C.PRODUCTS)[0].grade, null);
+});
+
+test('a grade is complete or absent, never partly guessed', () => {
+  assert.deepStrictEqual(calc.parseGrade(['', '', null]), { grade: null });
+  assert.deepStrictEqual(calc.parseGrade(['15', '15', '15']), { grade: [15, 15, 15] });
+  assert.deepStrictEqual(calc.parseGrade(['46', '0', '0']), { grade: [46, 0, 0] });
+  assert.deepStrictEqual(calc.parseGrade(['15', '', '']), { error: 'gradeAll' });
+  assert.deepStrictEqual(calc.parseGrade(['60', '60', '0']), { error: 'pctBad' });
 });
 
 test('organic nutrients are totalled apart from mineral fertiliser', () => {
@@ -280,6 +290,61 @@ test('long text is cut to its limit', () => {
 /* ---------- page shell, service worker and rendering code ---------- */
 const app = read('js/app.js'), sw = read('sw.js'), html = read('index.html');
 
+/* ---------- service worker behaviour, run against a fake cache and network ---------- */
+function swHarness() {
+  const stores = new Map(), listeners = {}, posted = [];
+  const cacheOf = name => { if (!stores.has(name)) stores.set(name, new Map()); const m = stores.get(name);
+    return { put: async (k, r) => { m.set(String(k.url || k), r.clone()); }, match: async k => { const r = m.get(String(k.url || k)); return r ? r.clone() : undefined; } }; };
+  const net = { files: {}, fail: new Set() };
+  const ctx = {
+    caches: { open: async n => cacheOf(n), has: async n => stores.has(n), delete: async n => stores.delete(n), keys: async () => [...stores.keys()] },
+    fetch: async url => { const u = String(url.url || url); if (net.fail.has(u) || !(u in net.files)) throw new Error('offline'); return new Response(net.files[u]); },
+    Response, Headers, URL, Uint8Array, Promise, Error, Date, Object, String,
+    self: { addEventListener: (k, fn) => { listeners[k] = fn; }, skipWaiting: async () => {}, location: { origin: 'https://x.test', href: 'https://x.test/Soil/sw.js' },
+      clients: { claim: async () => {}, matchAll: async () => [{ postMessage: m => posted.push(m) }] } },
+  };
+  require('vm').runInNewContext(sw, ctx);
+  const shell = [...sw.match(/const SHELL = \[([^\]]+)\]/)[1].matchAll(/'(\.\/[^']+)'/g)].map(m => m[1]).concat('./index.html');
+  const release = tag => { for (const f of shell) net.files[f] = tag + ':' + f; };
+  const fire = async (kind, data) => { let p; listeners[kind]({ data, waitUntil: x => { p = x; } }); await p; };
+  const saved = async f => { const m = stores.get('soil-shell'); const r = m && m.get(f); return r ? r.clone().text() : null; };
+  return { net, shell, release, fire, saved, posted, stores };
+}
+const pending = [];
+const testAsync = (name, fn) => pending.push(fn().then(() => { passed++; }, e => { failures.push(`${name}\n    ${String(e.message).split('\n')[0]}`); }));
+
+testAsync('an interrupted update leaves the saved release whole', async () => {
+  const h = swHarness();
+  h.release('v1'); await h.fire('install');
+  for (const f of h.shell) assert.strictEqual(await h.saved(f), 'v1:' + f);
+  h.release('v2'); h.net.fail.add('./js/calc.js');
+  await h.fire('message', 'check');
+  for (const f of h.shell) assert.strictEqual(await h.saved(f), 'v1:' + f, `${f} changed during a failed update`);
+  assert.deepStrictEqual(h.posted, [], 'a failed update must not announce a new version');
+  assert.ok(!h.stores.has('soil-staging'), 'no staging cache is left behind');
+});
+
+testAsync('a complete update replaces every file and is announced once', async () => {
+  const h = swHarness();
+  h.release('v1'); await h.fire('install');
+  await h.fire('message', 'check');
+  assert.deepStrictEqual(h.posted, [], 'nothing changed');
+  h.release('v2'); await h.fire('message', 'check');
+  for (const f of h.shell) assert.strictEqual(await h.saved(f), 'v2:' + f);
+  assert.deepStrictEqual(h.posted, ['updated']);
+});
+
+testAsync('a swap cut short is finished when the worker next starts', async () => {
+  const h = swHarness();
+  h.release('v1'); await h.fire('install');
+  /* a complete staged release, with the live cache only partly overwritten */
+  const stage = new Map(h.shell.map(f => [f, new Response('v2:' + f)])); stage.set('./__release-complete', new Response('ok'));
+  h.stores.set('soil-staging', stage); h.stores.get('soil-shell').set('./js/app.js', new Response('v2:./js/app.js'));
+  const h2 = swHarness(); for (const [k, v] of h.stores) h2.stores.set(k, v);
+  h2.release('v2'); await h2.fire('message', 'check');
+  for (const f of h2.shell) assert.strictEqual(await h2.saved(f), 'v2:' + f);
+});
+
 test('the service worker saves every file the page loads', () => {
   const files = [...sw.match(/const SHELL = \[([^\]]+)\]/)[1].matchAll(/'\.\/([^']+)'/g)].map(m => m[1]);
   assert.ok(/const INDEX = '\.\/index\.html';/.test(sw) && files.length >= 10, 'shell list');
@@ -297,9 +362,9 @@ test('the service worker has one fixed cache and needs no version bump', () => {
 });
 
 test('the service worker clears only this app\'s old caches and reads only its own', () => {
-  assert.ok(/k\.indexOf\(CACHE_PREFIX\) === 0 && k !== CACHE \? caches\.delete\(k\)/.test(sw), 'old caches are filtered by prefix');
+  assert.ok(/k\.indexOf\(CACHE_PREFIX\) === 0 && k !== CACHE && k !== STAGING \? caches\.delete\(k\)/.test(sw), 'old caches are filtered by prefix');
   assert.ok(!/caches\.match\(/.test(sw), 'no lookup across every cache');
-  assert.ok(/if \(!res \|\| !res\.ok\) return false;/.test(sw), 'an error response never replaces a saved file');
+  assert.ok(/if \(!res \|\| !res\.ok\) throw new Error/.test(sw), 'an error response never replaces a saved file');
   assert.ok(/cache: 'no-cache'/.test(sw), 'update checks go past the HTTP cache');
 });
 
@@ -339,9 +404,11 @@ test('scripts load in dependency order', () => {
 });
 
 /* ---------- report ---------- */
-if (failures.length) {
-  console.error(`${failures.length} failed, ${passed} passed\n`);
-  for (const f of failures) console.error('  ✗ ' + f);
-  process.exit(1);
-}
-console.log(`${passed} checks passed`);
+Promise.all(pending).then(() => {
+  if (failures.length) {
+    console.error(`${failures.length} failed, ${passed} passed\n`);
+    for (const f of failures) console.error('  ✗ ' + f);
+    process.exit(1);
+  }
+  console.log(`${passed} checks passed`);
+});
