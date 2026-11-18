@@ -345,7 +345,7 @@ const SOURCES = [
     ['Business Diary Philippines (after Philippine e-extension) – How to make fermented fruit juice', 'https://businessdiary.com.ph/3470/how-to-make-fermented-fruit-juice-or-ffj'],
     ['Colorado State University Extension – Using manure in gardens', 'https://extension.colostate.edu/resource/using-manure-in-colorado-gardens/'],
     ['University of Arizona Extension – Manure and composted manure use', 'https://extension.arizona.edu/publication/manure-and-composted-manure-use-arizona-agriculture'],
-    ['University of Connecticut – Compost, compost tea and manure: food safety', 'https://soiltesting.cahnr.uconn.edu/?p=614'],
+    ['University of Connecticut Home and Garden – Fertilizing with manure and compost', 'https://homegarden-cahnr.media.uconn.edu/wp-content/uploads/sites/3479/2023/02/Fertilizing-with-manure-and-compost-HT-1-30-23-2.pdf'],
     ['Top Crop Manager – Pros and cons of using chemical fertilizers', 'https://www.topcropmanager.com/pros-and-cons-of-using-chem-fertilizers-18067/'],
     ['Utah Agriculture in the Classroom – Perkin’ Through the Pores', 'https://www.soils4teachers.org/files/s4t/lessons/perkin-through.pdf'],
   ] },
@@ -359,7 +359,7 @@ const SOURCES = [
     ['NC State Extension – Large-Scale Organic Materials Composting', 'https://content.ces.ncsu.edu/large-scale-organic-materials-composting'],
     ['University of Maine Cooperative Extension – Home Composting (Bulletin 1143)', 'https://extension.umaine.edu/publications/1143e/'],
     ['Kansas State University – Diagnosing nutrient deficiencies (MF3028)', 'https://bookstore.ksre.ksu.edu/pubs/MF3028.pdf'],
-    ['University of Connecticut – Nutrient Deficiency Symptoms', 'https://homegarden-cahnr.media.uconn.edu/wp-content/uploads/sites/3479/2024/01/Nutrient-Deficiency-Symptoms-HT-1-30-24.pdf'],
+    ['University of Connecticut Home and Garden Education Center', 'https://homegarden.cahnr.uconn.edu/'],
   ] },
   { topic: ['Laporan ujian tanah dan tanah bermasalah', 'Soil test reports and problem soils', '土壤检测报告与问题土壤'], items: [
     ['University of Illinois Extension – Interpreting Test Results', 'https://extension.illinois.edu/soil/interpreting-test-results'],

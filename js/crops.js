@@ -148,7 +148,7 @@ LESSONS['7-1'] = { book: '', title: ['Kelapa sawit', 'Oil palm', '油棕'], body
   ['case', ['Dalam satu kajian, 37.5 tan tandan kosong sehektar setahun bersama baja N dan K menambah baik N dan K daun serta hasil, tetapi menurunkan magnesium daun. Tandan kosong membekalkan kalium, jadi nutriennya perlu dikira sebagai sebahagian daripada program, bukan tambahan kepadanya.',
             'In one study, 37.5 tonnes of empty fruit bunches per hectare per year with N and K fertiliser improved leaf N and K and yield, but lowered leaf magnesium. Empty fruit bunches supply potassium, so their nutrients should be counted as part of the programme, not added on top of it.',
             '在一项研究中，每公顷每年施 37.5 吨空果串并配合氮钾肥，提高了叶片氮、钾含量和产量，但降低了叶片的镁含量。空果串本身提供钾，因此其养分应计入施肥计划之内，而不是额外追加。']],
-  ['src', { s: 'Journal of Oil Palm Research (MPOB), The effects of oil palm empty fruit bunches on oil palm nutrition and yield, and soil chemical properties', u: 'https://jopr.mpob.gov.my/the-effects-of-oil-palm-empty-fruit-bunches-on-oil-palm-nutrition-and-yield-and-soil-chemical-properties/?v=true',
+  ['src', { s: 'Journal of Oil Palm Research (MPOB), The effects of oil palm empty fruit bunches on oil palm nutrition and yield, and soil chemical properties', u: 'https://jopr.mpob.gov.my/the-effects-of-oil-palm-empty-fruit-bunches-on-oil-palm-nutrition-and-yield-and-soil-chemical-properties/',
     a: ['Satu tapak percubaan; bukan kadar sungkupan yang disyorkan.', 'One trial site; not a recommended mulch rate.', '单一试验点；并非推荐的覆盖用量。'] }],
 ] };
 
@@ -350,7 +350,7 @@ SOURCES.push({ topic: ['Kelapa sawit, pokok buah, padi dan kapur', 'Oil palm, fr
   ['Journal of Oil Palm Research (MPOB) – Ground water-table maintenance in relation to peat subsidence, Sessang, Sarawak', 'https://jopr.mpob.gov.my/best-management-practices-for-oil-palm-cultivation-on-peat-ground-water-table-maintenance-in-relation-to-peat-subsidence-and-estimation-of-co2-emissions-at-sessang-sarawak/'],
   ['Malaysian Palm Oil Board, Oil Palm Bulletin – Oil palm fertiliser recommendation for Sabah soils', 'https://opb.mpob.gov.my/oil-palm-fertiliser-recommendation-for-sabah-soils/'],
   ['InfoSAWIT (PPKS) – Understanding leaf patterns and counting fronds on oil palm', 'https://www.en.infosawit.com/news/16670/understanding-leaf-patterns-and-counting-fronds-on-oil-palm'],
-  ['Journal of Oil Palm Research (MPOB) – Effects of oil palm empty fruit bunches on nutrition, yield and soil', 'https://jopr.mpob.gov.my/the-effects-of-oil-palm-empty-fruit-bunches-on-oil-palm-nutrition-and-yield-and-soil-chemical-properties/?v=true'],
+  ['Journal of Oil Palm Research (MPOB) – Effects of oil palm empty fruit bunches on nutrition, yield and soil', 'https://jopr.mpob.gov.my/the-effects-of-oil-palm-empty-fruit-bunches-on-oil-palm-nutrition-and-yield-and-soil-chemical-properties/'],
   ['International Tropical Fruits Network (TFNet) – Durian: fertiliser', 'http://www.itfnet.org/gfruit/Templates%20English/durian.agro.fert.htm'],
   ['International Tropical Fruits Network (TFNet) – Rambutan: fertiliser', 'http://www.itfnet.org/gfruit/Templates%20English/rambutan.agro.fert.htm'],
   ['International Tropical Fruits Network (TFNet) – Mango: fertiliser', 'http://www.itfnet.org/gfruit/Templates%20English/mango.agro.fert.htm'],
@@ -366,3 +366,163 @@ SOURCES.push({ topic: ['Kelapa sawit, pokok buah, padi dan kapur', 'Oil palm, fr
   ['Montana State University Extension – Reduce loss of ammonia gas from urea fertilizer', 'https://www.montana.edu/extension/roosevelt/ammoniagas.html'],
   ['FAO – Fertilizer use by crop in Ghana: organic sources of nutrients', 'https://www.fao.org/4/a0013e/a0013e08.htm'],
 ] });
+
+/* ---------- leaf sampling, and corrections from Malaysian sources ---------- */
+LESSONS['7-1'].body.push(
+  ['h', ['Mengambil sampel daun', 'Taking the leaf sample', '采集叶片样本']],
+  ['steps', [
+    ['Gunakan pelepah 17 untuk pokok berumur 3 tahun atau lebih selepas ditanam, dan pelepah 9 untuk pokok yang lebih muda.', 'Use frond 17 for palms 3 years or more after planting, and frond 9 for younger palms.', '定植 3 年或以上的树采第 17 片叶，较年幼的树采第 9 片叶。'],
+    ['Cari tempat rabung di atas rakis berubah daripada rata kepada tirus. Di situ, ambil 6 anak daun dari setiap belah: 3 dari barisan atas dan 3 dari barisan bawah.', 'Find the point where the ridge on top of the rachis changes from flat to pointed. There, take 6 leaflets from each side: 3 from the upper rank and 3 from the lower.', '找到叶轴上面的脊由平变尖的位置。在该处两侧各取 6 片小叶：上排 3 片、下排 3 片。'],
+    ['Simpan sepertiga tengah setiap anak daun sahaja, dan buang lidinya.', 'Keep only the middle third of each leaflet, and discard the midrib.', '每片小叶只保留中间三分之一，并去掉中脉。'],
+    ['Di tanah rata, sampel setiap pokok ke-10 dalam setiap baris ke-10: sekurang-kurangnya 1% pokok. Untuk memeriksa satu tompok bermasalah, gabungkan 20 hingga 30 pokok, dan sampel pokok yang sihat secara berasingan.', 'On flat land, sample every 10th palm in every 10th row: at least 1% of the palms. To check a problem patch, bulk 20 to 30 palms, and sample healthy palms separately.', '在平地上，每隔 10 行取第 10 株：至少占全部植株的 1%。检查问题地块时，合并 20 至 30 株，健康植株另行取样。'],
+    ['Tandakan pokok itu dan gunakan pokok yang sama setiap tahun. Pilih pokok yang sihat, sekurang-kurangnya empat pokok dari tepi jalan.', 'Mark those palms and use the same ones every year. Choose healthy palms at least four palms in from the roadside.', '给这些植株做标记，每年采同一批。选择离路边至少四株以内的健康植株。'],
+    ['Ambil sampel pada waktu pagi, sekali setahun pada masa yang sama, sekurang-kurangnya tiga bulan selepas membaja, dan bukan pada hari hujan atau musim yang sangat basah atau sangat kering.', 'Sample in the morning, once a year at the same time of year, at least three months after fertilising, and not on a rainy day or in a very wet or very dry spell.', '在上午取样，每年同一时间取一次，至少在施肥三个月之后，并避开雨天以及特别湿或特别干的时期。'],
+    ['Hantar ke makmal dengan segera dalam beg berlabel; ladang mengeringkan sampel dalam masa 24 jam.', 'Get it to the laboratory quickly in labelled bags; estates dry the samples within 24 hours.', '装入贴好标签的袋子尽快送到实验室；种植园会在 24 小时内把样本烘干。'],
+  ]],
+  ['note', ['Daun yang lebih muda daripada pelepah rujukan memberi bacaan N, P, K dan Mg yang lebih tinggi, dan daun yang lebih tua memberi bacaan yang lebih rendah. Tersilap pelepah boleh menyembunyikan atau mereka-reka kekurangan.',
+            'A leaf younger than the reference frond reads higher in N, P, K and Mg, and an older one reads lower. Taking the wrong frond can hide a deficiency or invent one.',
+            '比标准叶年幼的叶片，氮、磷、钾、镁读数偏高；较老的叶片读数偏低。采错叶片会掩盖缺素，或造成缺素的假象。']],
+  ['src', { s: 'Fairhurst (2015), Minimization of error in leaf analysis sampling and analysis, Tropical Crop Consultants Extension Bulletin TCCL-001', u: 'http://www.tropcropconsult.com/wp-content/uploads/2017/04/Fairhurst2015.pdf',
+    a: ['Amalan ladang kelapa sawit. Waktu pagi dan tempoh tiga bulan selepas membaja datang daripada panduan makmal dan pekebun kecil, bukan daripada MPOB.', 'Oil palm estate practice. The morning timing and the three months after fertilising come from laboratory and smallholder guides, not from MPOB.', '油棕种植园的做法。上午取样和施肥后三个月的说法来自实验室和小园主指南，而非 MPOB。'] }],
+  ['h', ['Membaca keputusan daun', 'Reading leaf results', '解读叶片分析结果']],
+  ['table', { head: [['Nutrien, pelepah 17', 'Nutrient, frond 17', '养分，第 17 片叶'], ['Kekurangan', 'Deficient', '缺乏'], ['Optimum, pokok muda (bawah 6 tahun)', 'Optimum, young palms (under 6 years)', '适宜，幼树（6 年以下）'], ['Optimum, pokok matang', 'Optimum, mature palms', '适宜，成龄树']],
+    rows: [
+      ['N (%)', '<2.30–2.50', '2.60–2.90', '2.40–2.80'],
+      ['P (%)', '<0.14–0.15', '0.16–0.19', '0.15–0.18'],
+      ['K (%)', '<0.75–1.00', '1.10–1.30', '0.90–1.20'],
+      ['Mg (%)', '<0.20', '0.30–0.45', '0.25–0.40'],
+      ['Ca (%)', '<0.25–0.30', '0.50–0.70', '0.50–0.75'],
+      ['B (mg/kg)', '<8', '15–25', '15–25'],
+      ['Cu (mg/kg)', '<3', '5–7', '5–8'],
+      ['Zn (mg/kg)', '<10', '15–20', '12–18'],
+    ] }],
+  ['ul', [
+    ['Gunakan julat, bukan satu nilai. Paras kritikal berubah mengikut umur pokok, kelembapan tanah, bahan tanaman dan jarak tanaman.', 'Use ranges, not single values. Critical levels shift with palm age, soil moisture, planting material and spacing.', '要用范围，而不是单一数值。临界值随树龄、土壤湿度、种植材料和株距而变。'],
+    ['Baca fosforus bersama nitrogen: P kritikal = 0.0487 × N daun + 0.039.', 'Read phosphorus against nitrogen: critical P = 0.0487 × leaf N + 0.039.', '磷要对照氮来读：临界磷 = 0.0487 × 叶片氮 + 0.039。'],
+    ['Keputusan lebih berguna apabila terkumpul selama beberapa tahun; perhatikan arah alirannya.', 'Results become more useful as they build up over several years; watch the trend.', '结果累积数年后更有用；要看变化趋势。'],
+    ['Jangan tetapkan baja daripada helaian makmal sahaja. N daun yang rendah mungkin berpunca daripada pemangkasan berlebihan atau saliran yang lemah, bukan kurang baja.', 'Do not set fertiliser from the laboratory sheet alone. Low leaf N may come from over-pruning or poor drainage, not too little fertiliser.', '不要只凭化验单定肥。叶片氮低可能是修剪过度或排水不良，而不是肥料不足。'],
+    ['Ralat persampelan dan makmal bersama boleh mencapai 10 hingga 20%. Gunakan makmal dan kaedah yang sama setiap tahun.', 'Sampling and laboratory error together can reach 10 to 20%. Use the same laboratory and method every year.', '取样和实验室误差合计可达 10% 至 20%。每年使用同一实验室和同一方法。'],
+  ]],
+  ['src', { s: 'Fairhurst & Mutert (1999), Interpretation and Management of Oil Palm Leaf Analysis Data, Better Crops International 13(1), after von Uexküll & Fairhurst (1991)', u: 'https://www.fertilizer.org/wp-content/uploads/2023/01/Better-Crops-International-1999-1.pdf',
+    a: ['Kelapa sawit di Asia Tenggara. MPOB tidak menerbitkan jadual paras kritikal yang ringkas; sistemnya menggunakan persamaan tindak balas hasil.', 'Oil palm in Southeast Asia. MPOB does not publish a simple table of critical levels; its system uses yield response equations.', '东南亚的油棕。MPOB 没有发布简单的临界值表；其系统采用产量反应方程。'] }],
+);
+
+LESSONS['7-2'].body.push(
+  ['h', ['Analisis daun durian', 'Durian leaf analysis', '榴莲的叶片分析']],
+  ['p', ['Tiada protokol persampelan daun atau jadual kecukupan Malaysia yang berwibawa ditemui untuk durian. Piawaian yang paling kerap dirujuk berasal dari Thailand, daripada kebun Mon Thong yang berhasil tinggi. Ia ditunjukkan di sini sebagai contoh sahaja.',
+         'No authoritative Malaysian leaf sampling protocol or sufficiency table was found for durian. The standard cited most often comes from Thailand, from high-yielding Mon Thong orchards. It is shown here as an example only.',
+         '未找到针对榴莲的权威马来西亚叶片取样规程或适宜范围表。最常被引用的标准来自泰国高产的金枕头果园。这里仅作示例。']],
+  ['table', { head: ['N (%)', 'P (%)', 'K (%)', 'Ca (%)', 'Mg (%)'], rows: [['2.0–2.4', '0.15–0.25', '1.5–2.5', '1.7–2.5', '0.25–0.50']] }],
+  ['ul', [
+    ['Daun yang disampel: daun kedua hingga keempat dari hujung pucuk yang sudah matang dan berhenti membesar, berumur kira-kira 5 hingga 7 bulan. Dua kertas kumpulan yang sama memberi kedudukan daun yang sedikit berbeza.', 'The leaf sampled: the second to fourth leaf from the tip of a flush that has matured and stopped growing, about 5 to 7 months old. Two papers by the same group give slightly different leaf positions.', '取样叶：已成熟并停止生长的新梢顶端往下第二至第四片叶，叶龄约 5 至 7 个月。同一研究组的两篇论文给出的叶位略有不同。'],
+    ['Di Australia, sepuluh pasang daun diambil daripada setiap sepuluh pokok dan digabungkan.', 'In Australia, ten leaf pairs are taken from each of ten trees and combined.', '在澳大利亚，从十棵树上各取十对叶片并合并。'],
+    ['Satu tinjauan di Queensland tidak menemui kaitan langsung antara paras nutrien daun, baja yang diberi dan hasil, dan menyifatkan piawaian sebegini sebagai tentatif.', 'A survey in Queensland found no direct link between leaf nutrient levels, fertiliser applied and yield, and described standards of this kind as tentative.', '昆士兰的一项调查未发现叶片养分水平、施肥量与产量之间有直接联系，并称这类标准只是暂定的。'],
+  ]],
+  ['src', { s: 'Poovarodom et al. (2002), Development of Leaf Nutrient Concentration Standards for Durian, Acta Horticulturae 594; Diczbalis & Westerhuis (2005), RIRDC Publication 05/163', u: 'https://ishs.org/ishs-article/594_51/',
+    a: ['Thailand timur dan utara Queensland; bukan Malaysia.', 'Eastern Thailand and north Queensland; not Malaysia.', '泰国东部和昆士兰北部；并非马来西亚。'] }],
+);
+
+/* corrections and additions from checking against Malaysian sources */
+putBefore('2-4', 'Colour indicator with barium sulfate',
+  ['note', ['Di Malaysia, makmal biasanya mengukur pH dalam air pada nisbah tanah kepada air 1:2.5, mengikut piawaian MS 2457. Jika anda mahu bacaan anda setanding dengan laporan makmal, gunakan 10 g tanah dengan 25 ml air.',
+            'In Malaysia, laboratories usually measure pH in water at a soil to water ratio of 1:2.5, following the standard MS 2457. If you want your reading to match a laboratory report, use 10 g of soil with 25 ml of water.',
+            '在马来西亚，实验室通常按 MS 2457 标准，以 1:2.5 的土水比在水中测 pH。若想让自己的读数与实验室报告可比，可用 10 克土加 25 毫升水。']],
+  ['src', { s: 'Standards Malaysia, MS 2457:2012; Alia Farhana et al. (2017), Universiti Putra Malaysia, Pakistan Journal of Botany 49(5)', u: 'https://www.pakbs.org/pjbot/papers/1507287778.pdf',
+    a: ['Malaysia. Teks piawaian tidak dapat dibuka; nisbah disahkan daripada kertas UPM.', 'Malaysia. The text of the standard could not be opened; the ratio is confirmed from the UPM paper.', '马来西亚。标准原文无法打开；该比例由博特拉大学的论文证实。'] }],
+);
+
+putBefore('5-1', 'Kinds of liming material',
+  ['h', ['Angka daripada kajian di Malaysia', 'Figures from Malaysian work', '马来西亚研究中的数字']],
+  ['ul', [
+    ['Tanah mineral berasid yang sangat terluluhawa: kira-kira 2 hingga 4 tan batu kapur sehektar setiap dua tahun.', 'Acidic, highly weathered mineral soils: about 2 to 4 tonnes of limestone per hectare every two years.', '高度风化的酸性矿质土：每两年每公顷约 2 至 4 吨石灰石。'],
+    ['Padi di tanah asid sulfat: 4 tan GML sehektar dalam satu kajian; dalam kajian lain, 2 tan GML bersama baja bio-organik menaikkan pH ke 5.', 'Paddy on acid sulfate soil: 4 tonnes of GML per hectare in one study; in another, 2 tonnes of GML with a bio-organic fertiliser raised pH to 5.', '酸性硫酸盐土上的水稻：一项研究为每公顷 4 吨 GML；另一项研究中，2 吨 GML 加生物有机肥把 pH 提高到 5。'],
+    ['Gambut: dalam percubaan MARDI, 12 tan kapur sehektar menaikkan pH daripada 3.47 kepada 4.20 sahaja. Tanaman pula berbeza: ubi kayu memberi hasil terbaik pada pH 3.8, manakala keledek terus meningkat hingga pH 5.5.', 'Peat: in a MARDI trial, 12 tonnes of lime per hectare raised pH only from 3.47 to 4.20. Crops differ too: cassava yielded best at pH 3.8, while sweet potato kept improving up to pH 5.5.', '泥炭土：在 MARDI 的试验中，每公顷 12 吨石灰只把 pH 从 3.47 提高到 4.20。作物也各不相同：木薯在 pH 3.8 时产量最好，而番薯一直到 pH 5.5 仍在增产。'],
+    ['Kelapa sawit bertoleransi terhadap asid: pH melebihi 4.0 sudah memadai, dan getah sesuai pada 4.5 hingga 5.5.', 'Oil palm tolerates acid: a pH above 4.0 is already adequate, and rubber suits 4.5 to 5.5.', '油棕耐酸：pH 高于 4.0 即已足够，橡胶适宜 4.5 至 5.5。'],
+    ['Dalam kajian padi di Malaysia, GML digaul kira-kira dua minggu sebelum menanam.', 'In Malaysian rice studies, GML was mixed in about two weeks before planting.', '在马来西亚的水稻研究中，GML 在种植前约两周混入土中。'],
+  ]],
+  ['note', ['Jadual dalam buku teks, 20 hingga 25 tan sehektar untuk gambut dan 3 hingga 6 tan untuk tanah mineral, tidak ditemui dalam mana-mana penerbitan MARDI. Angka gambut itu hanya munasabah sebagai dos untuk mencapai kira-kira pH 5, yang tidak diperlukan oleh kebanyakan tanaman di gambut. Angka di atas ialah contoh kajian, bukan syor: dapatkan keperluan kapur daripada ujian tanah.',
+            'The textbook table, 20 to 25 tonnes per hectare for peat and 3 to 6 tonnes for mineral soil, was not found in any MARDI publication. The peat figure only makes sense as the dose to reach about pH 5, which most crops on peat do not need. The figures above are examples from research, not recommendations: get the lime requirement from a soil test.',
+            '课本中的表（泥炭土每公顷 20 至 25 吨，矿质土 3 至 6 吨）在任何 MARDI 出版物中都未找到。泥炭土的数字只有作为达到约 pH 5 的用量才说得通，而泥炭土上的大多数作物并不需要这么高。以上数字是研究实例，不是建议：石灰需要量应以土壤检测为准。']],
+  ['src', { s: 'FAO, Fertilizer use by crop in Malaysia; Shamshuddin et al. (2016), Sains Malaysiana 45(3); Chew et al. (MARDI, 1980 to 1982), Experimental Agriculture; Applied Agricultural Resources, Soil requirements of plantation tree crops', u: 'https://www.fao.org/4/y5797e/y5797e05.htm',
+    a: ['Malaysia. Setiap angka datang daripada satu tanah dan satu tanaman.', 'Malaysia. Each figure comes from one soil and one crop.', '马来西亚。每个数字都来自某一种土壤和某一种作物。'] }],
+);
+
+putBefore('3-4', 'Acid sulfate soils',
+  ['table', { head: [['Umur kelapa sawit', 'Age of the oil palm', '油棕树龄'], ['Aras air tanah di ladang (cm)', 'Groundwater level in the field (cm)', '田间地下水位（厘米）'], ['Aras air dalam parit pengumpul (cm)', 'Water level in the collection drain (cm)', '集水沟水位（厘米）']],
+    rows: [
+      [['Belum matang, 1 hingga 3 tahun', 'Immature, 1 to 3 years', '未成龄，1 至 3 年'], '30–40', '35–45'],
+      [['Matang muda, 4 hingga 7 tahun', 'Young mature, 4 to 7 years', '初成龄，4 至 7 年'], '35–45', '45–55'],
+      [['Matang sepenuhnya, lebih 8 tahun', 'Fully mature, over 8 years', '完全成龄，8 年以上'], '40–50', '50–60'],
+    ] }],
+  ['note', ['Jadual MPOB ini lebih cetek daripada nasihat lama 50 hingga 70 cm. Manual RSPO untuk pekebun kecil memberi purata 50 cm di telaga pemantauan dan 60 cm di parit pengumpul. Kedua-duanya diukur ke bawah dari permukaan tanah atau tebing; pastikan tempat ukuran sebelum membandingkan angka.',
+            'This MPOB table is shallower than the older advice of 50 to 70 cm. The RSPO smallholder manual gives an average of 50 cm in a monitoring well and 60 cm in the collection drain. Both are measured downward from the ground surface or the bank; make sure where a figure was measured before comparing.',
+            'MPOB 的这张表比早期 50 至 70 厘米的建议更浅。RSPO 小园主手册给出监测井平均 50 厘米、集水沟平均 60 厘米。两者都是从地面或沟岸向下量；比较数字前要先确认测量位置。']],
+  ['src', { s: 'MPOB TT No. 472 (2010), Best management practices for oil palm planting on peat: optimum groundwater table; RSPO Smallholder BMP Manual for Existing Oil Palm Cultivation on Peat', u: 'https://tot.mpob.gov.my/files/2020/02/TT-472.pdf',
+    a: ['Kelapa sawit sedia ada di gambut, Malaysia.', 'Existing oil palm on peat, Malaysia.', '马来西亚泥炭土上的现有油棕。'] }],
+);
+
+LESSONS['3-3'].body.push(
+  ['h', ['Berapa luas setiap jenis', 'How much there is of each', '各类土壤的面积']],
+  ['table', { head: [['Tanah', 'Soil', '土壤'], ['Keluasan', 'Extent', '面积'], ['Angka utama', 'Key figures', '主要数字']],
+    rows: [
+      [['Ultisol dan Oksisol', 'Ultisols and Oxisols', '老成土和氧化土'], ['Kira-kira 72% tanah Malaysia', 'About 72% of Malaysian soils', '约占马来西亚土壤的 72%'], ['Berasid, sangat terluluhawa', 'Acidic, highly weathered', '酸性、高度风化']],
+      [['Gambut', 'Peat', '泥炭土'], ['Kira-kira 2.4 juta ha: 1.5 juta di Sarawak, 0.8 juta di Semenanjung, 0.1 juta di Sabah', 'About 2.4 million ha: 1.5 million in Sarawak, 0.8 million in the Peninsula, 0.1 million in Sabah', '约 240 万公顷：砂拉越 150 万、半岛 80 万、沙巴 10 万'], 'pH 3.3–3.5'],
+      [['Asid sulfat', 'Acid sulfate', '酸性硫酸盐土'], ['Kira-kira 0.5 juta ha, 110 000 ha di Semenanjung', 'About 0.5 million ha, 110 000 ha of it in the Peninsula', '约 50 万公顷，其中半岛 11 万公顷'], ['pH di bawah 3.5; hasil padi kurang daripada 2 tan sehektar tanpa pembaikan', 'pH below 3.5; rice yields under 2 tonnes per hectare without treatment', 'pH 低于 3.5；未经改良时水稻每公顷产量不足 2 吨']],
+      ['BRIS', ['Kira-kira 155 400 ha di Semenanjung dan 40 400 ha di Sabah', 'About 155 400 ha in the Peninsula and 40 400 ha in Sabah', '半岛约 155 400 公顷，沙巴约 40 400 公顷'], ['Pasir kadangkala melebihi 95%', 'Sand occasionally exceeding 95%', '砂粒有时超过 95%']],
+      [['Bekas lombong bijih timah', 'Tin tailings', '锡矿尾砂'], ['Kira-kira 200 000 ha pada tahun 1995; sumber lain memberi 113 700 ha', 'About 200 000 ha in 1995; other sources give 113 700 ha', '1995 年约 20 万公顷；其他资料为 113 700 公顷'], ''],
+    ] }],
+  ['src', { s: 'FAO, Fertilizer use by crop in Malaysia, Chapter 2; Universiti Malaya presentation to the FAO Global Soil Partnership, citing Shamshuddin et al. (2017)', u: 'https://www.fao.org/4/y5797e/y5797e05.htm',
+    a: ['Malaysia. Angka keluasan berbeza antara sumber.', 'Malaysia. The areas differ between sources.', '马来西亚。各资料的面积数字不一。'] }],
+);
+
+putBefore('5-2', 'Green manure',
+  ['p', ['Berapa lama? Kaedah pengkomposan pantas mengambil 2 hingga 7 minggu; timbunan dan lubang tradisional mengambil 2 hingga 4 bulan. Dalam satu kajian di Sabah, kompos tinja kambing matang selepas 56 hari. Nilai kematangan pada rupa dan bau, bukan pada bilangan hari.',
+         'How long? Rapid composting methods take 2 to 7 weeks; traditional heaps and pits take 2 to 4 months. In one study in Sabah, goat dung compost was mature after 56 days. Judge readiness by look and smell, not by a count of days.',
+         '需要多久？快速堆肥法需 2 至 7 周；传统的堆置和坑沤需 2 至 4 个月。沙巴的一项研究中，羊粪堆肥在 56 天后腐熟。要凭外观和气味判断是否腐熟，而不是数天数。']],
+  ['src', { s: 'FAO, On-farm composting methods (2003), Chapter 1; Kamal et al. (2025), Universiti Malaysia Sabah', u: 'http://www.fao.org/4/y5104e/y5104e05.htm',
+    a: ['Panduan umum dan satu kajian di Sabah. Tempoh 40 hari dalam buku teks tidak ditemui dalam mana-mana sumber.', 'General guidance and one Sabah study. The 40 days given in the textbook was not found in any source.', '一般指引和沙巴的一项研究。课本中 40 天的说法未在任何资料中找到。'] }],
+);
+
+putBefore('6-2', 'Commonly used fertilisers',
+  ['p', ['**Sekam padi** kaya silika tetapi rendah N, P dan K. Ia ialah pembaik tanah, bukan baja. Sekam yang dibakar menjadi arang digunakan untuk membantu tanah memegang air dan nutrien.',
+         '**Rice husk** is rich in silica but low in N, P and K. It is a soil conditioner, not a fertiliser. Husk charred into biochar is used to help soil hold water and nutrients.',
+         '**稻壳**富含硅，但氮、磷、钾含量低。它是土壤改良材料，而不是肥料。烧成炭的稻壳用于帮助土壤保水保肥。']],
+  ['src', { s: 'International Rice Research Institute, Rice Today: Black soil, green rice (2007); PhilRice, Golden waste', u: 'https://ricetoday.irri.org/black-soil-green-rice/',
+    a: ['Asia; tiada angka kandungan nutrien yang berwibawa ditemui untuk sekam Malaysia.', 'Asia; no authoritative nutrient figures were found for Malaysian husk.', '亚洲；未找到马来西亚稻壳的权威养分数据。'] }],
+);
+{ /* superphosphate grades, and the measured grade of Christmas Island rock phosphate */
+  const t = LESSONS['6-2'].body.find(b => b[0] === 'table' && b[1].rows.some(r => Array.isArray(r[0]) && r[0][1] === 'Urea'));
+  const at = t[1].rows.findIndex(r => Array.isArray(r[0]) && r[0][1].startsWith('Triple superphosphate'));
+  if (at < 0) throw new Error('the fertiliser table has no triple superphosphate row');
+  t[1].rows.splice(at, 0, [['Superfosfat tunggal (SSP)', 'Single superphosphate (SSP)', '过磷酸钙 (SSP)'], '0', '16–20', '0', '18–21% Ca, 11–12% S']);
+  const note = LESSONS['6-2'].body.find(b => b[0] === 'note' && b[1][1].startsWith('Christmas Island rock phosphate'));
+  if (!note) throw new Error('the note on Christmas Island rock phosphate is missing');
+  note[1] = ['MPOB mengukur batuan fosfat Pulau Christmas (CIRP) pada 32.5% P₂O₅, dan batuan fosfat lain antara 30 dan 34%. Gred eksport lama ialah kira-kira 35%, angka yang digunakan dalam buku teks. Gunakan angka pada beg.',
+    'MPOB measured Christmas Island rock phosphate (CIRP) at 32.5% P₂O₅, and other rock phosphates at between 30 and 34%. The old export grade was about 35%, the figure the textbook uses. Use the figure on the bag.',
+    'MPOB 测得圣诞岛磷矿粉（CIRP）含 32.5% P₂O₅，其他磷矿粉在 30% 至 34% 之间。早期的出口品位约为 35%，即课本采用的数字。请以包装上的数字为准。'];
+}
+
+SOURCES.push({ topic: ['Amalan ladang: sukatan, campuran, simpanan, hujan, daun dan makmal', 'Field practice: measures, mixing, storage, rain, leaf and laboratories', '田间实务：计量、混合、储存、降雨、叶片与实验室'], items: [
+  ['Fertilizers Europe – Guidance for the Compatibility of Fertilizer Blending Materials', 'https://www.fertilizerseurope.com/wp-content/uploads/2019/08/Guidance_for_compatibility2.pdf'],
+  ['Fertilizers Europe – Fertilizer storage on farms', 'https://www.fertilizerseurope.com/wp-content/uploads/2019/08/Farm_storage_A5_V4.pdf'],
+  ['Department of Agriculture Malaysia – SALM Standard (2005)', 'https://law.resource.org/pub/my/ibr/ms.gap.2005.pdf'],
+  ['FAO/IFA – Fertilizers and their use (2000)', 'https://www.fertilizer.org/wp-content/uploads/2023/01/2000_IFa_FAO_fertilizeruse.pdf'],
+  ['Goh, Härdter & Fairhurst (2003) – Fertilizing for maximum return', 'https://aarsb.com.my/wp-content/AgroMgmt/OilPalm/FertMgmt/Application/Goh,Hardter_FairhurstF[1]%20Fertilizing%20for%20maximum%20returns.pdf'],
+  ['MPOB TT No. 348 – Efficient Use of Urea as Nitrogen Fertilizer for Mature Oil Palm', 'https://tot.mpob.gov.my/files/2020/02/TT-348.pdf'],
+  ['MPOB TT No. 472 – Optimum groundwater table for oil palm on peat', 'https://tot.mpob.gov.my/files/2020/02/TT-472.pdf'],
+  ['MPOB TT No. 256 – Reactive phosphate fertilizers for young oil palm', 'https://tot.mpob.gov.my/files/2020/02/TT-256.pdf'],
+  ['MPOB TS No. 185 – Laboratory analyses and agronomy advisory services', 'https://tot.mpob.gov.my/files/2020/07/TS185-Farawahida-Mohamad-Darus.pdf'],
+  ['Fairhurst (2015) – Minimization of error in leaf analysis sampling and analysis', 'http://www.tropcropconsult.com/wp-content/uploads/2017/04/Fairhurst2015.pdf'],
+  ['Better Crops International 13(1), 1999 – oil palm leaf analysis and soil suitability', 'https://www.fertilizer.org/wp-content/uploads/2023/01/Better-Crops-International-1999-1.pdf'],
+  ['FAO – Fertilizer use by crop in Malaysia', 'https://www.fao.org/4/y5797e/y5797e05.htm'],
+  ['FAO – On-farm composting methods', 'http://www.fao.org/4/y5104e/y5104e05.htm'],
+  ['MADA–TARC – Farm management studies, Muda Irrigation Scheme (1981)', 'https://www.jircas.go.jp/sites/default/files/publication/techtarc/techtarc14-_1-101.pdf'],
+] });
+
+QUIZ[6].push(
+  Q(['Baja yang manakah tidak boleh dicampur dengan urea?', 'Which fertiliser must not be mixed with urea?', '哪一种肥料不可与尿素混合？'],
+    [['Superfosfat (SSP atau TSP)', 'Superphosphate (SSP or TSP)', '过磷酸钙（SSP 或 TSP）'], ['Kieserit', 'Kieserite', '硫镁矾'], ['Batuan fosfat', 'Rock phosphate', '磷矿粉'], ['Ammonium sulfat', 'Ammonium sulphate', '硫酸铵']],
+    ['Urea dan superfosfat membentuk bahan yang sangat melekit; tiga yang lain serasi dengan urea.', 'Urea and superphosphate form a very sticky material; the other three are compatible with urea.', '尿素与过磷酸钙会生成非常黏的物质；其余三种与尿素相容。']),
+  Q(['Bilakah masa yang paling sesuai untuk menabur urea?', 'When is the best time to spread urea?', '什么时候最适合撒施尿素？'],
+    [['Pada tanah lembap apabila hujan ringan dijangka dalam sehari dua', 'On moist soil when light rain is expected within a day or two', '土壤湿润、一两天内预计有小雨时'], ['Pada tanah kering dalam musim kemarau', 'On dry soil in the dry season', '旱季的干土上'], ['Sejurus sebelum hujan lebat', 'Just before heavy rain', '大雨来临前'], ['Bersama kapur', 'Together with lime', '与石灰一起']],
+    ['Urea di atas tanah kering hilang sebagai gas ammonia; hujan lebat menghanyutkannya; kapur mempercepat kehilangan itu.', 'Urea on dry soil is lost as ammonia gas; heavy rain washes it away; lime speeds up the loss.', '尿素在干土上会以氨气形式损失；大雨会把它冲走；石灰会加快损失。']));

@@ -51,7 +51,8 @@
   const classOf = (list, value, inclusive) => list.find(x => (inclusive ? value <= x.max : value < x.max)) || list[list.length - 1];
 
   /* ---------- fertiliser ---------- */
-  const HA = { ha: 1, m2: 1 / 10000, acre: 0.4047 };
+  /* a Kedah relong is 0.711 acre; some older sources give a larger relong for other states */
+  const HA = { ha: 1, m2: 1 / 10000, acre: 0.4047, relong: 0.2877 };
   const areaHa = f => Math.max(0, Number(f.area) || 0) * (HA[f.unit] || 1);
   const NUTRIENT_INDEX = { n: 0, p: 1, k: 2 };
 
@@ -106,6 +107,12 @@
     return gradeOk(grade) ? { grade } : { error: 'pctBad' };
   }
 
+  /* How many level measures (a tin, cup or scoop the grower has weighed) make up a dose in grams. */
+  function measures(grams, measureGrams) {
+    const g = Number(grams), m = Number(measureGrams);
+    return g > 0 && m > 0 && Number.isFinite(g / m) ? g / m : null;
+  }
+
   /* ---------- nutrients and cost applied ---------- */
   /* Nutrients in one application record, in kilograms. Organic materials are reported as total
      content, with the available part estimated only when the record carries a percentage. */
@@ -133,7 +140,7 @@
     return out;
   }
 
-  const api = { classify, shownAs, isExact, eq, massParts, blank, isCount, pctOk, gradeOk, slopeOf, classOf, HA, areaHa, fertProblem, fertLines, parseGrade, appliedOf, summarise };
+  const api = { classify, shownAs, isExact, eq, massParts, blank, isCount, pctOk, gradeOk, slopeOf, classOf, HA, areaHa, fertProblem, fertLines, parseGrade, measures, appliedOf, summarise };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   root.SoilCalc = api;
 })(typeof self !== 'undefined' ? self : globalThis);

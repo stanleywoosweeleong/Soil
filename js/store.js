@@ -6,7 +6,7 @@
   const calc = (typeof module !== 'undefined' && module.exports) ? require('./calc.js') : root.SoilCalc;
 
   const KINDS = ['texture', 'ph', 'slope', 'fert', 'note'];
-  const UNITS_OF_AREA = ['ha', 'm2', 'acre'];
+  const UNITS_OF_AREA = ['ha', 'm2', 'acre', 'relong'];
   /* IDs are placed in links and attributes, so only plain letters and digits are accepted */
   const okId = v => typeof v === 'string' && /^[a-z0-9]{1,40}$/i.test(v);
   /* a real calendar date, not only the right shape */

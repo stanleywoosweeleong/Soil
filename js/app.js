@@ -87,7 +87,7 @@
     mode: 'straight', area: 1, unit: 'ha',
     n: 100, p: 40, k: 60, pn: 'urea', pp: 'tsp', pk: 'mop',
     g: [15, 15, 15], basis: 'n', crate: 60,
-    need: 20, pct: 60, plants: 300, pnut: 'k', tprice: '',
+    need: 20, pct: 60, plants: 300, pnut: 'k', tprice: '', scoop: '',
     bag: 50, bg: [15, 15, 15], price: '',
     trate: 4.5, tapps: 4, ttrees: 100,
   }, store.get('fert', null) || {});
@@ -95,7 +95,7 @@
   (function tidyFert() {
     const triple = v => Array.isArray(v) && v.length === 3 ? v.map(x => (Number.isFinite(Number(x)) ? Number(x) : 0)) : [15, 15, 15];
     if (!['straight', 'compound', 'plant', 'tree', 'bag'].includes(fert.mode)) fert.mode = 'straight';
-    if (!['ha', 'm2', 'acre'].includes(fert.unit)) fert.unit = 'ha';
+    if (!['ha', 'm2', 'acre', 'relong'].includes(fert.unit)) fert.unit = 'ha';
     if (!['n', 'p', 'k'].includes(fert.basis)) fert.basis = 'n';
     if (!['', 'n', 'p', 'k'].includes(fert.pnut)) fert.pnut = '';
     fert.g = triple(fert.g); fert.bg = triple(fert.bg);
@@ -196,6 +196,15 @@
     </figure>`;
   }
 
+  /* a drawn illustration: numbers in the picture, words in the key below it */
+  function illus(id) {
+    const f = ILLUS[id];
+    if (!f) return '';
+    return `<figure class="illus">
+      <svg viewBox="${f.vb}" role="img" aria-label="${esc(tr(f.cap))}" font-family="inherit"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="context-stroke"/></marker></defs>${f.draw()}</svg>
+      <figcaption><b>${esc(tr(f.cap))}</b><ol>${f.key.map(k => `<li>${rich(k)}</li>`).join('')}</ol></figcaption>
+    </figure>`;
+  }
   const FIGS = { profile: figProfile, composition: figComposition, structure: figStructure, phscale: figPhScale };
   const TOOLS = ['tekstur', 'ph', 'cerun', 'tanda', 'baja'];
   const TOOL_KEYS = { tekstur: 'tTexture', ph: 'tPh', cerun: 'tSlope', tanda: 'tDef', baja: 'tFert' };
@@ -212,7 +221,7 @@
       case 'case': return `<p class="note case"><b>${esc(t('caseLabel'))}.</b> ${rich(v)}</p>`;
       case 'src': return `<p class="src"><b>${esc(t('srcLabel'))}:</b> ${v.u ? `<a href="${esc(v.u)}" target="_blank" rel="noopener">${esc(v.s)}</a>` : esc(v.s)}.${v.a ? ` <b>${esc(t('appliesLabel'))}:</b> ${rich(v.a)}` : ''}</p>`;
       case 'formula': return `<p class="formula">${rich(v)}</p>`;
-      case 'fig': return FIGS[v]();
+      case 'fig': return FIGS[v] ? FIGS[v]() : illus(v);
       case 'tool': return `<a class="toolcard" href="#/alat/${v}"><span><b>${esc(t(TOOL_KEYS[v]))}</b><small>${esc(t(TOOL_KEYS[v] + 'Desc'))}</small></span><em>${esc(t('openTool'))}</em></a>`;
       case 'ex': return `<div class="ex"><h3>${rich(v.title)}</h3><ol>${v.steps.map(x => `<li>${rich(x)}</li>`).join('')}</ol></div>`;
       case 'table': return `<div class="tablewrap"><table><thead><tr>${v.head.map(x => `<th scope="col">${rich(x)}</th>`).join('')}</tr></thead><tbody>${
@@ -494,7 +503,7 @@
   const numIn = (label, key, extra = '', whole = false) => `<label>${label}<input type="number" inputmode="${whole ? 'numeric' : 'decimal'}" min="${whole ? 1 : 0}" step="${whole ? 1 : 'any'}" data-f="${key}" value="${esc(fert[key])}" ${extra}></label>`;
   function areaFields() {
     return `<div class="row2">${numIn(esc(t('area')), 'area')}
-      <label><span class="vh">${esc(t('area'))}</span><select data-f="unit">${['ha', 'm2', 'acre'].map(u => `<option value="${u}" ${fert.unit === u ? 'selected' : ''}>${esc(t(u))}</option>`).join('')}</select></label>
+      <label><span class="vh">${esc(t('area'))}</span><select data-f="unit">${['ha', 'm2', 'acre', 'relong'].map(u => `<option value="${u}" ${fert.unit === u ? 'selected' : ''}>${esc(t(u))}</option>`).join('')}</select></label>
     </div>`;
   }
   function gradeFields(key) {
@@ -519,11 +528,12 @@
     }
     if (fert.mode === 'plant') {
       return `<div class="row2">${numIn(esc(t('perPlantNeed')), 'need')}${numIn(esc(t('pct')), 'pct', 'max="100"')}</div>
-        ${numIn(esc(t('plants')), 'plants', '', true)}`;
+        <div class="row2">${numIn(esc(t('plants')), 'plants', '', true)}${numIn(esc(t('scoopG')), 'scoop')}</div>`;
     }
     if (fert.mode === 'tree') {
       return `<div class="row2">${numIn(esc(t('treeRate')), 'trate')}${numIn(esc(t('apps')), 'tapps', '', true)}</div>
-        <div class="row2">${numIn(esc(t('trees')), 'ttrees', '', true)}${numIn(esc(t('bagPrice')), 'tprice')}</div>`;
+        <div class="row2">${numIn(esc(t('trees')), 'ttrees', '', true)}${numIn(esc(t('bagPrice')), 'tprice')}</div>
+        ${numIn(esc(t('scoopG')), 'scoop')}`;
     }
     return `<div class="row2">${numIn(esc(t('bagWeight')), 'bag')}${numIn(esc(t('price')), 'price')}</div>` + gradeFields('bg') +
       `<p class="label">${esc(t('organicPresets'))}</p><div class="presets">${ORGANIC_PRESETS.map(o => `<button type="button" data-preset="bg:${o.g.join('-')}">${esc(tr(o.name))}</button>`).join('')}</div>`;
@@ -566,6 +576,9 @@
           `${fmt(perHa)} × ${fmt(a)} ha ${massExact(total) && isExact(perHa) && isExact(a) ? '=' : '≈'} ${kg(total)}`,
         ])}`;
     }
+    /* the dose counted in the grower's own measure, once they have weighed a level one */
+    const inMeasures = kgEach => { const m = SoilCalc.measures(kgEach * 1000, fert.scoop);
+      return m === null ? '' : `<li><span>${esc(t('scoops'))}</span><b>≈ ${num(m, 1)}</b><small>${kg(kgEach)} ÷ ${fmt(Number(fert.scoop))} g. ${esc(t('scoopNote'))}</small></li>`; };
     if (fert.mode === 'plant') {
       const need = Number(fert.need) || 0, pctv = Number(fert.pct) || 0;
       if (need <= 0 || pctv <= 0 || !isCount(fert.plants)) return empty;
@@ -573,7 +586,7 @@
       const frac = pctv / 100, each = need / frac / 1000, total = each * n;   // kilograms
       return `<h2>${esc(t('result'))}</h2>
         <ul class="res">
-          <li><span>${esc(t('perPlant'))}</span><b>${kg(each)}</b></li>
+          <li><span>${esc(t('perPlant'))}</span><b>${kg(each)}</b></li>${inMeasures(each)}
           <li><span>${esc(t('total'))}</span><b>${kg(total)}</b><small>${bags(total)}</small></li>
         </ul>
         ${work([
@@ -590,7 +603,7 @@
       const cost = String(fert.tprice).trim() !== '' && Number.isFinite(price) && price >= 0 ? year / 50 * price : null;
       return `<h2>${esc(t('result'))}</h2>
         <ul class="res">
-          <li><span>${esc(t('perApp'))}</span><b>${kg(each)}</b></li>
+          <li><span>${esc(t('perApp'))}</span><b>${kg(each)}</b></li>${inMeasures(each)}
           <li><span>${esc(t('perRound'))}</span><b>${kg(round)}</b><small>${bags(round)}</small></li>
           <li><span>${esc(t('perYear'))}</span><b>${kg(year)}</b><small>${bags(year)}</small></li>
           ${cost === null ? '' : `<li><span>${esc(t('costRound'))}</span><b>RM ${fmt(cost / apps)}</b></li>
@@ -717,7 +730,7 @@
         <label>${esc(t('crop'))}<input type="text" name="crop" maxlength="60"></label>
         <div class="row2">
           <label>${esc(t('area'))}<input type="number" inputmode="decimal" min="0" step="any" name="area"></label>
-          <label><span class="vh">${esc(t('area'))}</span><select name="unit">${['ha', 'm2', 'acre'].map(u => `<option value="${u}">${esc(t(u))}</option>`).join('')}</select></label>
+          <label><span class="vh">${esc(t('area'))}</span><select name="unit">${['ha', 'm2', 'acre', 'relong'].map(u => `<option value="${u}">${esc(t(u))}</option>`).join('')}</select></label>
         </div>
         <label>${esc(t('trees'))}<input type="number" inputmode="numeric" min="0" step="1" name="trees"></label>
         <button class="btn" type="submit">${esc(t('savePlot'))}</button>
@@ -798,6 +811,7 @@
       </form>
       <div class="lesson-end">
         <button type="button" class="btn ghost" data-csv="${esc(p.id)}">${esc(t('csv'))}</button>
+        <button type="button" class="btn ghost" data-print>${esc(t('printPlot'))}</button>
         <button type="button" class="btn ghost danger" data-delplot="${esc(p.id)}">${esc(t('delPlot'))}</button>
       </div>
     </section>`;
@@ -1137,6 +1151,7 @@
       return;
     }
     if (d.csv) { plotCsv(d.csv); return; }
+    if (d.print !== undefined) { window.print(); return; }
     if (d.backup !== undefined) {
       download('soil-records.json', JSON.stringify(rec, null, 1), 'application/json');
       store.set('lastBackup', new Date().toISOString());

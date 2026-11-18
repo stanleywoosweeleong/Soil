@@ -14,9 +14,9 @@ const store = require('../js/store.js');
 
 /* the content files are plain scripts that declare constants; load them together and hand the constants back */
 const names = ['LANGS', 'LANG_ORDER', 'UI', 'HORIZONS', 'UNITS', 'TASKS', 'LESSONS', 'ACTIVITIES', 'QUIZ', 'QUIZ_LESSON', 'DEFICIENCY', 'GLOSSARY', 'BOOK',
-  'PRODUCTS', 'COMPOUND_PRESETS', 'ORGANIC_PRESETS', 'TEXTURE', 'TEXTURE_NOTE', 'TEXTURE_POLY', 'TEXTURE_GROUP', 'PH_BANDS', 'CROP_PH', 'SLOPE_PALM', 'SLOPE_DO', 'SOURCES', 'SEARCH_ALIASES', 'putBefore'];
+  'PRODUCTS', 'COMPOUND_PRESETS', 'ORGANIC_PRESETS', 'TEXTURE', 'TEXTURE_NOTE', 'TEXTURE_POLY', 'TEXTURE_GROUP', 'PH_BANDS', 'CROP_PH', 'SLOPE_PALM', 'SLOPE_DO', 'SOURCES', 'SEARCH_ALIASES', 'putBefore', 'ILLUS', 'ILLUS_AT'];
 const ctx = vm.createContext({});
-vm.runInContext(['content', 'units', 'crops', 'records'].map(f => read(`js/${f}.js`)).join('\n') + `\n;globalThis.__c = { ${names.join(', ')} };`, ctx);
+vm.runInContext(['content', 'units', 'crops', 'records', 'figures'].map(f => read(`js/${f}.js`)).join('\n') + `\n;globalThis.__c = { ${names.join(', ')} };`, ctx);
 const C = ctx.__c;
 const N = C.LANGS.length;
 
@@ -59,7 +59,7 @@ test('every lesson block is well formed in all three languages', () => {
       if (kind === 'ul' || kind === 'steps') assert.ok(v.length && v.every(x => isTuple(x) && okText(x)), at);
       if (kind === 'ex') assert.ok(isTuple(v.title) && v.steps.every(isTuple), at);
       if (kind === 'tool') assert.ok(TOOLS.includes(v), at);
-      if (kind === 'fig') assert.ok(['profile', 'composition', 'structure', 'phscale'].includes(v), at);
+      if (kind === 'fig') assert.ok(['profile', 'composition', 'structure', 'phscale'].includes(v) || C.ILLUS[v], at);
       if (kind === 'src') assert.ok(typeof v.s === 'string' && v.s && typeof v.u === 'string' && isTuple(v.a) && okText(v.a), at);
       if (kind === 'table') {
         assert.ok(v.head.every(x => typeof x === 'string' || isTuple(x)), at + ' head');
@@ -119,7 +119,7 @@ test('product and preset grades are valid percentages', () => {
 });
 
 test('chicken manure stays out of the app', () => {
-  const all = ['content', 'units', 'crops', 'records'].map(f => read(`js/${f}.js`)).join('\n');
+  const all = ['content', 'units', 'crops', 'records', 'figures'].map(f => read(`js/${f}.js`)).join('\n');
   assert.ok(!/chicken|poultry|tahi ayam|鸡粪/i.test(all));
 });
 
@@ -306,6 +306,27 @@ test('a content patch aimed at a missing heading fails loudly', () => {
   assert.throws(() => C.putBefore('5-5', 'No such heading', ['p', ['a', 'b', 'c']]), /no heading/);
 });
 
+test('every illustration is drawn, captioned in three languages and placed', () => {
+  const placed = new Set(C.ILLUS_AT.map(x => x[2]));
+  for (const [id, f] of Object.entries(C.ILLUS)) {
+    assert.ok(f.cap.length === 3 && f.cap.every(Boolean), `${id} caption`);
+    assert.ok(f.key.length >= 2 && f.key.every(k => k.length === 3 && k.every(Boolean)), `${id} key`);
+    const svg = f.draw();
+    assert.ok(svg.length > 80 && !/undefined|NaN/.test(svg), `${id} drawing`);
+    const numbers = new Set([...svg.matchAll(/font-weight="700" fill="var\(--surface\)">(\d+)</g)].map(m => Number(m[1])));
+    for (let n = 1; n <= f.key.length; n++) assert.ok(numbers.has(n), `${id}: number ${n} is in the key but not in the drawing`);
+    assert.ok(placed.has(id), `${id} is not used in any lesson`);
+  }
+  for (const l of Object.values(C.LESSONS)) for (const b of l.body) if (b[0] === 'fig') assert.ok(C.ILLUS[b[1]] || ['profile', 'composition', 'structure', 'phscale'].includes(b[1]), `unknown figure ${b[1]}`);
+});
+
+test('a dose is counted in the grower\'s own measure, and a relong is an area', () => {
+  assert.strictEqual(calc.measures(640, 320), 2);
+  assert.strictEqual(calc.measures(640, ''), null); assert.strictEqual(calc.measures(640, 0), null); assert.strictEqual(calc.measures(0, 320), null);
+  assert.ok(Math.abs(calc.areaHa({ area: 10, unit: 'relong' }) - 2.877) < 1e-9);
+  assert.strictEqual(clean({ plots: [{ id: 'a1', name: 'Sawah', area: 5, unit: 'relong' }], entries: [] }).plots[0].unit, 'relong');
+});
+
 test('long text is cut to its limit', () => {
   const out = clean({ plots: [{ id: 'p1', name: 'N'.repeat(200) }], entries: [{ id: 'e1', plot: 'p1', date: '2026-01-01', kind: 'note', data: { text: 'T'.repeat(900) } }] });
   assert.strictEqual(out.plots[0].name.length, 60); assert.strictEqual(out.entries[0].data.text.length, 500);
@@ -447,7 +468,7 @@ test('forms use the app\'s own validation', () => {
 
 test('scripts load in dependency order', () => {
   const order = [...html.matchAll(/<script src="js\/([a-z]+)\.js"/g)].map(m => m[1]);
-  assert.deepStrictEqual(order, ['content', 'units', 'crops', 'records', 'calc', 'store', 'app']);
+  assert.deepStrictEqual(order, ['content', 'units', 'crops', 'records', 'figures', 'calc', 'store', 'app']);
 });
 
 /* ---------- report ---------- */

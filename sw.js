@@ -19,6 +19,7 @@ const SHELL = [
   './js/units.js',
   './js/crops.js',
   './js/records.js',
+  './js/figures.js',
   './js/calc.js',
   './js/store.js',
   './js/app.js',
