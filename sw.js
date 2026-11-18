@@ -68,8 +68,17 @@ function promote() {
   }).catch(() => false);
 }
 
+/* While sw.js itself is being replaced, the old worker and the new one run side by side and share
+   these caches. A Web Lock, which is shared by every worker and page of the origin, keeps one
+   worker from swapping a release in while another is swapping or reading. Where locks are not
+   available the queue below still orders the work inside this worker. */
+const LOCK = 'soil-release';
+const locks = self.navigator && self.navigator.locks;
+const exclusive = fn => (locks ? locks.request(LOCK, fn) : fn());
+const shared = fn => (locks ? locks.request(LOCK, { mode: 'shared' }, fn) : fn());
+
 /* everything that reads or replaces the live cache queues behind this, so a page never loads half a copy */
-let settled = promote();
+let settled = exclusive(promote);
 const whenSettled = () => settled.then(() => null, () => null);
 
 /* Downloads every shell file past the HTTP cache. Rejects if any file fails or takes too long.
@@ -105,16 +114,20 @@ function swapIn(files) {
    one at a time, each after the previous has settled. */
 function refreshShell() {
   return download().then(files => {
-    const run = whenSettled().then(() => swapIn(files));
+    const run = whenSettled().then(() => exclusive(() => swapIn(files)));
     settled = run;
     return run;
   }, () => false);
 }
 
+const announce = () => self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => list.forEach(c => c.postMessage('updated')));
+
 /* install: save the shell, then take over at once. Safe because the cache name is stable,
    so a new worker never strands an open page on a deleted cache. */
 self.addEventListener('install', e => {
-  e.waitUntil(refreshShell().then(() => self.skipWaiting()));
+  /* when this worker replaces an older one and brings new files, the open pages are told here too,
+     in case the older worker's own check lost the race for the lock and saw nothing new */
+  e.waitUntil(refreshShell().then(changed => (changed ? announce() : null)).then(() => self.skipWaiting()));
 });
 
 /* activate: delete only this app's other caches (the old versioned ones). Cache Storage is
@@ -130,7 +143,7 @@ self.addEventListener('activate', e => {
 
 /* A saved file is handed to the page marked "no-cache". Without that, the browser may keep reusing the copy it
    already holds in memory for as long as the host's max-age allows, and a refresh would show the old app. */
-const fromShell = request => whenSettled().then(() => caches.open(CACHE)).then(c => c.match(request, { ignoreSearch: true })).then(hit => {
+const fromShell = request => whenSettled().then(() => shared(() => caches.open(CACHE).then(c => c.match(request, { ignoreSearch: true })))).then(hit => {
   if (!hit) return hit;
   const headers = new Headers(hit.headers);
   headers.set('cache-control', 'no-cache');
@@ -168,7 +181,7 @@ self.addEventListener('message', e => {
     e.waitUntil(
       refreshShell().then(changed => {
         if (!changed) return null;
-        return self.clients.matchAll({ type: 'window' }).then(list => list.forEach(c => c.postMessage('updated')));
+        return announce();
       })
     );
     return;

@@ -866,7 +866,9 @@
       const v = Math.round(w * 10) / 10;
       if (v > 0 && !seen.has(v) && opts.length < 4) { seen.add(v); opts.push(v); }
     }
-    return { q, o: opts.map(v => `${num(v)} ${unit}`), a: 0, why };
+    /* q and why are functions, read when the question is shown, so that the text and the number
+       format follow the language on screen even if it is changed part-way through a quiz */
+    return { get q() { return q(); }, get o() { return opts.map(v => `${num(v)} ${unit}`); }, a: 0, get why() { return why(); } };
   }
   function generated() {
     const straight = [['urea', 'N', 46], ['as', 'N', 21], ['tsp', 'P₂O₅', 46], ['mop', 'K₂O', 60]];
@@ -875,14 +877,14 @@
       const [id, s, g] = pick(straight);
       const ans = pick([100, 150, 200, 250, 300, 400]);
       const x = ans * g / 100;
-      out.push(numericQ(fill('gq1', { p: tr(prod(id).name), g, s, x: num(x) }), ans, [x * g / 100, x, ans + 50], 'kg', `${num(x)} ÷ ${(g / 100).toFixed(2)} = ${num(ans)} kg`));
+      out.push(numericQ(() => fill('gq1', { p: tr(prod(id).name), g, s, x: num(x) }), ans, [x * g / 100, x, ans + 50], 'kg', () => `${num(x)} ÷ ${(g / 100).toFixed(2)} = ${num(ans)} kg`));
     }
     { // nutrient in a weight of compound fertiliser
       const g = pick([[15, 15, 15], [12, 12, 17], [10, 10, 10], [18, 46, 0]]);
       const i = pick(g[2] === 0 ? [0, 1] : [0, 1, 2]);
       const w = pick([100, 200, 250, 300, 500]);
       const ans = w * g[i] / 100;
-      out.push(numericQ(fill('gq2', { w, g: g.join('-'), s: ['N', 'P₂O₅', 'K₂O'][i] }), ans, [w / g[i] * 10, g[i], w - ans], 'kg', `${w} × ${(g[i] / 100).toFixed(2)} = ${num(ans)} kg`));
+      out.push(numericQ(() => fill('gq2', { w, g: g.join('-'), s: ['N', 'P₂O₅', 'K₂O'][i] }), ans, [w / g[i] * 10, g[i], w - ans], 'kg', () => `${w} × ${(g[i] / 100).toFixed(2)} = ${num(ans)} kg`));
     }
     { // per-plant amount scaled to a number of plants
       const [id, s, g] = pick(straight);
@@ -890,13 +892,13 @@
       const n = pick([100, 200, 400]);
       const x = each * g / 100;
       const ans = each * n / 1000;
-      out.push(numericQ(fill('gq3', { p: tr(prod(id).name), g, s, x: num(x, 2), n }), ans, [x * n / 1000, ans * 10, x * g / 100 * n / 1000], 'kg', `${num(x, 2)} ÷ ${(g / 100).toFixed(2)} = ${num(each)} g; ${num(each)} × ${n} = ${num(ans)} kg`));
+      out.push(numericQ(() => fill('gq3', { p: tr(prod(id).name), g, s, x: num(x, 2), n }), ans, [x * n / 1000, ans * 10, x * g / 100 * n / 1000], 'kg', () => `${num(x, 2)} ÷ ${(g / 100).toFixed(2)} = ${num(each)} g; ${num(each)} × ${n} = ${num(ans)} kg`));
     }
     return out;
   }
   function startQuiz(n) {
     const qs = QUIZ[n].map((q, i) => Object.assign({}, q, { l: (QUIZ_LESSON[n] || [])[i] }));
-    if (n === 6) qs.push(...generated().map(q => Object.assign(q, { l: '6-4' })));
+    if (n === 6) qs.push(...generated().map(q => { q.l = '6-4'; return q; }));
     quiz = { n, qs, i: 0, score: 0, picked: null, order: shuffled(4) };
   }
   function pageQuiz(n) {
@@ -1062,8 +1064,14 @@
     try { return location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent); }
     catch (e) { return []; }   // a malformed link opens the home page
   };
+  /* What the user has typed into the record forms. These fields are not held in app state, so a
+     redraw in place (language, theme, a save elsewhere on the page) would otherwise wipe them. */
+  const formKey = el => `${el.form.id || el.form.dataset.save || ''}|${el.name}`;
+  const typedFields = () => [...main.querySelectorAll('form [name]')].filter(el => el.form && el.type !== 'file');
   function render(keepScroll) {
     const r = parse();
+    const typed = new Map();
+    if (keepScroll) for (const el of typedFields()) typed.set(formKey(el), el.type === 'checkbox' ? el.checked : el.value);
     if (r[0] === 'kuiz' && quiz && quiz.n !== Number(r[1])) quiz = null;   // an open quiz survives a visit to the lesson
     renderChrome(r);
     main.innerHTML =
@@ -1075,6 +1083,11 @@
       r[0] === 'istilah' ? (!keepScroll && r[1] !== undefined && (glossQuery = r[1].slice(0, 80)), pageGlossary()) :
       r[0] === 'buku' ? pageBook() :
       r[0] === 'sumber' ? pageSources() : pageHome();
+    for (const el of typedFields()) {
+      if (!typed.has(formKey(el))) continue;
+      const v = typed.get(formKey(el));
+      if (el.type === 'checkbox') el.checked = v === true; else el.value = v;
+    }
     if (!keepScroll) window.scrollTo(0, 0);
     if (!r[0]) checkOffline();
     if (!keepScroll && r[0] === 'nota' && /^s\d+$/.test(r[2] || '')) {
@@ -1192,7 +1205,7 @@
         valid = true;
         stored = addEntries([makeEntry(form.dataset.plot, f.get('date'), 'note', { text: text('text').slice(0, 500) })]);
       }
-      if (stored) render(true);
+      if (stored) { form.reset(); render(true); }   // the saved form starts empty; anything typed in the others is kept
       else { err.textContent = t(valid ? 'saveFailed' : (form.id === 'plotform' && text('name') && !treesOk) ? 'countBad' : needed); err.hidden = false; }
       return;
     }
